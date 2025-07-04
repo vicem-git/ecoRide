@@ -2,6 +2,8 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
+from alchemy import alchemy_db
+import models
 
 load_dotenv("../.env")
 
@@ -12,7 +14,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 )
 
-db = SQLAlchemy(app)
+alchemy_db.init_app(app)
 
 
 @app.route("/")

@@ -1,5 +1,6 @@
 from geoalchemy2 import Geography
 from typing import Any, List, Optional
+from alchemy import Base, alchemy_db
 
 from sqlalchemy import (
     CheckConstraint,
@@ -20,10 +21,6 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.sql.sqltypes import NullType
 import datetime
 import uuid
-
-
-class Base(DeclarativeBase):
-    pass
 
 
 class AccountAccess(Base):
