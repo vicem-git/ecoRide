@@ -1,21 +1,9 @@
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-CREATE EXTENSION IF NOT EXISTS "postgis";
-
-
-CREATE TABLE accounts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    accesss_id UUID NOT NULL REFERENCES access(id) ON DELETE CASCADE,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE access (
+CREATE TABLE account_access (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(50) UNIQUE NOT NULL
-)
+);
 
-INSERT INTO access (name) VALUES
+INSERT INTO account_access (name) VALUES
 ('user'),
 ('admin'),
 ('moderator');
@@ -31,6 +19,17 @@ INSERT INTO account_status (name) VALUES
 ('inactive'),
 ('suspended');
 
+
+CREATE TABLE accounts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    account_access_id UUID NOT NULL REFERENCES account_access(id) ON DELETE CASCADE,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    account_status UUID NOT NULL REFERENCES account_status(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT now()
+);
+
+
 CREATE TABLE roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) UNIQUE NOT NULL
@@ -43,7 +42,7 @@ INSERT INTO roles (name) VALUES
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id UUID NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-    username VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(30) UNIQUE NOT NULL,
     photo_url VARCHAR(255) NULL,
     credits INTEGER DEFAULT 20
 );
@@ -54,18 +53,39 @@ CREATE TABLE user_roles (
     PRIMARY KEY (user_id, role_id)
 );
 
+
+CREATE TABLE preferences (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(50) UNIQUE NOT NULL,
+);
+
+INSERT INTO preferences (name) VALUES
+('smoking_allowed'),
+('non_smoking'),
+('pets_allowed'),
+('no_pets_allowed'),
+('music_allowed'),
+('no_music_allowed'),
+('air_conditioning'),
+('no_air_conditioning');
+
+CREATE TABLE driver_preferences (
+  driver_id UUID NOT NULL REFERENCES driver_data(id) ON DELETE CASCADE,
+  preference_id UUID NOT NULL REFERENCES preferences(id) ON DELETE CASCADE,
+  PRIMARY KEY (driver_id, preference_id)
+);
+
 CREATE TABLE driver_data (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
-    preferences VARCHAR(50)[] NULL
+    rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5)
 );
 
 CREATE TABLE driver_vehicles (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, vehicle_id)
-)
+);
 
 CREATE TABLE vehicles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -98,18 +118,33 @@ INSERT INTO energy_types (name) VALUES
 CREATE TABLE trips (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     driver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    start_location GEOGRAPHY(POINT) NOT NULL,
-    end_location GEOGRAPHY(POINT) NOT NULL,
+    start_location GEOGRAPHY(POINT, 4326) NOT NULL,
+    end_location GEOGRAPHY(POINT, 4326) NOT NULL,
     start_time TIMESTAMP NOT NULL,
     price INTEGER NOT NULL,
     status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT now(),
+    updated_at TIMESTAMP DEFAULT now()
 );
+
+CREATE OR REPLACE FUNCTION update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = now();
+   RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON trips
+FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();
+
 
 CREATE TABLE trip_passengers (
   trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  PIMARY KEY (trip_id, user_id)
+  PRIMARY KEY (trip_id, user_id)
 )
 
 
@@ -127,7 +162,7 @@ CREATE TABLE reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
     author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    rating INTEGER CHECK (rating >= 0 AND rating <= 5),
+    rating INTEGER CHECK (rating >= 0 AND rating <= 5) NOT NULL,
     comments TEXT,
     review_status_id UUID NOT NULL REFERENCES review_status(id) ON DELETE CASCADE
 );
