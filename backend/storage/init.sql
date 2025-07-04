@@ -22,9 +22,9 @@ INSERT INTO account_status (name) VALUES
 
 CREATE TABLE accounts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_access_id UUID NOT NULL REFERENCES account_access(id) ON DELETE CASCADE,
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    account_access_id UUID NOT NULL REFERENCES account_access(id) ON DELETE CASCADE, 
     account_status UUID NOT NULL REFERENCES account_status(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT now()
 );
@@ -56,7 +56,7 @@ CREATE TABLE user_roles (
 
 CREATE TABLE preferences (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(50) UNIQUE NOT NULL,
+  name VARCHAR(50) UNIQUE NOT NULL
 );
 
 INSERT INTO preferences (name) VALUES
@@ -69,40 +69,60 @@ INSERT INTO preferences (name) VALUES
 ('air_conditioning'),
 ('no_air_conditioning');
 
-CREATE TABLE driver_preferences (
-  driver_id UUID NOT NULL REFERENCES driver_data(id) ON DELETE CASCADE,
-  preference_id UUID NOT NULL REFERENCES preferences(id) ON DELETE CASCADE,
-  PRIMARY KEY (driver_id, preference_id)
-);
-
 CREATE TABLE driver_data (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5)
 );
 
-CREATE TABLE driver_vehicles (
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
-  PRIMARY KEY (user_id, vehicle_id)
-);
-
-CREATE TABLE vehicles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    plate_number VARCHAR(20) UNIQUE NOT NULL,
-    registration_date DATE NOT NULL,
-    brand VARCHAR(50) NOT NULL,
-    model VARCHAR(50) NOT NULL,
-    color VARCHAR(30) NOT NULL,
-    photo_url VARCHAR(255) NULL,
-    number_of_seats INTEGER NOT NULL,
-    energy_type_id UUID NOT NULL REFERENCES energy_types(id) ON DELETE CASCADE
+CREATE TABLE driver_preferences (
+  driver_id UUID NOT NULL REFERENCES driver_data(id) ON DELETE CASCADE,
+  preference_id UUID NOT NULL REFERENCES preferences(id) ON DELETE CASCADE,
+  PRIMARY KEY (driver_id, preference_id)
 );
 
 CREATE TABLE vehicle_brand (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(50) UNIQUE NOT NULL
 );
+
+INSERT INTO vehicle_brand (name) VALUES
+('Acura'),
+('Audi'),
+('BMW'),
+('BYD'),
+('Chevrolet'),
+('Chrysler'),
+('Citroen'),
+('Dodge'),
+('Fiat'),
+('Ford'),
+('GMC'),
+('Honda'),
+('Hyundai'),
+('Infiniti'),
+('Jaguar'),
+('Jeep'),
+('Kia'),
+('Land Rover'),
+('Lexus'),
+('Lincoln'),
+('Mazda'),
+('Mercedes-Benz'),
+('Mitsubishi'),
+('Nissan'),
+('Opel'),
+('Peugeot'),
+('Polestar'),
+('Porsche'),
+('Renault'),
+('Skoda'),
+('Subaru'),
+('Suzuki'),
+('Tesla'),
+('Toyota'),
+('Volkswagen'),
+('Volvo');
 
 CREATE TABLE energy_types (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -114,6 +134,26 @@ INSERT INTO energy_types (name) VALUES
 ('diesel'),
 ('electric'),
 ('hybrid');
+
+CREATE TABLE vehicles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    plate_number VARCHAR(20) UNIQUE NOT NULL,
+    registration_date DATE NOT NULL,
+    brand UUID NOT NULL REFERENCES vehicle_brand(id) ON DELETE CASCADE,
+    model VARCHAR(50) NOT NULL,
+    color VARCHAR(30) NOT NULL,
+    photo_url VARCHAR(255) NULL,
+    number_of_seats INTEGER NOT NULL,
+    energy_type_id UUID NOT NULL REFERENCES energy_types(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE driver_vehicles (
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id, vehicle_id)
+);
+
 
 CREATE TABLE trips (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -145,13 +185,13 @@ CREATE TABLE trip_passengers (
   trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   PRIMARY KEY (trip_id, user_id)
-)
+);
 
 
 CREATE TABLE review_status (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(50) UNIQUE NOT NULL
-)
+);
 
 INSERT INTO review_status (name) VALUES
 ('pending'),
