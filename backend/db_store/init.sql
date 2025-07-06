@@ -158,11 +158,13 @@ CREATE TABLE driver_vehicles (
 CREATE TABLE trips (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     driver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
     start_location GEOGRAPHY(POINT, 4326) NOT NULL,
     end_location GEOGRAPHY(POINT, 4326) NOT NULL,
     start_time TIMESTAMP NOT NULL,
     price INTEGER NOT NULL,
     status VARCHAR(50) DEFAULT 'pending',
+    rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
 );

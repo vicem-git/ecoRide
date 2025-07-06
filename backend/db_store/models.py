@@ -381,6 +381,7 @@ class Trips(Base):
         Uuid, primary_key=True, server_default=text("gen_random_uuid()")
     )
     driver_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    vehicle_id: Mapped[uuid.UUID] = mapped_column(Uuid)
     start_location: Mapped[Any] = mapped_column(
         Geography(geometry_type="POINT", srid=4326)
     )
@@ -392,6 +393,7 @@ class Trips(Base):
     status: Mapped[Optional[str]] = mapped_column(
         String(50), server_default=text("'pending'::character varying")
     )
+    rating: Mapped[Optional[int]] = mapped_column(Integer, server_default=text("0"))
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(
         DateTime, server_default=text("now()")
     )
