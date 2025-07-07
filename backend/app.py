@@ -2,9 +2,14 @@ import time
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 import os
+import sys
+
+sys.path.insert(0, ".")
+
 from dotenv import load_dotenv
-from db_store.alchemy import alchemy_db
-import db_store.models
+import db_store.alchemy as alchemy
+import db_store.models as models
+import db_store.crud as crud
 
 load_dotenv("../.env")
 
@@ -15,6 +20,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 )
 
+alchemy_db = alchemy.alchemy_db
 alchemy_db.init_app(app)
 
 
@@ -26,3 +32,9 @@ def index():
 @app.route("/api/time")
 def get_current_time():
     return {"time": time.time()}
+
+
+@app.route("/api/health")
+def health_check():
+    result = crud.test_connection()
+    return {"status": "healthy" if result else "unhealthy"}

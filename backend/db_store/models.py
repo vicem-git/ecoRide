@@ -1,6 +1,6 @@
 from geoalchemy2 import Geography
 from typing import Any, List, Optional
-from alchemy import Base, alchemy_db
+from db_store.alchemy import Base, alchemy_db
 
 from sqlalchemy import (
     CheckConstraint,
