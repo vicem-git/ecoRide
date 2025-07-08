@@ -2,7 +2,6 @@ import './App.css'
 import Navbar from './components/Navbar'
 import SearchBar from './components/SearchBar'
 import HomeBanner from './assets/images/pexels-darshan394-1173777.jpg'
-import { useThemeStore } from './state/themeStore'
 import { useState, useEffect } from 'react';
 
 if (!localStorage.theme) {
@@ -10,7 +9,6 @@ if (!localStorage.theme) {
 }
 
 function App() {
-  const { dark, toggleTheme } = useThemeStore();
   const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {

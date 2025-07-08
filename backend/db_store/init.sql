@@ -25,7 +25,7 @@ CREATE TABLE accounts (
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     account_access_id UUID NOT NULL REFERENCES account_access(id) ON DELETE CASCADE, 
-    account_status UUID NOT NULL REFERENCES account_status(id) ON DELETE CASCADE,
+    account_status_id UUID NOT NULL REFERENCES account_status(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT now()
 );
 
@@ -41,10 +41,10 @@ INSERT INTO roles (name) VALUES
 
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    account_id UUID UNIQUE NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
     username VARCHAR(30) UNIQUE NOT NULL,
     photo_url VARCHAR(255) NULL,
-    credits INTEGER DEFAULT 20
+    credits INTEGER DEFAULT 20 CHECK (credits >= 0)
 );
 
 CREATE TABLE user_roles (

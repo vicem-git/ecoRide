@@ -13,6 +13,8 @@
   --color-base2: oklch(0.7671 0.0093 113.77);
   --color-contrast: oklch(0.4471 0.0616 148.17);
   --color-contrast-2: oklch(0.3071 0.0616 148.17);
+  --color-success: oklch(0.822 0.0831 147.34);
+  --color-error: oklch(0.6565 0.1689 24.16);
 
   --font-sans: "Open Sans", sans-serif;
 }
