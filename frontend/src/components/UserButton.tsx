@@ -31,7 +31,7 @@ function UserButton() {
           <button
             className="p-2 flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-contrast)] transition-colors duration-200"
             onClick={() => {
-              navigate('/signup');
+              navigate('/register');
               setOpen(false);
             }}>
             <UserPlus size={24} strokeWidth={1.75} />

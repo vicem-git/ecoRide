@@ -19,7 +19,8 @@ function SignupPage() {
           </div>
         </nav >
       </div>
-      <div>
+      <div className="flex flex-col items-center justify-center w-[60%]">
+        <h1 className="text-3xl font-bold mb-16 text-[var(--color-contrast)]">Ravi de vous rencontrer :) </h1>
         <SignupForm />
       </div>
     </div>
