@@ -1,7 +1,7 @@
-import Logo from '../assets/logos/ecoride-logo-2.svg'
-import Logo2 from '../assets/logos/ecoride.svg';
-import ThemeToggle from '../components/ThemeToggle';
-import SignupForm from '../components/SignupForm';
+import Logo from '@/assets/logos/ecoride-logo-2.svg'
+import Logo2 from '@/assets/logos/ecoride.svg';
+import ThemeToggle from '@/components/ThemeToggle';
+import SignupForm from '@/components/SignupForm';
 import toast from 'react-hot-toast';
 
 function SignupPage() {

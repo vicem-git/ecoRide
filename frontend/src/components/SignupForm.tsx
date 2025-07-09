@@ -1,6 +1,6 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import SignupFormSchema, { SignupFormData } from '../schemas/SignupFormSchema';
+import SignupFormSchema, { SignupFormData } from '@/schemas/SignupFormSchema';
 import toast from 'react-hot-toast';
 
 // signup form component, requiring email, username and password

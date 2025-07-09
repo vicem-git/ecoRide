@@ -1,4 +1,5 @@
 # access CURD operations for user management
+from flask import current_app
 
 
 def get_user_by_email(conn, email):
@@ -7,12 +8,18 @@ def get_user_by_email(conn, email):
         return cur.fetchone()  # returns None if not found
 
 
-def create_account(conn, email, username, hashed_password):
+def create_account(conn, email, hashed_password):
+    access_id = current_app.load_static_ids["account_access"]["user"]
+    status_id = current_app.load_static_ids["account_status"]["active"]
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO accounts (email, username, password_hash) VALUES (%s, %s, %s) RETURNING id",
-            (email, username, hashed_password),
+            """
+            INSERT INTO accounts (email, password_hash, account_access_id, account_status_id)
+            VALUES (%s, %s, %s, %s)
+            RETURNING id
+            """,
+            (email, hashed_password, access_id, status_id),
         )
-        user_id = cur.fetchone()[0]
+        account_id = cur.fetchone()[0]
         conn.commit()
-        return user_id
+        return account_id

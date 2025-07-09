@@ -1,8 +1,8 @@
-import ThemeToggle from './ThemeToggle';
-import SearchButton from './SearchButton';
-import UserButton from './UserButton';
-import Logo from '../assets/logos/ecoride-logo-2.svg'
-import Logo2 from '../assets/logos/ecoride.svg';
+import ThemeToggle from '@/components/ThemeToggle';
+import SearchButton from '@/components/SearchButton';
+import UserButton from '@/components/UserButton';
+import Logo from '@/assets/logos/ecoride-logo-2.svg'
+import Logo2 from '@/assets/logos/ecoride.svg';
 
 function Navbar() {
   return (

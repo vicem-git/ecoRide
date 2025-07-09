@@ -1,7 +1,7 @@
 import './App.css'
-import Navbar from './components/Navbar'
-import SearchBar from './components/SearchBar'
-import HomeBanner from './assets/images/pexels-darshan394-1173777.jpg'
+import Navbar from '@/components/Navbar'
+import SearchBar from '@/components/SearchBar'
+import HomeBanner from '@/assets/images/pexels-darshan394-1173777.jpg'
 import { useState, useEffect } from 'react';
 
 if (!localStorage.theme) {

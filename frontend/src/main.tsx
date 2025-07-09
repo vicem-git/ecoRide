@@ -2,8 +2,8 @@ import ReactDOM from 'react-dom/client'
 import { StrictMode, Suspense, lazy } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { Toaster } from 'react-hot-toast'
-import './index.css'
-import App from './App.tsx'
+import '@/index.css'
+import App from '@/App.tsx'
 
 
 const SearchPage = lazy(() => import('./pages/SearchPage.tsx'))

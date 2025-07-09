@@ -23,8 +23,9 @@ pool = ConnectionPool(
 )
 
 app.pool = pool
-
 with pool.connection() as conn:
+    crud_utilities.configure_conn(conn, os.getenv("DB_SCHEMA"))
+
     try:
         app.load_static_ids = crud_utilities.load_static_ids(conn)
         print("Static IDs loaded successfully.")

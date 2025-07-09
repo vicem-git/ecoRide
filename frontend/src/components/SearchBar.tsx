@@ -1,5 +1,5 @@
-import circleDotEnd from '../assets/icons/circle-dot-end.svg';
-import circleDotStart from '../assets/icons/circle-dot-start.svg';
+import circleDotEnd from '@/assets/icons/circle-dot-end.svg';
+import circleDotStart from '@/assets/icons/circle-dot-start.svg';
 
 function SearchBar() {
   return (
