@@ -1,5 +1,5 @@
 import time
-from flask import Flask, request
+from flask import Flask, session
 from flask_cors import CORS
 from psycopg_pool import ConnectionPool
 import os
@@ -13,6 +13,7 @@ load_dotenv("../.env")
 
 app = Flask(__name__)
 CORS(app, origins="http://localhost:5173", support_credentials=True)
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 pool = ConnectionPool(
     conninfo=f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"

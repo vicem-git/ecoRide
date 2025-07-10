@@ -3,7 +3,9 @@ venv_back/
 __pycache__/
 *.pyc
 
+
 # Environment / secrets
+archive/
 .env
 frontend/.env.local
 backend/.flaskenv
