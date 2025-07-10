@@ -5,8 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='graphics/ecoride-logo.svg') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}ecoRide{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <script src="{{ url_for('static', filename='js/htmx.min.js') }}"></script>
+    <script type="module" src="http://localhost:5174/js/app.js"></script>
     {% block head %}{% endblock %}
   </head>
   <body class="bg-[var(--color-base)] text-[var(--color-contrast)] font-sans">
