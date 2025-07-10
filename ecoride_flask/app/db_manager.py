@@ -9,10 +9,10 @@ class DatabaseManager:
             conninfo=f"postgresql://{db_config['db_user']}:{db_config['db_password']}@{db_config['db_host']}:{db_config['db_port']}/{db_config['db_name']}",
         )
 
-    def get_connection(self):
+    def get_conn(self):
         return self.pool.getconn()
 
-    def release_connection(self, conn):
+    def release_conn(self, conn):
         self.pool.putconn(conn)
 
     def close_all(self):

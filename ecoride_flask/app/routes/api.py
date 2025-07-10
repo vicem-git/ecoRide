@@ -1,15 +1,9 @@
 from flask import current_app, Blueprint, request, jsonify
-import time
 from werkzeug.security import generate_password_hash
 from app.db_store import crud_utilities, user_crud
 
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
-
-
-@api_bp.route("/time")
-def get_current_time():
-    return {"time": time.time()}
 
 
 @api_bp.route("/health")
