@@ -23,6 +23,7 @@
     --default-mono-font-family: var(--font-mono);
     --color-base: oklch(0.9451 0.0093 106.57);
     --color-base2: oklch(0.7671 0.0093 113.77);
+    --color-base3: oklch(0.5988 0.0093 113.77);
     --color-contrast: oklch(0.4471 0.0616 148.17);
   }
 }
@@ -175,8 +176,14 @@
   .visible {
     visibility: visible;
   }
+  .absolute {
+    position: absolute;
+  }
   .fixed {
     position: fixed;
+  }
+  .relative {
+    position: relative;
   }
   .static {
     position: static;
@@ -205,8 +212,17 @@
   .flex {
     display: flex;
   }
+  .hidden {
+    display: none;
+  }
+  .inline-block {
+    display: inline-block;
+  }
   .h-16 {
     height: calc(var(--spacing) * 16);
+  }
+  .h-\[24px\] {
+    height: 24px;
   }
   .h-\[48px\] {
     height: 48px;
@@ -229,6 +245,9 @@
   .w-16 {
     width: calc(var(--spacing) * 16);
   }
+  .w-\[24px\] {
+    width: 24px;
+  }
   .w-\[60\%\] {
     width: 60%;
   }
@@ -237,9 +256,6 @@
   }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
-  }
-  .resize {
-    resize: both;
   }
   .flex-col {
     flex-direction: column;
@@ -268,6 +284,9 @@
   .rounded {
     border-radius: 0.25rem;
   }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
+  }
   .rounded-sm {
     border-radius: var(--radius-sm);
   }
@@ -285,9 +304,6 @@
   }
   .bg-gray-600 {
     background-color: var(--color-gray-600);
-  }
-  .bg-lime-600 {
-    background-color: var(--color-lime-600);
   }
   .object-cover {
     object-fit: cover;
@@ -320,10 +336,21 @@
   .text-white {
     color: var(--color-white);
   }
-  .transition {
-    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, visibility, content-visibility, overlay, pointer-events;
+  .transition-colors {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .duration-200 {
+    --tw-duration: 200ms;
+    transition-duration: 200ms;
+  }
+  .hover\:bg-\[var\(--color-base3\)\] {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-base3);
+      }
+    }
   }
   .focus\:ring-2 {
     &:focus {
@@ -372,6 +399,10 @@ html {
   inherits: false;
 }
 @property --tw-skew-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-duration {
   syntax: "*";
   inherits: false;
 }
@@ -448,6 +479,7 @@ html {
       --tw-rotate-z: initial;
       --tw-skew-x: initial;
       --tw-skew-y: initial;
+      --tw-duration: initial;
       --tw-shadow: 0 0 #0000;
       --tw-shadow-color: initial;
       --tw-shadow-alpha: 100%;
