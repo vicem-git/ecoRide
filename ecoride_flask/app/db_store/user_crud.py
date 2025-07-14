@@ -1,5 +1,6 @@
 # user CRUD operations for user management
 from flask import current_app
+from psycopg.rows import dict_row
 
 
 def create_account(conn, email, hashed_password):
@@ -41,14 +42,14 @@ def create_user(conn, account_id, username):
 
 
 def request_login(conn, email):
-    with conn.cursor() as cur:
+    with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             """
             SELECT account_id, account_access_id, account_status_id FROM accounts WHERE email = %s 
             """,
             (email),
         )
-    account_found = cur.fetchone()
+        account_found = cur.fetchone()
     return account_found  # returns None if not found
 
 
