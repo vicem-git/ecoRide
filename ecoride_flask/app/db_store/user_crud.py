@@ -19,12 +19,18 @@ def create_account(conn, email, hashed_password):
         return account_id
 
 
+def get_user_by_account_id(conn, account_id):
+    with conn.cursor() as cur:
+        cur.execute("SELECT id FROM users WHERE account_id = %s", (account_id,))
+        return cur.fetchone()  # returns None if not found
+
+
 def create_user(conn, account_id, username):
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO users (account_id, username)
-            VALUES (%s, %s)
+            INSERT INTO users (username) WHERE account_id = %s
+            VALUES (%s)
             RETURNING id
             """,
             (account_id, username),
@@ -32,6 +38,29 @@ def create_user(conn, account_id, username):
         user_id = cur.fetchone()[0]
         conn.commit()
         return user_id
+
+
+def request_login(conn, email):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT account_id, account_access_id, account_status_id FROM accounts WHERE email = %s 
+            """,
+            (email),
+        )
+    account_found = cur.fetchone()
+    return account_found  # returns None if not found
+
+
+def retrieve_password(conn, account_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT password_hash FROM accounts WHERE id = %s
+            """,
+            (account_id,),
+        )
+        return cur.fetchone()
 
 
 def set_username(conn, user_id, username):

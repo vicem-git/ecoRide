@@ -9,7 +9,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, 'dist'),
+    outDir: 'dist',
     rollupOptions: {
       input: path.resolve(__dirname, 'app/static/js/app.js'),
     },

@@ -1,13 +1,11 @@
-<div class='fixed top-4 flex w-[60%]'>
-  <nav class="flex flex-row p-2 w-full rounded-xs bg-[var(--color-base2)] justify-between items-center"> 
-    <div class="flex flex-row items-center ml-4">
-      <img src="{{ url_for('static', filename='graphics/logo2.svg') }}" class="h-fit"/>
-    </div>
-    <div class="flex flex-row items-center gap-4">
-      {% include "partials/trips-button.html" %}
-      {% include "partials/user-button.html" %}
-      {% include "partials/theme-button.html" %}
-    </div> 
-  </nav>
-</div>
+<div class="flex flex-row items-center gap-4">
+  {% if page_wrap == "home" %}
+    {% include "partials/trips-button.html" %}
+    {% include "partials/user-button.html" %}
+  {% endif %}
+  {% if page_wrap == "register" %}
+    {% include "partials/home-button.html" %}
+  {% endif %}
+  {% include "partials/theme-button.html" %}
+</div> 
 

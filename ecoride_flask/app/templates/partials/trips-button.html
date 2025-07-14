@@ -1,16 +1,22 @@
-<div class="relative inline-block">
+<div id="trips-dropdown-wrapper" class="relative inline-block">
   <button
-    onclick="toggleHidden('tripDropdown')"
+    onclick="toggleHidden('trips-dropdown')"
     class="p-2 flex flex-row rounded-sm bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200"
   >
-    <img src="{{ url_for('static', filename='graphics/direction-signal.svg') }}" alt="Trips Icon" class="w-[24px] h-[24px]"/> 
+    <svg viewbox="0 0 24 24" class="w-[24px] h-[24px]">
+      {% include "graphics/trips-icon.html" %}    
+    </svg>
   </button>
-  <div id="tripDropdown" class="p-2 absolute flex flex-col rounded-sm gap-2 bg-[var(--color-base2)]">
+  <div id="trips-dropdown" class="hidden p-2 absolute flex flex-col rounded-sm gap-2 bg-[var(--color-base2)]">
     <button class="flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">
-      <img src="{{ url_for('static', filename='graphics/add.svg') }}" alt="add-trip-icon" class="w-[24px] h-[24px]"/>
+      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        {% include "graphics/add-icon.html" %}    
+      </svg>
     </button>
     <button class="flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">
-      <img src="{{ url_for('static', filename='graphics/search.svg') }}" alt="search-trip-con" class="w-[24px] h-[24px]"/>
+      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        {% include "graphics/search-icon.html" %}    
+      </svg>
     </button>
   </div>
 </div>

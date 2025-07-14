@@ -12,3 +12,9 @@ export function toggleHidden(el) {
     elem.classList.toggle('hidden');
   }
 }
+
+document.body.addEventListener("htmx:beforeSwap", () => {
+  document.querySelectorAll(".dropdown").forEach((dropdown) => {
+    dropdown.classList.add("hidden");
+  });
+});

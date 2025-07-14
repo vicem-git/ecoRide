@@ -1,3 +1,24 @@
-<button class="p-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">
-  <img src="{{ url_for('static', filename='graphics/circle-user.svg') }}" alt="Theme Icon" class="w-[24px] h-[24px]"/>
-</button>
+<div class="relative inline-block">
+  <button
+    onclick="toggleHidden('user-dropdown')"
+    class="p-2 flex flex-row rounded-sm bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200"
+  >
+    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+      {% include "graphics/user-icon.html" %}
+    </svg>
+  </button>
+  <div id="user-dropdown" class="dropdown hidden p-2 absolute flex flex-col rounded-sm gap-2 bg-[var(--color-base2)]">
+    <button class="flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">
+      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        {% include "graphics/login-icon.html" %}    
+      </svg>
+      <p> Connexion </p>
+    </button>
+    <a href="{{ url_for('html.registration') }}" class="flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">
+      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        {% include "graphics/register-icon.html" %}    
+      </svg>
+      <p> Inscription </p>
+    </a>
+  </div>
+</div>

@@ -1,14 +1,16 @@
-<div class='sticky top-28 flex w-full justify-center'>
-  <div class="flex p-6 flex-row rounded-xs bg-[var(--color-base2)] h-[72px] gap-3 items-center">
-    <div class="p-2 h-[48px] flex flex-row rounded-sm bg-[var(--color-base)] gap-2">
-      <img src="{{ url_for('static', filename='graphics/circle-dot-start.svg') }}"/>
-      <input type="text" id="start-point-search"
-             class="rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none" />
+<div class='sticky top-21 flex w-full justify-center'>
+  <div class="flex p-2 flex-row rounded-xs bg-[var(--color-base2)] h-[56px] gap-3 items-center">
+    <div class="p-2 flex flex-row rounded-sm bg-[var(--color-base)] gap-2">
+      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        {% include "graphics/loc-point.html" %}    
+      </svg>
+      <input type="text" id="start-point-search" class="rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none" />
     </div>
-    <div class="p-2 h-[48px] flex flex-row rounded-sm bg-[var(--color-base)] gap-2">
-      <img src="{{ url_for('static', filename='graphics/circle-dot-end.svg') }}"/>
-      <input type="text" id="end-point-search"
-             class="rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none" />
+    <div class="p-2 flex flex-row rounded-sm bg-[var(--color-base)] gap-2">
+      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        {% include "graphics/loc-point.html" %}    
+      </svg>      
+      <input type="text" id="end-point-search" class="rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none" />
     </div>
     <input type="date" id="start-date" class="h-[48px] p-2 rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none" />
     <input type="date" id="end-date" class="h-[48px] p-2 rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none" />

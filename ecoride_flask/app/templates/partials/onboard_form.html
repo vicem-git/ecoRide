@@ -1,0 +1,33 @@
+<main id="onboard-main" class="flex flex-col min-h-screen">
+  <h1 class="text-3xl p-8 mb-24"> Préparons votre compte ! </h1>
+  
+  <div class="flex flex-col items-center justify-center bg-[var(--color-base)]">
+    <form
+      id="register-form"
+      hx-post="{{ url_for('api.onboard_user') }}"
+      hx-swap="innerHTML"
+      hx-trigger="submit"
+      hx-target="#onboard-main"
+      class="flex flex-col items-center"
+    >
+      <div class="text-xl flex flex-col items-center justify-center mb-12 gap-3">
+        <h2 class="mb-8 tracking-wide font-bold">Raconte-nous un peu sur toi !</h2>
+        <input
+          type="text"
+          name="username"
+          placeholder="choisir un nom d'utilisateur"
+          class="p-2 border border-gray-300 rounded"
+          required
+        />
+
+        <select name="role" class="p-2 border border-gray-300 rounded" required>
+          <option value="" disabled selected>Comment allez-vous utiliser la plateforme ?</option>
+          <option value="driver">Conducteur.ice</option>
+          <option value="passenger">Passager</option>
+        </select>
+
+        <input type="hidden" name="account_id" value="{{ account_id }}" />      </div> 
+      <button type="submit" class="px-4 py-2 rounded-sm bg-[var(--color-base2)] hover:bg-[var(--color-base3)] font-semibold transition-colors duration-300">Submit</button>
+    </form>
+  </div>
+</main>

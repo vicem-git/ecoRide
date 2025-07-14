@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv(".env")
 
+FLASK_SECRET = os.getenv("FLASK_SECRET_KEY")
+
 db_config = {
     "min_conn": int(os.getenv("DB_POOL_MIN_CONN", 1)),
     "max_conn": int(os.getenv("DB_POOL_MAX_CONN", 10)),
