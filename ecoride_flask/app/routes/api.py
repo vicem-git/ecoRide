@@ -9,8 +9,10 @@ from flask import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.db_store import crud_utilities, user_crud
-from app.utils import RegistrationData, OnboardingData, LoginData
+from app.models import RegistrationData, OnboardingData, LoginData, SessionUser
 from pydantic import ValidationError
+from app.utils import bcrypt
+from flask_login import login_user
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -23,6 +25,7 @@ def health_check():
             result = crud_utilities.test_connection(conn)
             if result:
                 return {"status": "healthy"}, 200
+
     except Exception as e:
         error_message = f"Database connection failed: {str(e)}"
         return {"status": error_message}, 500
@@ -51,19 +54,33 @@ def register_user():
                         "partials/redirect_to_login.html", errors=error_message
                     )
                 )
-                response.headers["HX-Redirect"] = "/login"
+                response.headers["HX-Redirect"] = "{{ url_for('html.login' }}"
 
                 return response, 409
 
-            hashed_pw = generate_password_hash(reg_data.password)
+            hashed_pw = bcrypt.generate_password_hash(reg_data.password)
             account_id = user_crud.create_account(conn, reg_data.email, hashed_pw)
 
-            return render_template(
-                "partials/onboard_form.html", account_id=account_id
-            ), 201
+            # AUTHENTICATE THE USER
+            account = SessionUser.authenticate(conn, reg_data.email, reg_data.password)
+
+            # load user to login manager
+            if account:
+                login_user(account)
+
+            response = make_response(
+                render_template("partials/onboard_form.html", account_id=account_id)
+            )
+            response.headers["HX-Redirect"] = "{{ url_for('html.onboard') }}"
+            return response, 201
+
     except ValidationError as ve:
         errors = ve.errors()
-        return render_template("partials/error_fragment.html", errors=errors), 400
+        response = make_response(
+            render_template("partials/error_fragment.html", errors=errors)
+        )
+        return response, 400
+
     except Exception as e:
         print("Error during registration:", str(e))
         return jsonify(
@@ -96,7 +113,9 @@ def onboard_user():
                         user_id=existing_user["id"],
                     )
                 )
-                response.headers["HX-Redirect"] = f"/dashboard/{existing_user['id']}"
+                response.headers["HX-Redirect"] = (
+                    "{{ url_for('dashboard', user_id=existing_user['id']) }}"
+                )
 
                 return response
 
@@ -105,7 +124,11 @@ def onboard_user():
                 conn, onboard_data.account_id, onboard_data.username
             )
 
-            return render_template("pages/user_dashboard", user_id=user_id), 201
+            response = make_response(
+                render_template("partials/onboarding_successful.html", user_id=user_id)
+            )
+            response.headers["HX-Redirect"] = "{{ url_for('html.dashboard') }}"
+            return response, 201
 
     except ValidationError as ve:
         return render_template("partials/error_fragment.html", errors=ve.errors()), 400
@@ -130,7 +153,6 @@ def login_user():
         errors = e.errors()
         html = render_template("partials/error_fragment.html", errors=errors)
         resp = make_response(html, 400)
-        resp.headers["HX-Target"] = "#errors-container"
         return resp
 
     conn = None
@@ -145,7 +167,6 @@ def login_user():
                     errors=["No account found with this email."],
                 )
                 resp = make_response(html, 404)
-                resp.headers["HX-Target"] = "#errors-container"
                 return resp, 404
 
             if login_response["account_status_id"] == "suspended":
@@ -159,7 +180,7 @@ def login_user():
             hashed_pw = user_crud.retrieve_password(
                 conn, account_id=login_response["id"]
             )
-            login_ok = check_password_hash(hashed_pw, login_data.password)
+            login_ok = bcrypt.check_password_hash(hashed_pw, login_data.password)
 
             if not login_ok:
                 # if password does not match, return error

@@ -1,1 +1,1 @@
-from .form_models import RegistrationData, OnboardingData
+from .extensions import bcrypt, login_manager

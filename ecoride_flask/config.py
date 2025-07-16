@@ -1,9 +1,20 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv(".env")
 
-FLASK_SECRET = os.getenv("FLASK_SECRET_KEY")
+
+class Config:
+    SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
+
+    # Session config
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=15)
+    SESSION_COOKIE_NAME = "session"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+
 
 db_config = {
     "min_conn": int(os.getenv("DB_POOL_MIN_CONN", 1)),

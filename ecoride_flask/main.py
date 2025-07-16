@@ -1,7 +1,9 @@
 from flask import Flask
 from app.db_store import DatabaseManager
 from app.routes import api_bp, html_bp
-from config import db_config
+from config import db_config, Config
+from app.utils import bcrypt, login_manager
+from app.models import load_user
 
 
 def create_app():
@@ -10,9 +12,16 @@ def create_app():
         static_folder="app/static",
     )
 
+    app.config.from_object(Config)
+
+    bcrypt.init_app(app)
+
     db_manager = DatabaseManager(db_config)
     app.db_manager = db_manager
     app.pool = db_manager.pool
+
+    login_manager.init_app(app)
+    load_user(app)
 
     app.register_blueprint(api_bp)
     app.register_blueprint(html_bp)
@@ -25,7 +34,7 @@ def create_app():
             except Exception as e:
                 app.logger.error(f"Failed to close database pool: {str(e)}")
 
-    # Optional: Add signal handler for system signals
+    # SAFE CLOSING ON EXIT
     import atexit
 
     def safe_close():

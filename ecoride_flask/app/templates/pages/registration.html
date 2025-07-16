@@ -8,7 +8,10 @@ Inscription
 
 <main id="register-main" class="flex flex-col min-h-screen">
   <h1 class="text-3xl p-8 mb-24"> Ravi de vous rencontrer :) </h1>
-  
+  <div id="register-responses"></div>
+  <div id="register-indicator" class="htmx-indicator hidden">
+    <span class="animate-spin">Chargement...</span>
+  </div>
   <div class="flex flex-col items-center justify-center bg-[var(--color-base)]">
     <form
       id="register-form"
@@ -16,7 +19,8 @@ Inscription
       hx-post="{{ url_for('api.register_user') }}"
       hx-swap="innerHTML"
       hx-trigger="submit"
-      hx-target="#register-main"
+      hx-target="#register-responses"
+      hx-indicator="#register-indicator"
       class="flex flex-col items-center"
     >
       <div class="text-xl flex flex-col items-center justify-center mb-12 gap-3">
@@ -27,7 +31,7 @@ Inscription
       </div> 
       <button type="submit" class="px-4 py-2 rounded-sm bg-[var(--color-base2)] hover:bg-[var(--color-base3)] font-semibold transition-colors duration-300" type="submit">Inscription !</button>
     </form>
-  </div>
+  </div> 
 </main>
 
 {% endblock %}
