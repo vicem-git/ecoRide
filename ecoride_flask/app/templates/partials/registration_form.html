@@ -1,0 +1,14 @@
+    <form
+      id="register-form"
+      formaction="{{ url_for('api.register') }}"
+      method="POST"
+      class="flex flex-col items-center"
+    >
+      <div class="text-xl flex flex-col items-center justify-center mb-12 gap-3">
+        <h2 class="mb-8 tracking-wide font-bold">veuillez fournir les détails d'inscription</h2>
+        <input type="email" name="email" placeholder="Email" class="mb-4 p-2 border border-gray-300 rounded" required/>
+        <input type="password" name="password" placeholder="Password" class="mb-4 p-2 border border-gray-300 rounded" required/>
+        <input  type="password" name="confirm_password" placeholder="Confirm Password" class="mb-4 p-2 border border-gray-300 rounded" required/>
+      </div> 
+      <button type="submit" class="px-4 py-2 rounded-sm bg-[var(--color-base2)] hover:bg-[var(--color-base3)] font-semibold transition-colors duration-300" type="submit">Inscription !</button>
+    </form>

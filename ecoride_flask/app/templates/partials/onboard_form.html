@@ -4,10 +4,8 @@
   <div class="flex flex-col items-center justify-center bg-[var(--color-base)]">
     <form
       id="register-form"
-      hx-post="{{ url_for('api.onboard_user') }}"
-      hx-swap="innerHTML"
-      hx-trigger="submit"
-      hx-target="#onboard-main"
+      method="POST"
+      action="{{ url_for('api.onboard') }}"
       class="flex flex-col items-center"
     >
       <div class="text-xl flex flex-col items-center justify-center mb-12 gap-3">

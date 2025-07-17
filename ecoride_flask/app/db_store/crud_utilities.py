@@ -32,11 +32,17 @@ def load_static_ids(conn):
         # Load account_access
         cur.execute("SELECT name, id FROM account_access;")
         rows = cur.fetchall()
-        ids["account_access"] = {row["name"]: row["id"] for row in rows}
+        ids["account_access"] = {
+            row["name"]: str(row["id"]) if not isinstance(row["id"], str) else row["id"]
+            for row in rows
+        }
 
         # Load account_status
         cur.execute("SELECT name, id FROM account_status;")
         rows = cur.fetchall()
-        ids["account_status"] = {row["name"]: row["id"] for row in rows}
+        ids["account_status"] = {
+            row["name"]: str(row["id"]) if not isinstance(row["id"], str) else row["id"]
+            for row in rows
+        }
 
     return ids

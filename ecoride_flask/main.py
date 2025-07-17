@@ -1,9 +1,9 @@
 from flask import Flask
-from app.db_store import DatabaseManager
+from app.db_store import DatabaseManager, crud_utilities
 from app.routes import api_bp, html_bp
 from config import db_config, Config
 from app.utils import bcrypt, login_manager
-from app.models import load_user
+from app.models import session_user_loader
 
 
 def create_app():
@@ -18,21 +18,19 @@ def create_app():
 
     db_manager = DatabaseManager(db_config)
     app.db_manager = db_manager
-    app.pool = db_manager.pool
+
+    with app.db_manager.connection() as conn:
+        app.static_ids = crud_utilities.load_static_ids(conn)
+
+    print(app.static_ids)
 
     login_manager.init_app(app)
-    load_user(app)
+    session_user_loader(app)
 
     app.register_blueprint(api_bp)
     app.register_blueprint(html_bp)
 
-    @app.teardown_appcontext
-    def cleanup(exc):
-        if hasattr(app, "pool"):
-            try:
-                app.pool.close()
-            except Exception as e:
-                app.logger.error(f"Failed to close database pool: {str(e)}")
+    login_manager.login_view = "html.login"
 
     # SAFE CLOSING ON EXIT
     import atexit
@@ -40,7 +38,7 @@ def create_app():
     def safe_close():
         try:
             if hasattr(app, "pool"):
-                app.pool.close()
+                app.db_manager.close_all()
         except Exception as e:
             print(f"Failed to close database pool on exit: {str(e)}")
 

@@ -1,4 +1,5 @@
 from psycopg_pool import pool
+from contextlib import contextmanager
 
 
 class DatabaseManager:
@@ -17,3 +18,13 @@ class DatabaseManager:
 
     def close_all(self):
         self.pool.closeall()
+
+    @contextmanager
+    def connection(self):
+        conn = None
+        try:
+            conn = self.get_conn()
+            yield conn
+        finally:
+            if conn is not None:
+                self.release_conn(conn)
