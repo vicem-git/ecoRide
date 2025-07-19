@@ -64,6 +64,7 @@ def register_user():
     except ValidationError as ve:
         for err in ve.errors():
             flash(f"{err['loc'][0]}: {err['msg']}")
+        return make_response("", 400)
 
     except Exception as e:
         print("Error during registration:", str(e))
@@ -123,6 +124,7 @@ def onboard_user():
     except ValidationError as ve:
         for err in ve.errors():
             flash(f"{err['loc'][0]}: {err['msg']}")
+        return make_response("", 400)
 
     except Exception as e:
         print("Error during onboarding:", str(e))
@@ -180,8 +182,10 @@ def login():
             return response
 
     except ValidationError as ve:
+        print("Validation error:", ve.errors())
         for err in ve.errors():
             flash(f"{err['loc'][0]}: {err['msg']}")
+        return make_response("", 400)
 
     except Exception as e:
         print("Error during user login:", str(e))

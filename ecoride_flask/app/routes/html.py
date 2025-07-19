@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, current_app
 import datetime
 from flask_login import login_required, current_user
+from app.utils import access_resolver
 
 html_bp = Blueprint("html", __name__, template_folder="../templates")
 
@@ -39,32 +40,18 @@ def login():
 @html_bp.route("/dashboard")
 @login_required
 def dashboard():
-    account_access = current_app.static_ids["account_access"]
-    account_access_id = current_user.account_access_id
+    current_access = str(current_user.account_access_id)
 
-    print("Current user authenticated?", current_user.is_authenticated)
-    print("Current user ID:", current_user.get_id())
+    current_access = access_resolver(current_access)
 
-    if not account_access_id:
-        return "Missing account_access_id", 400
+    return render_template(
+        "pages/dashboard.html",
+        current_time=current_time,
+        page_wrap="dashboard",
+        case=current_access,
+    )
 
-    if account_access_id == account_access["user"]:
-        user_id = request.args.get("user_id")
-        if user_id is None:
-            return "Missing user_id", 400
-        user_id = request.args.get("user_id")
-        # fetch user info as needed
-        return render_template(
-            "dashboard.html", access="user", user_id=user_id, current_time=current_time
-        )
-    elif account_access_id == account_access["admin"]:
-        return render_template("dashboard.html", access="admin")
 
-    elif account_access_id == account_access["moderator"]:
-        return render_template("dashboard.html", access="mod")
-
-    else:
-        return (
-            "Unknown access type",
-            400,
-        )  # handle logic to retrieve user data based on account_access_id and user_id
+@html_bp.route("/contact")
+def contact():
+    return render_template("pages/contact.html", page_wrap="contact")

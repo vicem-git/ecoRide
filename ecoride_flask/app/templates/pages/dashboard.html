@@ -7,6 +7,9 @@ Tableau de bord
 {% block main %}
 <main id="index-main" class="p-8 min-h-screen">
   <h1 class="text-3xl mb-4">Hello, ecoRide :)</h1>
-  <p>your Dasboard. You landed here at {{ current_time }}</p> 
+  <p>your Dasboard. You landed here at {{ current_time }}</p>
+  {% if case  == "user" %}
+    <div>WELCOME USER</div>
+  {% endif %}
 </main>
 {% endblock %}

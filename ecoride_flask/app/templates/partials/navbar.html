@@ -2,10 +2,14 @@
   {% if page_wrap == "home" %}
     {% include "partials/trips-button.html" %}
     {% include "partials/user-button.html" %}
-  {% endif %}
-  {% if page_wrap == "register" or page_wrap == "login" %}
+  {% elif page_wrap in ["register", "login"] %}
+    {% include "partials/home-button.html" %}
+    {% elif page_wrap in ["dashboard", "contact"] %}
+    {% include "partials/trips-button.html" %}
+    {% include "partials/user-button.html" %}
     {% include "partials/home-button.html" %}
   {% endif %}
   {% include "partials/theme-button.html" %}
+
 </div> 
 
