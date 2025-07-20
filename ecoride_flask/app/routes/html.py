@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, current_app
 import datetime
 from flask_login import login_required, current_user
-from app.utils import access_resolver
+from app.utils import static_id_resolver
 
 html_bp = Blueprint("html", __name__, template_folder="../templates")
 
@@ -42,7 +42,7 @@ def login():
 def dashboard():
     current_access = str(current_user.account_access_id)
 
-    current_access = access_resolver(current_access)
+    current_access = static_id_resolver("account_access", current_access)
 
     return render_template(
         "pages/dashboard.html",

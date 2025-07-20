@@ -5,6 +5,7 @@ from psycopg.rows import dict_row
 
 def test_connection(conn):
     try:
+        conn.autocommit = True
         with conn.cursor() as cur:
             cur.execute("SELECT 1;")
             result = cur.fetchone()
@@ -25,31 +26,25 @@ def configure_conn(conn, schema_name):
         raise
 
 
-def load_static_ids(conn):
+STATIC_TABLES = [
+    "account_access",
+    "account_status",
+    "roles",
+    "preferences",
+    "vehicle_brand",
+    "energy_types",
+    "review_status",
+    "trip_status",
+]
+
+
+def load_static_ids(db_manager):
     ids = {}
-
-    try:
+    with db_manager.connection() as conn:
+        conn.autocommit = True
         with conn.cursor(row_factory=dict_row) as cur:
-            # Load account_access
-            cur.execute("SELECT name, id FROM account_access;")
-            rows = cur.fetchall()
-            ids["account_access"] = {
-                row["name"]: str(row["id"])
-                if not isinstance(row["id"], str)
-                else row["id"]
-                for row in rows
-            }
+            for table in STATIC_TABLES:
+                cur.execute(f"SELECT name, id FROM {table};")
+                ids[table] = {row["name"]: str(row["id"]) for row in cur.fetchall()}
 
-            # Load account_status
-            cur.execute("SELECT name, id FROM account_status;")
-            rows = cur.fetchall()
-            ids["account_status"] = {
-                row["name"]: str(row["id"])
-                if not isinstance(row["id"], str)
-                else row["id"]
-                for row in rows
-            }
-
-        return ids
-    except Exception as e:
-        print(f"Failed to load static IDs: {e}")
+    return ids

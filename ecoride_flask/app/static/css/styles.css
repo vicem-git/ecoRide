@@ -9,9 +9,10 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {  
-  --color-base: oklch(0.9451 0.0093 106.57);
-  --color-base2: oklch(0.7671 0.0093 113.77);
-  --color-base3: oklch(0.5988 0.0093 113.77);
+  --color-base: oklch(0.9799 0.0093 106.57);
+  --color-base2: oklch(0.9036 0.0093 106.57);
+  --color-base3: oklch(0.7671 0.0093 113.77);
+  --color-base4: oklch(0.5988 0.0093 113.77);
   --color-contrast: oklch(0.4471 0.0616 148.17);
   --color-contrast-2: oklch(0.3071 0.0616 148.17);
   --color-success: oklch(0.822 0.0831 147.34);

@@ -7,6 +7,7 @@ def session_user_loader(app):
     def user_loader(account_id):
         print("Loading user:", account_id)
         with app.db_manager.connection() as conn:
+            conn.autocommit = True
             with conn.cursor() as cursor:
                 cursor.execute(
                     "SELECT a.id, a.email, a.account_status_id, a.account_access_id, u.id, u.username FROM accounts a LEFT JOIN users u ON u.account_id = a.id WHERE a.id = %s",

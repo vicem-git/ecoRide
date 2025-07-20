@@ -137,6 +137,7 @@ INSERT INTO energy_types (name) VALUES
 
 CREATE TABLE vehicles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    driver_id UUID NOT NULL REFERENCES driver_data(id) ON DELETE CASCADE,
     plate_number VARCHAR(20) UNIQUE NOT NULL,
     registration_date DATE NOT NULL,
     brand UUID NOT NULL REFERENCES vehicle_brand(id) ON DELETE CASCADE,
@@ -147,23 +148,28 @@ CREATE TABLE vehicles (
     energy_type_id UUID NOT NULL REFERENCES energy_types(id) ON DELETE CASCADE
 );
 
-
-CREATE TABLE driver_vehicles (
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
-  PRIMARY KEY (user_id, vehicle_id)
+CREATE TABLE trip_status (
+  id UUID PRIMARY KEY gen_random_uuid(),
+  name VARCHAR(50) UNIQUE NOT NULL
 );
+
+INSERT INTO trip_status (name) values
+('pending'),
+('upcoming'),
+('in_progress'),
+('completed'),
+('cancelled');
 
 
 CREATE TABLE trips (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    driver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    driver_id UUID NOT NULL REFERENCES driver_data(id) ON DELETE CASCADE,
     vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
     start_location GEOGRAPHY(POINT, 4326) NOT NULL,
     end_location GEOGRAPHY(POINT, 4326) NOT NULL,
     start_time TIMESTAMP NOT NULL,
     price INTEGER NOT NULL,
-    status VARCHAR(50) DEFAULT 'pending',
+    trip_status UUID NOT NULL REFERENCES trip_status(id) ON DELETE CASCADE DEFAULT,
     rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
@@ -206,6 +212,21 @@ CREATE TABLE reviews (
     author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     rating INTEGER CHECK (rating >= 0 AND rating <= 5) NOT NULL,
     comments TEXT,
-    review_status_id UUID NOT NULL REFERENCES review_status(id) ON DELETE CASCADE
+    review_status_id UUID NOT NULL REFERENCES review_status(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT now(),
+    updated_at TIMESTAMP DEFAULT now()
 );
+
+CREATE OR REPLACE FUNCTION update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = now();
+   RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON reviews
+FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();
 

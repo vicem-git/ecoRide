@@ -9,7 +9,7 @@
     <script type="module" src="http://localhost:5173/js/app.js"></script>
     {% endblock %}
   </head>
-  <body class="bg-[var(--color-base)] text-[var(--color-contrast)] font-sans flex flex-col items-center">
+  <body class="bg-[var(--color-base)] text-[var(--color-contrast)] font-sans font-semibold flex flex-col items-center">
    <div id="banner">
      {% block banner %}
       {% include "partials/banner.html" %}
@@ -20,7 +20,7 @@
       {% include "partials/header.html" %}
      {% endblock %}
    </div>
-   <div id="main-content">
+   <div id="main-content" class="w-[70%] bg-var(--color-base)">
      {% block main %}
       MAIN CONTENT
      {% endblock %}

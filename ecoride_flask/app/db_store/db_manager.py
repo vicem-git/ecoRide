@@ -17,7 +17,7 @@ class DatabaseManager:
         self.pool.putconn(conn)
 
     def close_all(self):
-        self.pool.closeall()
+        self.pool.close()
 
     @contextmanager
     def connection(self):

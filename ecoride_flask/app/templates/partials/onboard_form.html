@@ -18,11 +18,19 @@
           required
         />
 
-        <select name="role" class="p-2 border border-gray-300 rounded" required>
-          <option value="" disabled selected>Comment allez-vous utiliser la plateforme ?</option>
-          <option value="driver">Conducteur.ice</option>
-          <option value="passenger">Passager</option>
-        </select>
+        <div class="flex flex-col gap-2">
+          <p class="font-medium">Comment allez-vous utiliser la plateforme ?</p>
+
+          <label class="flex items-center gap-2">
+            <input type="checkbox" name="roles" value="driver" />
+            Conducteur.ice
+          </label>
+
+          <label class="flex items-center gap-2">
+            <input type="checkbox" name="roles" value="passenger" />
+            Passager
+          </label>
+        </div>
 
         <input type="hidden" name="account_id" value="{{ account_id }}" />      </div> 
       <button type="submit" class="px-4 py-2 rounded-sm bg-[var(--color-base2)] hover:bg-[var(--color-base3)] font-semibold transition-colors duration-300">Submit</button>

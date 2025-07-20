@@ -9,7 +9,11 @@ Tableau de bord
   <h1 class="text-3xl mb-4">Hello, ecoRide :)</h1>
   <p>your Dasboard. You landed here at {{ current_time }}</p>
   {% if case  == "user" %}
-    <div>WELCOME USER</div>
+    {% include "partials/user_dashboard.html" %}
+  {% elif case == "admin" %}
+    <div> welcome admin </div>
+  {% elif case == "moderator" %}
+    <div> welcome moderator </div>
   {% endif %}
 </main>
 {% endblock %}

@@ -9,6 +9,7 @@ from flask import (
     url_for,
     flash,
 )
+import logging
 from app.db_store import crud_utilities, user_crud
 from app.models import RegistrationData, OnboardingData, LoginData, SessionUser
 from pydantic import ValidationError
@@ -16,6 +17,9 @@ from app.utils import bcrypt
 from flask_login import login_user, logout_user, login_required, current_user
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
+
+# MODULE LOGGER
+logger = logging.getLogger(__name__)
 
 
 @api_bp.route("/health")
@@ -67,7 +71,7 @@ def register_user():
         return make_response("", 400)
 
     except Exception as e:
-        print("Error during registration:", str(e))
+        logger.error("Error during registration:", str(e))
         return jsonify(
             {"error": "A server error occurred. Please try again later."}
         ), 500
@@ -87,8 +91,6 @@ def onboard_user():
             existing_user = user_crud.get_user_by_account_id(
                 conn, onboard_data.account_id
             )
-
-            print(existing_user)
 
             if existing_user:
                 # return fragment that redirects to corresponding user dashboard
@@ -116,6 +118,7 @@ def onboard_user():
                 response = make_response("", 500)
                 return response
 
+            user_crud.set_user_roles(conn, user_id, onboard_data.roles)
             flash("Welcome aboard!")
             response = make_response("", 201)
             response.headers["HX-Redirect"] = url_for("html.dashboard")
@@ -127,7 +130,7 @@ def onboard_user():
         return make_response("", 400)
 
     except Exception as e:
-        print("Error during onboarding:", str(e))
+        logger.error("Error during onboarding:", str(e))
         return jsonify(
             {"error": "A server error occurred. Please try again later."}
         ), 500
@@ -173,7 +176,6 @@ def login():
                 return response
 
             session_user = user_crud.get_user_object(conn, login_response["id"])
-            print(session_user.is_active)
 
             login_user(session_user)
 
@@ -182,13 +184,13 @@ def login():
             return response
 
     except ValidationError as ve:
-        print("Validation error:", ve.errors())
+        logger.error("Validation error:", ve.errors())
         for err in ve.errors():
             flash(f"{err['loc'][0]}: {err['msg']}")
         return make_response("", 400)
 
     except Exception as e:
-        print("Error during user login:", str(e))
+        logger.error("Error during user login:", str(e))
         return jsonify(
             {"error": "A server error occurred. Please try again later."}
         ), 500
