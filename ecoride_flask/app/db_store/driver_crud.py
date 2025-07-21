@@ -63,3 +63,18 @@ def get_driver_vehicles(conn, driver_id):
         )
         vehicles = cur.fetchall()
         return vehicles if vehicles else None
+
+
+def set_driver_rating(conn, driver_id):
+    with conn.cursor as cur:
+        # select rating from trips where driver_id = driver_id
+        # set driver rating as average of all trips rating
+        cur.execute("SELECT rating FROM trips WHERE driver_id = %s", (driver_id,))
+        all_ratings = cur.fetchall()
+        average = sum(x for int(x) in all_ratings) / len(all_ratings)
+
+        cur.execute(
+            "UPDATE driver_data SET rating = %s WHERE user_id = %s",
+            (average, driver_id),
+        )
+        conn.commit()

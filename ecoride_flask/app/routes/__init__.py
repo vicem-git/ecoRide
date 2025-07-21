@@ -1,2 +1,2 @@
-from .api import api_bp
-from .html import html_bp
+from . import api
+from .pages import pages_bp

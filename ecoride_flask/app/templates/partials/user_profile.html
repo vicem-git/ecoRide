@@ -1,0 +1,12 @@
+{% block main %}
+  {% include "partials/profile_summary.html" %}
+  
+  {% if case == "driver" %}
+    {% include "partials/driver_info.html" %}
+    {% include "partials/driver_vehicles.html" %}
+    {% include "partials/driver_preferences.html" %}
+  {% endif %}
+
+  {% include "partials/upcoming_trips.html" %}
+  {% include "partials/trip_history.html" %}
+{% endblock %}

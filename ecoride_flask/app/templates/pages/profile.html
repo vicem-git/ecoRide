@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+Tableau de bord
+{% endblock %}
+
+{% block main %}
+<main id="index-main" class="p-8 min-h-screen">
+  <h1 class="text-3xl mb-4">Hello, ecoRide :)</h1>
+  <p>Your Profile. You landed here at {{ current_time }}</p>
+  {% if case  == "user" %}
+    {% include "partials/user_profile.html" %}
+  {% elif case == "admin" %}
+    <div> welcome admin </div>
+  {% elif case == "moderator" %}
+    <div> welcome moderator </div>
+  {% endif %}
+</main>
+{% endblock %}

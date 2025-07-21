@@ -17,7 +17,7 @@ Connexion
     <form
       id="login-form"
       method="POST"
-      hx-post="{{ url_for('api.login') }}"
+      hx-post="{{ url_for('auth.login') }}"
       hx-swap="innerHTML"
       hx-trigger="submit"
       class="flex flex-col items-center"

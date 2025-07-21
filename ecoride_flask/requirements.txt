@@ -9,6 +9,8 @@ Faker==37.4.2
 Flask==3.1.1
 Flask-Bcrypt==1.0.1
 Flask-Login==0.6.3
+geographiclib==2.0
+geopy==2.4.1
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.6
