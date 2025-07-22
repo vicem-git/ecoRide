@@ -47,7 +47,7 @@ def get_id(cur, table, name):
     return cur.fetchone()[0]
 
 
-def seed_data(conn, num_drivers=50, num_users=100, trips_per_driver=3):
+def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
     with conn.cursor() as cur:
         # Get static IDs
         access_id = get_id(cur, "account_access", "user")
