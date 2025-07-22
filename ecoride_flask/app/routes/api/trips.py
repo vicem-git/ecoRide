@@ -6,6 +6,7 @@ from flask import (
 )
 import logging
 from app.db_store import trips_crud
+from datetime import datetime
 
 
 trips_bp = Blueprint("trips", __name__, url_prefix="/trips")
@@ -27,7 +28,7 @@ def create_trip():
 @trips_bp.route("/query_trips", methods=["GET", "POST"])
 def query_trips():
     form = request.form
-    start_date = form.get("start_date") or datetime.utcnow().isoformat()
+    start_date = form.get("start_date") or datetime.now().isoformat()
 
     print(f"Form data: {form}")
 
@@ -38,7 +39,6 @@ def query_trips():
             end_city=form.get("end_city"),
             max_price=form.get("max_price"),
             start_date=form.get("start_date"),
-            end_date=form.get("end_date"),
         )
 
     return render_template(

@@ -117,7 +117,7 @@ def list_trips(
 
 
 def search_trip_summaries(
-    conn, start_city=None, end_city=None, max_price=None, start_date=None, end_date=None
+    conn, start_city=None, end_city=None, max_price=None, start_date=None
 ):
     query = """
         SELECT s.*
