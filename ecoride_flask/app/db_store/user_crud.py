@@ -24,7 +24,7 @@ def get_user_by_account_id(conn, account_id):
     conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM users WHERE account_id = %s", (account_id,))
-        user_id = cur.fetchone()[0]
+        user_id = cur.fetchone()
         return user_id  # returns None if not found
 
 
@@ -117,6 +117,13 @@ def get_user_object(conn, account_id):
         )
 
 
+def get_roles_list(conn):
+    with conn.cursor() as cur:
+        cur.execute("SELECT id, name FROM roles")
+        role_list = cur.fetchall()
+        return [{"id": row[0], "name": row[1]} for row in role_list]
+
+
 def get_user_roles(conn, user_id):
     conn.autocommit = True
     with conn.cursor() as cur:
@@ -133,18 +140,18 @@ def set_user_roles(conn, user_id, roles):
         cur.execute("DELETE FROM user_roles WHERE user_id = %s", (user_id,))
         for role in roles:
             cur.execute(
-                "INSERT INTO user_roles (user_id, role) VALUES (%s, %s)",
+                "INSERT INTO user_roles (user_id, role_id) VALUES (%s, %s)",
                 (user_id, role),
             )
         conn.commit()
         return True
 
 
-def get_account_credits(conn, user_id):
+def get_user_credits(conn, user_id):
     conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT credits FROM accounts WHERE id = (SELECT account_id FROM users WHERE id = %s)",
+            "SELECT credits FROM users WHERE id = %s",
             (user_id,),
         )
         credits = cur.fetchone()

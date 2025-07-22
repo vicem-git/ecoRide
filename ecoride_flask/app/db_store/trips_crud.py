@@ -115,3 +115,35 @@ def list_trips(
         trips_found = cur.fetchall()
         return trips_found if trips_found else None
 
+
+def search_trip_summaries(
+    conn, start_city=None, end_city=None, max_price=None, start_date=None, end_date=None
+):
+    query = """
+        SELECT s.*
+        FROM trip_summaries s
+        WHERE 1=1
+    """
+    params = []
+
+    if start_city:
+        query += " AND s.summary->>'start_city' = %s"
+        params.append(start_city)
+
+    if end_city:
+        query += " AND s.summary->>'end_city' = %s"
+        params.append(end_city)
+
+    if max_price:
+        query += " AND (s.summary->>'price')::int <= %s"
+        params.append(max_price)
+
+    if start_date and start_date.lower() != "none":
+        query += " AND (s.summary->>'start_time')::timestamp >= %s"
+        params.append(start_date)
+
+    query += " ORDER BY (s.summary->>'start_time')::timestamp ASC"
+
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(query, params)
+        return cur.fetchall()

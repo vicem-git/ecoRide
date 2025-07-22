@@ -1,4 +1,12 @@
-<form
+{% extends "base.html" %}
+
+{% block title %}
+Recherche de voyages
+{% endblock %}
+
+{% block main %}
+<main id="index-main" class="p-8 flex flex-col min-h-screen w-full">
+  <form
     method="POST"
     action="{{ url_for('trips.query_trips') }}"
     hx-post="{{ url_for('trips.query_trips') }}"
@@ -36,3 +44,8 @@
       </svg>
     </button>
   </form>
+  <div id="trip-container" class="w-full">
+  
+  </div>
+</main>
+{% endblock %}

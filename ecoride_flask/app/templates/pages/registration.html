@@ -8,21 +8,11 @@ Inscription
 
 <main id="register-main" class="flex flex-col min-h-screen">
   <h1 class="text-3xl p-8 mb-12"> Ravi de vous rencontrer :) </h1>
-  {% with messages = get_flashed_messages() %}
-    {% for msg in messages %}
-      <div class="alert alert-success">{{ msg }}</div>
-    {% endfor %}
-  {% endwith %}
   <div id="register-indicator" class="htmx-indicator hidden">
     <span class="animate-spin">Chargement...</span>
   </div>
   <div class="flex flex-col items-center justify-center bg-[var(--color-base)] mt-12">
-    {% if case == "register" %}
-      {% include "partials/registration_form.html" %}
-    {% endif %}
-    {% if case == "onboard" %}
-      {% include "partials/onboard_form.html" %}
-    {% endif %}
+    {% include "partials/registration_form.html" %} 
   </div> 
 </main>
 

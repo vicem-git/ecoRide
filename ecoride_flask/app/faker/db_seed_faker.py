@@ -170,7 +170,7 @@ def seed_data(conn, num_drivers=50, num_users=100, trips_per_driver=3):
                 chosen_passengers = random.sample(passenger_ids, random.randint(1, 3))
                 for pid in chosen_passengers:
                     cur.execute(
-                        "INSERT INTO trip_passengers (trip_id, passenger_id) VALUES (%s, %s)",
+                        "INSERT INTO trip_passengers (trip_id, user_id) VALUES (%s, %s)",
                         (trip_id, pid),
                     )
 
@@ -194,15 +194,15 @@ def seed_data(conn, num_drivers=50, num_users=100, trips_per_driver=3):
     # USAGE IN MAIN.PY
     #
     #
-    try:
-        with db_manager.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT COUNT(*) FROM users")
-                user_count = cur.fetchone()[0]
-                if user_count < 10:
-                    seed_data(conn, num_drivers=50, num_users=150, trips_per_driver=3)
-                    logging.info("✅ Database seeded.")
-                else:
-                    logging.info("ℹ️ Seeding skipped: users already exist.")
-    except Exception as e:
-        logging.error(f"❌ Seeding error: {e}")
+    # try:
+    # with db_manager.connection() as conn:
+    # with conn.cursor() as cur:
+    #   cur.execute("SELECT COUNT(*) FROM users")
+    #   user_count = cur.fetchone()[0]
+    #   if user_count < 10:
+    #       seed_data(conn, num_drivers=50, num_users=150, trips_per_driver=3)
+    #       logging.info("✅ Database seeded.")
+    #   else:
+    #       logging.info("ℹ️ Seeding skipped: users already exist.")
+    # except Exception as e:
+    # logging.error(f"❌ Seeding error: {e}")

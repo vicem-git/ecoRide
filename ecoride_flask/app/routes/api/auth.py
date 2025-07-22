@@ -10,11 +10,12 @@ from flask import (
     flash,
 )
 import logging
-from app.db_store import crud_utilities, user_crud, driver_crud
-from app.models import RegistrationData, OnboardingData, LoginData, SessionUser
+from app.db_store import crud_utilities, user_crud
+from app.models import RegistrationData, LoginData, SessionUser
 from pydantic import ValidationError
 from app.utils import bcrypt
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required
+from app.utils.static_resolvers import static_id_resolver
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -40,86 +41,41 @@ def health_check():
 @auth_bp.route("/register", methods=["POST"])
 def register_user():
     data = request.form.to_dict()
+    data["roles"] = request.form.getlist("roles")
 
     conn = None
+
     try:
-        # validation here
         reg_data = RegistrationData(**data)
 
         with current_app.db_manager.connection() as conn:
             existing_account = user_crud.get_user_by_email(conn, reg_data.email)
 
             if existing_account:
-                error_message = "A user with this email already exists. please head over to the login page"
-                flash(error_message)
-                response = make_response("", 409)
-                return response
+                flash("un compte existe déjà avec cet email. veuillez vous connecter.")
+                return make_response(render_template("partials/flash.html"), 409)
+
+            if user_crud.check_username(conn, reg_data.username):
+                flash("Nom d'utilisateur déjà pris.")
+                return make_response(render_template("partials/flash.html"), 409)
 
             hashed_pw = bcrypt.generate_password_hash(reg_data.password, 14).decode(
                 "utf-8"
             )
-            account_created = user_crud.create_account(conn, reg_data.email, hashed_pw)
+            account_id = user_crud.create_account(conn, reg_data.email, hashed_pw)
+            user_id = user_crud.create_user(conn, account_id, reg_data.username)
+            user_crud.set_user_roles(conn, user_id, reg_data.roles)
 
-            if account_created:
-                response = make_response("", 201)
-                response.headers["HX-Redirect"] = url_for("pages.login")
-                return response
-
-    except ValidationError as ve:
-        for err in ve.errors():
-            flash(f"{err['loc'][0]}: {err['msg']}")
-        return make_response("", 400)
-
-    except Exception as e:
-        logger.error("Error during registration:", str(e))
-        return jsonify(
-            {"error": "A server error occurred. Please try again later."}
-        ), 500
-
-
-@auth_bp.route("/onboard", methods=["POST"])
-def onboard_user():
-    data = request.form.to_dict()
-
-    conn = None
-    try:
-        # validate data
-        onboard_data = OnboardingData(**data)
-
-        with current_app.db_manager.connection() as conn:
-            # check if the user is already onboarded
-            existing_user = user_crud.get_user_by_account_id(
-                conn, onboard_data.account_id
+            session_user = SessionUser(
+                account_id=account_id,
+                email=reg_data.email,
+                account_status_id=static_id_resolver("account_status", "active"),
+                account_access_id=static_id_resolver("account_access", "user"),
+                user_id=user_id,
+                username=reg_data.username,
             )
+            login_user(session_user)
 
-            if existing_user:
-                # return fragment that redirects to corresponding user profile
-                response = make_response("", 204)
-                response.headers["HX-Redirect"] = url_for(
-                    "pages.profile", user_id=existing_user
-                )
-                return response
-
-            # check username uniqueness
-            username_exists = user_crud.check_username(conn, onboard_data.username)
-
-            if username_exists:
-                flash("Username already exists. Please choose a different username.")
-                response = make_response("", 409)
-                return response
-
-            # if not onboarded, create a user with the account ID
-            user_id = user_crud.create_user(
-                conn, onboard_data.account_id, onboard_data.username
-            )
-
-            if not user_id:
-                flash("Failed to create user. Please try again later.")
-                response = make_response("", 500)
-                return response
-
-            user_crud.set_user_roles(conn, user_id, onboard_data.roles)
-            flash("Welcome aboard!")
             response = make_response("", 201)
             response.headers["HX-Redirect"] = url_for("pages.profile", user_id=user_id)
             return response
@@ -127,13 +83,12 @@ def onboard_user():
     except ValidationError as ve:
         for err in ve.errors():
             flash(f"{err['loc'][0]}: {err['msg']}")
-        return make_response("", 400)
+        return make_response(render_template("partials/flash.html"), 400)
 
     except Exception as e:
-        logger.error("Error during onboarding:", str(e))
-        return jsonify(
-            {"error": "A server error occurred. Please try again later."}
-        ), 500
+        logger.error("Registration failed: %s", str(e))
+        flash("Something went wrong. Try again later.")
+        return make_response(render_template("partials/flash.html"), 500)
 
 
 @auth_bp.route("/login", methods=["POST"])
@@ -179,10 +134,31 @@ def login():
 
             login_user(session_user)
 
-            response = make_response("", 204)
-            response.headers["HX-Redirect"] = url_for(
-                "pages.profile", user_id=session_user.id
+            # resolve access level
+
+            access_level = static_id_resolver(
+                "account_access", session_user.account_access_id
             )
+
+            print("Access Level:", access_level)
+            print("Session User:", session_user.user_id)
+
+            if access_level == "admin":
+                url = url_for("pages.admin_dashboard")
+            elif access_level == "moderator":
+                url = url_for("pages.moderator_dashboard")
+            elif access_level == "user" and session_user.user_id is not None:
+                url = url_for("pages.profile", user_id=session_user.user_id)
+            elif access_level == "user" and session_user.user_id is None:
+                url = url_for("pages.onboard")
+            else:
+                logging.warning(
+                    f"Unexpected login redirect state: access={access_level}, user_id={session_user.user_id}"
+                )
+                url = url_for("pages.index")  # fallback
+
+            response = make_response("", 204)
+            response.headers["HX-Redirect"] = url
             return response
 
     except ValidationError as ve:
@@ -202,4 +178,4 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("html.index"))
+    return redirect(url_for("pages.index"))

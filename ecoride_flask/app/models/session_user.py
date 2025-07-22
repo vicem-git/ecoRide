@@ -15,7 +15,7 @@ class SessionUser(UserMixin):
         self.email = email
         self.account_status_id = str(account_status_id)
         self.account_access_id = str(account_access_id)
-        self.user_id = user_id
+        self.user_id = str(user_id) if user_id is not None else None
         self.username = username
 
     @property

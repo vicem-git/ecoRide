@@ -1,5 +1,4 @@
 import psycopg
-from app.faker.villes import villes
 from geopy.distance import geodesic
 import random
 import logging
@@ -18,6 +17,25 @@ db_name = "ecoride_db"
 conninfo = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 
+villes = {
+    "Paris": {"lat": 48.85341, "lng": 2.34880},
+    "Marseille": {"lat": 43.29695, "lng": 5.38107},
+    "Lyon": {"lat": 45.74846, "lng": 4.84671},
+    "Toulouse": {"lat": 43.60426, "lng": 1.44367},
+    "Nice": {"lat": 43.70313, "lng": 7.26608},
+    "Nantes": {"lat": 47.21725, "lng": -1.55336},
+    "Strasbourg": {"lat": 48.58392, "lng": 7.74553},
+    "Montpellier": {"lat": 43.61092, "lng": 3.87723},
+    "Bordeaux": {"lat": 44.84044, "lng": -0.58050},
+    "Lille": {"lat": 50.63297, "lng": 3.05858},
+    "Rennes": {"lat": 48.11198, "lng": -1.67429},
+    "Reims": {"lat": 49.25000, "lng": 4.03333},
+    "Le Havre": {"lat": 49.49380, "lng": 0.10767},
+    "Grenoble": {"lat": 45.17155, "lng": 5.72239},
+    "Dijon": {"lat": 47.31667, "lng": 5.01667},
+}
+
+
 def reverse_lookup_coords(lat, lng):
     for city, coords in villes.items():
         if abs(coords["lat"] - lat) < 0.05 and abs(coords["lng"] - lng) < 0.05:
@@ -34,6 +52,7 @@ def generate_summaries(conn):
                 ST_X(t.start_location::geometry),
                 ST_Y(t.end_location::geometry),
                 ST_X(t.end_location::geometry),
+                t.start_time,
                 t.price,
                 d.rating,
                 v.plate_number,
@@ -61,6 +80,7 @@ def generate_summaries(conn):
                 start_lng,
                 end_lat,
                 end_lng,
+                start_time,
                 price,
                 rating,
                 plate,
@@ -88,6 +108,7 @@ def generate_summaries(conn):
             summary = {
                 "start_city": start_city,
                 "end_city": end_city,
+                "start_time": start_time.isoformat(),
                 "distance_km": round(distance_km, 2),
                 "estimated_duration_min": duration_min,
                 "price": price,

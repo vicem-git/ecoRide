@@ -1,12 +1,13 @@
 {% block main %}
-  {% include "partials/profile_summary.html" %}
-  
-  {% if case == "driver" %}
-    {% include "partials/driver_info.html" %}
-    {% include "partials/driver_vehicles.html" %}
-    {% include "partials/driver_preferences.html" %}
-  {% endif %}
-
-  {% include "partials/upcoming_trips.html" %}
-  {% include "partials/trip_history.html" %}
-{% endblock %}
+  <div id="flash-messages" hx-swap-oob="true">
+    {% include "partials/flash.html" %}
+  </div>
+  <div class="flex flex-col justify-center gap-4 p-4 w-full">
+    {% include "partials/profile_summary.html" %}
+    {% if driver_info %}
+      {% include "partials/driver_info.html" %}
+    {% endif %}
+    {% include "partials/upcoming_trips.html" %}
+    {% include "partials/trip_history.html" %}
+  </div>
+  {% endblock %}

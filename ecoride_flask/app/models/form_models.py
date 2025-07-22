@@ -1,4 +1,5 @@
 from typing_extensions import Self
+from typing import List
 from pydantic import (
     BaseModel,
     EmailStr,
@@ -15,17 +16,14 @@ class RegistrationData(BaseModel):
     confirm_password: str = Field(
         ..., min_length=8, description="Confirm user's password"
     )
+    username: str = constr(min_length=3, max_length=30)
+    roles: List[str] = Field(..., min_items=1)
 
     @model_validator(mode="after")
     def passwords_match(self) -> Self:
         if self.password != self.confirm_password:
             raise ValueError("Passwords do not match")
         return self
-
-
-class OnboardingData(BaseModel):
-    account_id: UUID4 = Field(..., description="Unique identifier for the account")
-    username: str = constr(min_length=3, max_length=30)
 
 
 class LoginData(BaseModel):

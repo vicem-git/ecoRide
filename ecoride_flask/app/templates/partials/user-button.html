@@ -18,8 +18,8 @@
       <a href="{{ url_for('pages.contact') }}" class="flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">
         <p> Contact </p>
       </a>
-    {% elif current_user.is_authenticated %}
-      <a href="{{ url_for('pages.profile') }}" class="flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">
+    {% elif current_user.is_authenticated and current_user.user_id %}
+      <a href="{{ url_for('pages.profile', user_id=current_user.user_id) }}" class="flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">
         <p> Tableau de bord </p>
       </button>
       <a href="{{ url_for('pages.contact') }}" class="flex flex-row rounded-xs gap-2 bg-[var(--color-base2)] hover:bg-[var(--color-base3)] transition-colors duration-200">

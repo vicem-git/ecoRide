@@ -16,7 +16,6 @@ CREATE TABLE account_status (
 
 INSERT INTO account_status (name) VALUES
 ('active'),
-('inactive'),
 ('suspended');
 
 
@@ -130,9 +129,9 @@ CREATE TABLE energy_types (
 );
 
 INSERT INTO energy_types (name) VALUES
-('petrol'),
+('essence'),
 ('diesel'),
-('electric'),
+('electrique'),
 ('hybrid');
 
 CREATE TABLE vehicles (
@@ -149,7 +148,7 @@ CREATE TABLE vehicles (
 );
 
 CREATE TABLE trip_status (
-  id UUID PRIMARY KEY gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(50) UNIQUE NOT NULL
 );
 
@@ -169,7 +168,7 @@ CREATE TABLE trips (
     end_location GEOGRAPHY(POINT, 4326) NOT NULL,
     start_time TIMESTAMP NOT NULL,
     price INTEGER NOT NULL,
-    trip_status UUID NOT NULL REFERENCES trip_status(id) ON DELETE CASCADE DEFAULT,
+    trip_status UUID NOT NULL REFERENCES trip_status(id) ON DELETE CASCADE,
     rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
@@ -229,4 +228,10 @@ CREATE TRIGGER set_timestamp
 BEFORE UPDATE ON reviews
 FOR EACH ROW
 EXECUTE FUNCTION update_timestamp();
+
+CREATE TABLE trip_summaries (
+    trip_id UUID PRIMARY KEY REFERENCES trips(id) ON DELETE CASCADE,
+    summary JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT now()
+);
 

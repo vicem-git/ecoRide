@@ -2,13 +2,13 @@ from flask import Flask
 import logging
 from app.db_store import DatabaseManager, crud_utilities
 from app.routes import pages_bp
-from app.routes.api import auth_bp, user_bp
+from app.routes.api import auth_bp, user_bp, trips_bp
 from config import db_config, Config
 from app.utils import bcrypt, login_manager, safe_close
 from app.models import session_user_loader
-
-# from app.faker import seed_data
 import atexit
+
+from app.faker import seed_data, generate_summaries
 
 
 def create_app():
@@ -35,6 +35,7 @@ def create_app():
     app.register_blueprint(pages_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(trips_bp)
 
     login_manager.login_view = "pages.login"
 

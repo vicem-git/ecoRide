@@ -9,7 +9,7 @@ class Config:
     SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
 
     # Session config
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=15)
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=1)
     SESSION_COOKIE_NAME = "session"
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = False
