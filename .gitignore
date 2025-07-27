@@ -1,15 +1,12 @@
 # Python
 venv/
-venv-ecoride/
 __pycache__/
 *.pyc
 
 
 # Environment / secrets
-archive/
 .env
-frontend/.env.local
-backend/.flaskenv
+.flaskenv
 
 
 # Logs
@@ -21,25 +18,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# React / frontend
+# Node
 node_modules/
-dist/
-dist-ssr/
+
 *.local
 
 # Vite cache
 .vite/
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
 # OS files
 .DS_Store

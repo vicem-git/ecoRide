@@ -60,14 +60,11 @@ def profile(user_id):
 
         if "driver" in user_roles:
             driver_data = driver_crud.get_driver_data(conn, user_id)
-            print(f"Driver data: {driver_data}")
 
             if not driver_data:
                 new_driver = driver_crud.create_driver(conn, user_id)
-                print(f"New driver created: {new_driver}")
 
             driver_id = driver_data["id"]
-            print(f"Driver ID: {driver_id}")
 
             if driver_data:
                 driver_preferences = driver_crud.get_driver_preferences(conn, driver_id)
@@ -78,8 +75,6 @@ def profile(user_id):
                     "preferences": driver_preferences,
                     "vehicles": driver_vehicles,
                 }
-
-            print(f"Driver info: {driver_info}")
 
         return render_template(
             "pages/profile.html",

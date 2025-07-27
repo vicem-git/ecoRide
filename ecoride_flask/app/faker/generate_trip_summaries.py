@@ -44,93 +44,98 @@ def reverse_lookup_coords(lat, lng):
 
 
 def generate_summaries(conn):
-    with conn.cursor() as cur:
-        cur.execute("""
-            SELECT
-                t.id,
-                ST_Y(t.start_location::geometry),
-                ST_X(t.start_location::geometry),
-                ST_Y(t.end_location::geometry),
-                ST_X(t.end_location::geometry),
-                t.start_time,
-                t.price,
-                d.rating,
-                v.plate_number,
-                v.model,
-                v.color,
-                v.number_of_seats,
-                b.name AS brand,
-                e.name AS energy
-            FROM trips t
-            JOIN driver_data d ON t.driver_id = d.id
-            JOIN vehicles v ON t.vehicle_id = v.id
-            JOIN vehicle_brand b ON v.brand = b.id
-            JOIN energy_types e ON v.energy_type_id = e.id
-            WHERE NOT EXISTS (
-                SELECT 1 FROM trip_summaries s WHERE s.trip_id = t.id
-            )
-        """)
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT
+                    t.id,
+                    ST_Y(t.start_location::geometry),
+                    ST_X(t.start_location::geometry),
+                    ST_Y(t.end_location::geometry),
+                    ST_X(t.end_location::geometry),
+                    t.start_time,
+                    t.price,
+                    d.rating,
+                    v.plate_number,
+                    v.model,
+                    v.color,
+                    v.number_of_seats,
+                    b.name AS brand,
+                    e.name AS energy
+                FROM trips t
+                JOIN driver_data d ON t.driver_id = d.id
+                JOIN vehicles v ON t.vehicle_id = v.id
+                JOIN vehicle_brand b ON v.brand = b.id
+                JOIN energy_types e ON v.energy_type_id = e.id
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM trip_summaries s WHERE s.trip_id = t.id
+                )
+            """)
 
-        rows = cur.fetchall()
+            rows = cur.fetchall()
 
-        for row in rows:
-            (
-                trip_id,
-                start_lat,
-                start_lng,
-                end_lat,
-                end_lng,
-                start_time,
-                price,
-                rating,
-                plate,
-                model,
-                color,
-                seats,
-                brand,
-                energy,
-            ) = row
+            for row in rows:
+                (
+                    trip_id,
+                    start_lat,
+                    start_lng,
+                    end_lat,
+                    end_lng,
+                    start_time,
+                    price,
+                    rating,
+                    plate,
+                    model,
+                    color,
+                    seats,
+                    brand,
+                    energy,
+                ) = row
 
-            distance_km = geodesic(
-                (start_lat, start_lng), (end_lat, end_lng)
-            ).kilometers
-            speed = 60 + (hash(trip_id) % 30)  # semi-random but deterministic
-            duration_min = round((distance_km / speed) * 60)
+                distance_km = geodesic(
+                    (start_lat, start_lng), (end_lat, end_lng)
+                ).kilometers
+                speed = 60 + (hash(trip_id) % 30)  # semi-random but deterministic
+                duration_min = round((distance_km / speed) * 60)
 
-            start_city = reverse_lookup_coords(start_lat, start_lng)
-            end_city = reverse_lookup_coords(end_lat, end_lng)
+                start_city = reverse_lookup_coords(start_lat, start_lng)
+                end_city = reverse_lookup_coords(end_lat, end_lng)
 
-            cur.execute(
-                "SELECT COUNT(*) FROM trip_passengers WHERE trip_id = %s", (trip_id,)
-            )
-            passenger_count = cur.fetchone()[0]
+                cur.execute(
+                    "SELECT COUNT(*) FROM trip_passengers WHERE trip_id = %s",
+                    (trip_id,),
+                )
+                passenger_count = cur.fetchone()[0]
 
-            summary = {
-                "start_city": start_city,
-                "end_city": end_city,
-                "start_time": start_time.isoformat(),
-                "distance_km": round(distance_km, 2),
-                "estimated_duration_min": duration_min,
-                "price": price,
-                "vehicle": {
-                    "brand": brand,
-                    "model": model,
-                    "energy": energy,
-                    "seats": seats,
-                    "color": color,
-                    "plate": plate,
-                },
-                "passenger_count": passenger_count,
-                "driver_rating": rating,
-            }
+                summary = {
+                    "start_city": start_city,
+                    "end_city": end_city,
+                    "start_time": start_time.isoformat(),
+                    "distance_km": round(distance_km, 2),
+                    "estimated_duration_min": duration_min,
+                    "price": price,
+                    "vehicle": {
+                        "brand": brand,
+                        "model": model,
+                        "energy": energy,
+                        "seats": seats,
+                        "color": color,
+                        "plate": plate,
+                    },
+                    "passenger_count": passenger_count,
+                    "driver_rating": rating,
+                }
 
-            cur.execute(
-                "INSERT INTO trip_summaries (trip_id, summary) VALUES (%s, %s)",
-                (trip_id, json.dumps(summary)),
-            )
+                cur.execute(
+                    "INSERT INTO trip_summaries (trip_id, summary) VALUES (%s, %s)",
+                    (trip_id, json.dumps(summary)),
+                )
 
-        conn.commit()
-        print(f"✅ {len(rows)} trip summaries generated.")
+            conn.commit()
+            print(f"✅ {len(rows)} trip summaries generated.")
+    except Exception as e:
+        logger.error(f"Error generating trip summaries: {e}")
+        raise
 
 
 if __name__ == "__main__":

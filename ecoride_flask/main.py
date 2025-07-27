@@ -17,7 +17,7 @@ def create_app():
         static_folder="app/static",
     )
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     app.config.from_object(Config)
     bcrypt.init_app(app)
     db_manager = DatabaseManager(db_config)
@@ -28,6 +28,34 @@ def create_app():
         logging.info("static ids loaded ~")
     except Exception as e:
         logging.error(f"failed to load static ids: {str(e)}")
+
+    try:
+        with db_manager.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM users")
+                user_count = cur.fetchone()[0]
+                conn.commit()
+            if user_count < 10:
+                seed_data(conn, num_drivers=1000, num_users=3000, trips_per_driver=5)
+                logging.info("DB SEED : Database seeded.")
+            else:
+                logging.info("DB SEED : Seeding skipped: users already exist.")
+
+        with db_manager.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM trip_summaries")
+                summary_count = cur.fetchone()[0]
+                conn.commit()
+            if summary_count == 0:
+                generate_summaries(conn)
+                logging.info("DB SEED : Summaries generated.")
+            else:
+                logging.info(
+                    "DB SEED : Summary generation skipped: data already present."
+                )
+
+    except Exception as e:
+        logging.error(f"❌ Seeding error: {e}")
 
     login_manager.init_app(app)
     session_user_loader(app)

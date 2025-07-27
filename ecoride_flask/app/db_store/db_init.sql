@@ -1,3 +1,18 @@
+-- CREATE ROLE ecoride_admin WITH LOGIN PASSWORD 'your_secure_password';
+-- CREATE DATABASE ecoride_db OWNER ecoride_admin;
+-- GRANT ALL PRIVILEGES ON DATABASE ecoride_db TO ecoride_admin;
+-- \c ecoride_db
+CREATE SCHEMA IF NOT EXISTS public;
+GRANT USAGE, CREATE ON SCHEMA public TO ecoride_admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO ecoride_admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO ecoride_admin;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO ecoride_admin;
+
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS "postgis";
+
+
 CREATE TABLE account_access (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(50) UNIQUE NOT NULL
@@ -234,4 +249,5 @@ CREATE TABLE trip_summaries (
     summary JSONB NOT NULL,
     created_at TIMESTAMP DEFAULT now()
 );
+
 
