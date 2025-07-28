@@ -11,7 +11,7 @@ Connexion
   <div id="flash-messages" hx-swap-oob="true">
     {% include "partials/flash.html" %}
   </div>
-  <div class="flex flex-col items-center justify-center bg-[var(--color-base)]">
+  <div class="flex flex-col items-center justify-center">
     <form
       id="login-form"
       method="POST"
@@ -25,7 +25,7 @@ Connexion
         <input type="email" name="email" placeholder="Email" class="mb-4 p-2 border border-gray-300 rounded" required/>
         <input type="password" name="password" placeholder="Password" class="mb-4 p-2 border border-gray-300 rounded" required/>
       </div> 
-      <button type="submit" class="px-4 py-2 rounded-sm bg-[var(--color-base2)] hover:bg-[var(--color-base3)] font-semibold transition-colors duration-300" type="submit">Connexion !</button>
+      <button type="submit" class="px-4 py-2 rounded-sm bg-base2 hover:bg-base3 font-semibold transition-colors duration-300" type="submit">Connexion !</button>
     </form>
   </div>
 </main>

@@ -5,11 +5,28 @@ Acceuil
 {% endblock %}
 
 {% block main %}
-<main id="index-main" class="p-8 min-h-screen bg-[var(--color-base)]">
-  <h1 class="text-3xl mb-4">Hello, ecoRide :)</h1>
-  {% include "partials/searchbar.html" %}
-  <p>this is homepage. toggle navbar and see !</p>
-  <p>you landed here at {{ current_time }}</p> 
+<main id="index-main" class="p-8 min-h-screen">
+  {% include "partials/home-searchbar.html" %}
+  <section class="p-12 flex flex-col mt-8 rounded-lg items-center text-contrast shadow-lg shadow-contrast/20">
+    <section class="mb-12">
+      <p class="text-2xl p-2">EcoRide connecte les voyageurs <strong>éco-responsables</strong></p>
+      <p class="text-2xl">à des solutions de covoiturage <strong>abordables</strong> et <strong>fiables</strong>.</p>
+    </section>
+    <div class="flex gap-8 items-center">
+      <section class="text-center">
+        <p class="text-lg mb-4"><strong>Mobilité écologique :</strong><br>Réduisez votre empreinte carbone</p>
+        <p class="text-base3">Chaque trajet partagé, c’est une voiture de moins sur la route. Avec EcoRide, vous réduisez vos émissions de CO₂ tout en adoptant une manière de voyager plus responsable Voyager devient un acte écologique sans effort supplémentaire, juste en changeant d’habitude.</p>
+      </section>
+      <section class="text-center">
+        <p class="text-lg mb-4"><strong>Voyages abordables :</strong><br>voyagez plus pour moins cher</p>
+        <p class="text-base3"> Carburant, péages, entretien… le covoiturage permet de diviser ces dépenses. Avec EcoRide, vous pouvez proposer ou réserver un trajet à moindre coût, tout en gardant un bon niveau de confort. Une solution simple, juste, et efficace pour mieux gérer ses déplacements au quotidien.</p>
+      </section>
+      <section class="text-center">
+        <p class="text-lg mb-4"><strong>Communauté engagée :</strong><br>partagez un moment et créez du lien</p>
+        <p class="text-base3">EcoRide rassemble une communauté de voyageurs solidaires et respectueux de l’environnement. Voyager ensemble, c’est aussi redonner du sens à nos déplacements et créer du lien autrement. Faites des rencontres, simplement en voyageant.</p>
+      </section> 
+    </div>
+  </section>
 </main>
 {% endblock %}
 

@@ -42,6 +42,21 @@ def update_trip_status(conn, trip_id, new_status):
         return True
 
 
+def get_trip_available_seats(conn, trip_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT available_seats
+            FROM trip_available_seats
+            WHERE trip_id = %s
+            """,
+            (trip_id,),
+        )
+        result = cur.fetchone()
+        available_seats = result[0] if result else None
+        return available_seats
+
+
 def get_user_trips(conn, user_id, status):
     conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
@@ -68,56 +83,13 @@ def set_trip_rating(conn, trip_id, rating):
         return True
 
 
-def list_trips(
+def search_trips(
     conn,
-    near_start=None,
-    near_end=None,
-    max_dist_km=10,
-    status=None,
-    start_after=None,
+    start_city=None,
+    end_city=None,
+    passenger_nr=None,
     max_price=None,
-    sort_by=None,
-):
-    conn.autocommit = True
-    with conn.cursor(row_factory=dict_row) as cur:
-        query = "SELECT * FROM trips WHERE TRUE"
-        params = []
-
-        if near_start:
-            query += (
-                " AND ST_DWithin(start_location, ST_MakePoint(%s), %s)::geography, %s"
-            )
-            params += [near_start["lng"], near_start["lat"], max_dist_km * 1000]
-        if near_end:
-            query += (
-                " AND ST_DWithin(end_location, ST_MakePoint(%s), %s)::geography, %s"
-            )
-            params += [near_end["lng"], near_end["lat"], max_dist_km * 1000]
-
-        if status:
-            query += " AND trip_status = %s"
-            params.append(status)
-
-        if start_after:
-            query += " AND start_time >= %s"
-            params.append(start_after)
-
-        if max_price:
-            query += " AND price <= %s"
-            params.append(max_price)
-
-        if sort_by == "start_time":
-            query += " ORDER BY start_time ASC"
-        elif sort_by == "price":
-            query += " ORDER BY price ASC"
-
-        cur.execute(query, params)
-        trips_found = cur.fetchall()
-        return trips_found if trips_found else None
-
-
-def search_trip_summaries(
-    conn, start_city=None, end_city=None, max_price=None, start_date=None
+    start_date=None,
 ):
     query = """
         SELECT s.*
@@ -146,4 +118,14 @@ def search_trip_summaries(
 
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(query, params)
-        return cur.fetchall()
+        trips = cur.fetchall()
+
+    for trip in trips:
+        trip_id = trip.get("trip_id")
+        trip["available_seats"] = get_trip_available_seats(conn, trip_id)
+
+    if passenger_nr:
+        passenger_nr = int(passenger_nr)
+        trips = [trip for trip in trips if trip["available_seats"] >= int(passenger_nr)]
+
+    return trips if trips else None

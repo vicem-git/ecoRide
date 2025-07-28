@@ -7,22 +7,19 @@ from flask import (
     redirect,
     url_for,
 )
-import datetime
+from datetime import datetime
 from flask_login import login_required, current_user
 from app.utils import static_id_resolver
-from app.db_store import user_crud, driver_crud
+from app.db_store import user_crud, driver_crud, trips_crud
 from app.faker.villes import villes
 
 pages_bp = Blueprint("pages", __name__, template_folder="../templates")
-
-current_time = datetime.datetime.now().strftime("%c")
 
 
 @pages_bp.route("/")
 def index():
     return render_template(
         "pages/index.html",
-        current_time=current_time,
         page_wrap="home",
         cities=list(villes.keys()),
     )
@@ -41,6 +38,8 @@ def login():
 @pages_bp.route("/profile/<user_id>")
 @login_required
 def profile(user_id):
+    current_time = datetime.now().strftime("%c")
+
     current_access = str(current_user.account_access_id)
     current_access = static_id_resolver("account_access", current_access)
 
@@ -90,8 +89,26 @@ def profile(user_id):
 
 @pages_bp.route("/search_trips")
 def search_trips():
+    start_city = request.args.get("start_city")
+    end_city = request.args.get("end_city")
+    start_date = request.args.get("start_date") or datetime.now().isoformat()
+    passenger_nr = request.args.get("passenger_nr")
+
+    # NEED TO ESCAPE SMTH ?
+    with current_app.db_manager.connection() as conn:
+        trips = trips_crud.search_trips(
+            conn,
+            start_city=start_city,
+            end_city=end_city,
+            passenger_nr=passenger_nr,
+            start_date=start_date,
+        )
+
     return render_template(
-        "pages/search_trips.html", page_wrap="search_trips", cities=list(villes.keys())
+        "pages/search_trips.html",
+        page_wrap="search_trips",
+        trips=trips,
+        cities=list(villes.keys()),
     )
 
 

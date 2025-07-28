@@ -209,6 +209,14 @@ CREATE TABLE trip_passengers (
   PRIMARY KEY (trip_id, user_id)
 );
 
+CREATE OR REPLACE VIEW trip_available_seats AS
+SELECT
+  t.id AS trip_id,
+  v.number_of_seats - COUNT(tp.user_id) AS available_seats
+FROM trips t
+JOIN vehicles v ON v.id = t.vehicle_id
+LEFT JOIN trip_passengers tp ON tp.trip_id = t.id
+GROUP BY t.id, v.number_of_seats;
 
 CREATE TABLE review_status (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

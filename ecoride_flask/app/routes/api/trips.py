@@ -25,7 +25,7 @@ def create_trip():
     return render_template("pages/create_trip.html", page_wrap="create_trip")
 
 
-@trips_bp.route("/query_trips", methods=["GET", "POST"])
+@trips_bp.route("/query_trips")
 def query_trips():
     form = request.form
     start_date = form.get("start_date") or datetime.now().isoformat()
@@ -33,11 +33,11 @@ def query_trips():
     print(f"Form data: {form}")
 
     with current_app.db_manager.connection() as conn:
-        results = trips_crud.search_trip_summaries(
+        results = trips_crud.search_trips(
             conn,
             start_city=form.get("start_city"),
             end_city=form.get("end_city"),
-            max_price=form.get("max_price"),
+            passenger_nr=form.get("passenger_nr"),
             start_date=form.get("start_date"),
         )
 
