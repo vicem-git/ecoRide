@@ -10,6 +10,17 @@ logger = logging.getLogger(__name__)
 
 fake = Faker("fr_FR")
 
+car_models = [
+    ("citadine", 4),  # city car
+    ("berline", 5),  # sedan
+    ("coupé", 2),
+    ("break", 5),  # station wagon
+    ("minivan", 7),  # minivan
+    ("SUV", 5),
+    ("cabriolé", 2),  # convertible
+    ("fourgon", 3),  # van
+]
+
 
 def random_ville():
     city = random.choice(list(villes.keys()))
@@ -129,10 +140,11 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                 energy_id = cur.fetchone()[0]
                 license_plate = get_unique_license_plate(cur)
                 vehicle_id = str(uuid4())
+                model, max_seats = random.choice(car_models)
                 cur.execute(
                     """
                     INSERT INTO vehicles (
-                        id, driver_id, plate_number, registration_date, brand, model, color, number_of_seats, energy_type_id
+                        id, driver_id, plate_number, registration_date, brand, model, color, number_of_seats, energy_type
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                     (
@@ -141,9 +153,9 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                         license_plate,
                         fake.date_between(start_date="-3y", end_date="-1y"),
                         brand_id,
-                        fake.word(),
+                        model,
                         fake.color_name(),
-                        random.randint(2, 5),
+                        max_seats,
                         energy_id,
                     ),
                 )
@@ -222,5 +234,5 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
 
         conn.commit()
     except Exception as e:
-        logger.error(f"❌ Error in seed_data: {e}")
+        logger.error(f"DB SEED ERROR : {e}")
         raise

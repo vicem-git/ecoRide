@@ -1,14 +1,14 @@
 from flask import Flask
 import logging
-from app.db_store import DatabaseManager, crud_utilities
+from app.db_store import DatabaseManager, crud_utilities, trips_crud
 from app.routes import pages_bp
-from app.routes.api import auth_bp, user_bp, trips_bp
+from app.routes.api import auth_bp, users_bp, drivers_bp, trips_bp
 from config import db_config, Config
 from app.utils import bcrypt, login_manager, safe_close
 from app.models import session_user_loader
 import atexit
 
-from app.faker import seed_data, generate_summaries
+from app.faker import seed_data
 
 
 def create_app():
@@ -42,16 +42,12 @@ def create_app():
                 logging.info("DB SEED : Seeding skipped: users already exist.")
 
         with db_manager.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT COUNT(*) FROM trip_summaries")
-                summary_count = cur.fetchone()[0]
-                conn.commit()
-            if summary_count == 0:
-                generate_summaries(conn)
-                logging.info("DB SEED : Summaries generated.")
+            count = trips_crud.regenerate_all_missing_summaries(conn)
+            if count:
+                logging.info(f"BATCH SUMMARIES: {count} summaries generated.")
             else:
                 logging.info(
-                    "DB SEED : Summary generation skipped: data already present."
+                    "BATCH SUMMARIES: Summary generation skipped: data already present."
                 )
 
     except Exception as e:
@@ -62,7 +58,8 @@ def create_app():
 
     app.register_blueprint(pages_bp)
     app.register_blueprint(auth_bp)
-    app.register_blueprint(user_bp)
+    app.register_blueprint(users_bp)
+    app.register_blueprint(drivers_bp)
     app.register_blueprint(trips_bp)
 
     login_manager.login_view = "pages.login"

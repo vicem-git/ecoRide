@@ -159,7 +159,7 @@ CREATE TABLE vehicles (
     color VARCHAR(30) NOT NULL,
     photo_url VARCHAR(255) NULL,
     number_of_seats INTEGER NOT NULL,
-    energy_type_id UUID NOT NULL REFERENCES energy_types(id) ON DELETE CASCADE
+    energy_type UUID NOT NULL REFERENCES energy_types(id) ON DELETE CASCADE
 );
 
 CREATE TABLE trip_status (
@@ -258,4 +258,12 @@ CREATE TABLE trip_summaries (
     created_at TIMESTAMP DEFAULT now()
 );
 
-
+CREATE VIEW trip_with_status_and_summary AS
+SELECT
+  t.id AS trip_id,
+  t.driver_id,
+  s.name AS status,
+  ts.summary
+FROM trips t
+JOIN trip_status s ON t.status_id = s.id
+LEFT JOIN trip_summaries ts ON ts.trip_id = t.id;
