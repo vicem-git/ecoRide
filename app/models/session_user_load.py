@@ -5,7 +5,6 @@ from app.utils import login_manager
 def session_user_loader(app):
     @login_manager.user_loader
     def user_loader(account_id):
-        print("Loading user:", account_id)
         with app.db_manager.connection() as conn:
             conn.autocommit = True
             with conn.cursor() as cursor:

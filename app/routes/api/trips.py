@@ -54,10 +54,12 @@ def view_trip():
 
 @trips_bp.route("/passenger-trips/<status>")
 @htmx_login_required
-@require_ownership("user_id")
+@require_ownership("for_user")
 def passenger_trips_by_status(status):
     status = request.view_args.get("status")
     user_id = current_user.user_id
+
+    print(status)
 
     try:
         status_id = static_name_resolver("trip_status", status)
@@ -72,7 +74,7 @@ def passenger_trips_by_status(status):
 
 @trips_bp.route("/driver-trips/<status>")
 @htmx_login_required
-@require_ownership("user_id")
+@require_ownership("for_user")
 def driver_trips_by_status(status):
     status = request.view_args.get("status")
     user_id = current_user.user_id
@@ -82,12 +84,12 @@ def driver_trips_by_status(status):
     except Exception:
         return "Invalid status", 400
 
-    requested_user_id = request.args.get("for_user", user_id)
-    if requested_user_id != str(user_id):
-        return "Forbidden", 403
-
     with current_app.db_manager.connection() as conn:
-        driver_id = driver_crud.get_driver_data(conn, user_id)
+        driver_data = driver_crud.get_driver_data(conn, user_id)
+        if not driver_data:
+            return "Driver data not found", 404
+
+        driver_id = driver_data.get("id")
 
         trips = trips_crud.get_driver_trips(conn, driver_id, status)
 

@@ -24,7 +24,7 @@ def create_app():
 
     app.jinja_env.filters["fr_date"] = fr_date
 
-    # CONTEXT PROCESSOR TEST
+    # CONTEXT PROCESSOR TEST cool
     # use to inject variables into templates globally
     @app.context_processor
     def inject_year():

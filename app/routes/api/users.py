@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 @users_bp.route("/edit_roles", methods=["GET", "POST"])
 @htmx_login_required
-@require_ownership("user_id")
+@require_ownership("for_user")
 def edit_roles():
     with current_app.db_manager.connection() as conn:
         if request.method == "GET":
@@ -58,7 +58,7 @@ def edit_roles():
 
 @users_bp.route("/get_account_credits")
 @htmx_login_required
-@require_ownership("user_id")
+@require_ownership("for_user")
 def get_account_credits():
     with current_app.db_manager.connection() as conn:
         credits = user_crud.get_user_credits(conn, current_user.user_id)

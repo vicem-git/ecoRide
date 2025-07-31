@@ -35,24 +35,23 @@ def login():
 @pages_bp.route("/profile/<user_id>")
 @login_required
 def profile(user_id):
-    current_access = str(current_user.account_access_id)
-    current_access = static_id_resolver("account_access", current_access)
-
     owner = str(current_user.user_id) == str(user_id)
 
     with current_app.db_manager.connection() as conn:
-        user = user_crud.get_user_by_account_id(conn, current_user.id)
-        user_id = user[0]
+        profile_user = user_crud.get_user_public_data(conn, user_id)
+        if not profile_user:
+            return "User not found", 404
 
-        user_roles = user_crud.get_user_roles(conn, user_id)
+        profile_user_id = profile_user["id"]
+
+        profile_user_roles = user_crud.get_user_roles(conn, profile_user_id)
 
         return render_template(
             "pages/profile.html",
             page_wrap="profile",
-            user_id=user_id,
+            profile_user=profile_user,
             owner=owner,
-            case=current_access,
-            roles=user_roles,
+            roles=profile_user_roles,
         )
 
 

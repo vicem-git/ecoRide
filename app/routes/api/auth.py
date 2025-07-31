@@ -60,13 +60,19 @@ def register_user():
                     "un compte existe déjà avec cet email. veuillez vous connecter."
                 ]
                 return make_response(
-                    render_template("partials/server_msg.html", message=message), 200
+                    render_template(
+                        "partials/server_msg.html", message=message, msg_case="error"
+                    ),
+                    200,
                 )
 
             if user_crud.check_username(conn, reg_data.username):
                 message = ["Nom d'utilisateur déjà pris."]
                 return make_response(
-                    render_template("partials/server_msg.html", message=message), 200
+                    render_template(
+                        "partials/server_msg.html", message=message, msg_case="error"
+                    ),
+                    200,
                 )
 
             hashed_pw = bcrypt.generate_password_hash(reg_data.password, 14).decode(
@@ -97,6 +103,7 @@ def register_user():
                 render_template(
                     "partials/server_msg.html",
                     messages=["Utilisateur inscrit, redirection..."],
+                    msg_case="success",
                 )
             )
             response.headers["HX-Trigger"] = json.dumps(
@@ -111,14 +118,20 @@ def register_user():
             error["msg"].removeprefix("Value error, ").strip() for error in errors
         ]
         return make_response(
-            render_template("partials/server_msg.html", messages=messages), 200
+            render_template(
+                "partials/server_msg.html", messages=messages, msg_case="error"
+            ),
+            200,
         )
 
     except Exception as e:
         logger.error("Registration failed: %s", str(e))
         message = ["Une erreur s'est produite. Réessayez plus tard."]
         return make_response(
-            render_template("partials/server_msg.html", message=message), 500
+            render_template(
+                "partials/server_msg.html", message=message, mgs_case="error"
+            ),
+            500,
         )
 
 
@@ -138,7 +151,10 @@ def login():
                 # if no account found, return error
                 messages = ["No account found with this email."]
                 response = make_response(
-                    render_template("partials/server_msg.html", messages=messages), 200
+                    render_template(
+                        "partials/server_msg.html", messages=messages, msg_case="error"
+                    ),
+                    200,
                 )
                 return response
 
@@ -146,7 +162,10 @@ def login():
                 # if account found, but not suspended, return error
                 messages = ["This account has been suspended."]
                 response = make_response(
-                    render_template("partials/server_msg.html", messages=messages), 200
+                    render_template(
+                        "partials/server_msg.html", messages=messages, msg_case="error"
+                    ),
+                    200,
                 )
                 return response
 
@@ -163,7 +182,10 @@ def login():
                 # if password does not match, return error
                 messages = ["Incorrect password."]
                 response = make_response(
-                    render_template("partials/server_msg.html", messages=messages), 200
+                    render_template(
+                        "partials/server_msg.html", messages=messages, msg_case="error"
+                    ),
+                    200,
                 )
                 return response
 
@@ -181,6 +203,7 @@ def login():
                 render_template(
                     "partials/server_msg.html",
                     messages=["Connexion réussie, redirection..."],
+                    msg_case="success",
                 )
             )
 
@@ -208,14 +231,20 @@ def login():
             error["msg"].removeprefix("Value error, ").strip() for error in errors
         ]
         return make_response(
-            render_template("partials/server_msg.html", messages=messages), 200
+            render_template(
+                "partials/server_msg.html", messages=messages, msg_case="error"
+            ),
+            200,
         )
 
     except Exception as e:
         logger.error("Login failed: %s", str(e))
         message = ["Une erreur s'est produite. Réessayez plus tard."]
         return make_response(
-            render_template("partials/server_msg.html", message=message), 500
+            render_template(
+                "partials/server_msg.html", message=message, msg_case="error"
+            ),
+            500,
         )
 
 

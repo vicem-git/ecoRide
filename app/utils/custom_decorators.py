@@ -18,11 +18,11 @@ def htmx_login_required(f):
     return decorated_function
 
 
-def require_ownership(param="user_id"):
+def require_ownership(param="for_user"):
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            user_id = kwargs.get(param)
+            user_id = request.args.get(param)
             if not user_id or str(user_id) != str(current_user.user_id):
                 abort(403)
             return f(*args, **kwargs)

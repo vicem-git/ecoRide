@@ -25,7 +25,17 @@ def get_user_by_account_id(conn, account_id):
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM users WHERE account_id = %s", (account_id,))
         user_id = cur.fetchone()
-        return user_id  # returns None if not found
+        return user_id if user_id else None
+
+
+def get_user_public_data(conn, user_id):
+    conn.autocommit = True
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT id, username, photo_url FROM users WHERE id = %s", (user_id,)
+        )
+        user_data = cur.fetchone()
+        return user_data if user_data else None
 
 
 def create_user(conn, account_id, username):
@@ -47,7 +57,7 @@ def request_login(conn, email):
             (email,),
         )
         account_found = cur.fetchone()
-    return account_found  # returns None if not found
+    return account_found if account_found else None
 
 
 def retrieve_password(conn, account_id):
@@ -84,7 +94,8 @@ def get_user_by_email(conn, email):
     conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM accounts WHERE email = %s", (email,))
-        return cur.fetchone()  # returns None if not found
+        found = cur.fetchone()
+        return found[0] if found else None
 
 
 def get_user_object(conn, account_id):

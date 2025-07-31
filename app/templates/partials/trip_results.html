@@ -1,6 +1,6 @@
 <div class="flex flex-col mt-8 gap-4 items-center">
   {% for trip in trips %}
-    <div class="flex rounded p-8 bg-ground1 gap-2 w-[70%] justify-between items-center">
+    <div class="flex rounded p-8 {{ 'bg-eco-ground' if trip.summary.vehicle.energy == 'electrique' else 'bg-ground1' }} gap-2 w-full justify-between items-center">
       <div class="flex flex-col gap-2">
         <div class="flex text-lg font-semibold text-contrast2 items-center">
           {{ trip.summary.start_city }}
@@ -24,7 +24,10 @@
         </div>
       {% endif %}
       <div class="flex gap-6 items-end justify-center">
-        <div>
+        <div class="flex gap-4 items-center">
+          <div class="w-16 h-16 rounded-full overflow-hidden">
+            <img src="{{ trip.summary.driver_photo }}"/>
+          </div>
           <div class="flex flex-col items-end justify-between">
             <p class="text-xl text-apart2">{{ trip.summary.driver_name }}</p>
             <p>
@@ -44,7 +47,9 @@
           </div>
         </div>
         <div class="flex flex-col text-ground4 gap-4 items-center">
-          
+          <button class="p-2 rounded bg-ground2 text-ground4 hover:bg-ground3 transition-colors">
+            détail
+          </button>
           <p>
             <strong>{{ trip.summary.price }}€</strong>
           </p>

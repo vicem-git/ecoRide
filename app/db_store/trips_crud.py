@@ -89,15 +89,14 @@ def get_passenger_trips(conn, user_id, status=None):
         query = """
             SELECT *
             FROM trip_with_status_and_summary t
-            JOIN trip_passengers tp ON t.id = tp.trip_id
-            WHERE tp.passenger_id = %s
-            ORDER BY t.start_time DESC
+            JOIN trip_passengers tp ON t.trip_id = tp.trip_id
+            WHERE tp.user_id = %s
         """
         params = [user_id]
         if status:
             query += " AND t.status = %s"
             params.append(status)
-        query += "ORDER BY t.start_time DESC"
+        query += " ORDER BY (t.summary->>'start_time')::timestamp DESC"
         cur.execute(query, params)
         trips = cur.fetchall()
         return trips if trips else None
@@ -107,14 +106,14 @@ def get_driver_trips(conn, driver_id, status=None):
     with conn.cursor(row_factory=dict_row) as cur:
         query = """
             SELECT *
-            FROM trip_with_status_and_summary
+            FROM trip_with_status_and_summary t
             WHERE driver_id = %s
         """
         params = [driver_id]
         if status:
             query += " AND status = %s"
             params.append(status)
-        query += " ORDER BY start_time DESC"
+        query += " ORDER BY (t.summary->>'start_time')::timestamp DESC"
         cur.execute(query, params)
         trips = cur.fetchall()
         return trips if trips else None
@@ -207,7 +206,8 @@ def generate_trip_summary(conn, trip_id, commit=True):
                 v.color,
                 b.name AS brand,
                 e.name AS energy,
-                u.username AS driver_name
+                u.username AS driver_name,
+                u.photo_url as driver_photo
             FROM trips t
             JOIN driver_data d ON t.driver_id = d.id
             JOIN users u ON d.user_id = u.id
@@ -238,6 +238,7 @@ def generate_trip_summary(conn, trip_id, commit=True):
             brand,
             energy,
             driver_name,
+            driver_photo,
         ) = row
 
         distance_km = geodesic((start_lat, start_lng), (end_lat, end_lng)).kilometers
@@ -262,6 +263,7 @@ def generate_trip_summary(conn, trip_id, commit=True):
                 "plate": plate,
             },
             "driver_name": driver_name,
+            "driver_photo": driver_photo,
             "driver_rating": rating,
         }
 

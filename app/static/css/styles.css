@@ -10,6 +10,7 @@
 
 @theme {
   --color-eco: oklch(0.8383 0.2037 131.93);
+  --color-eco-ground: oklch(0.9282 0.0679 131.93);
   --color-apart: oklch(0.6573 0.0456 275.07);
   --color-apart2: oklch(0.5861 0.0532 275.07);
   --color-apart3: oklch(0.5119 0.0532 275.07);
@@ -38,3 +39,22 @@ html {
   font-family: var(--font-sans);
 }
 
+[x-cloak] { display: none !important; }
+
+input[type="range"].range-slider::-webkit-slider-runnable-track {
+  @apply h-2 bg-apart rounded;
+}
+
+input[type="range"].range-slider::-moz-range-track {
+  @apply h-2 bg-apart rounded;
+}
+
+input[type="range"].range-slider::-webkit-slider-thumb {
+  @apply w-4 h-4 bg-apart2 rounded-full;
+  -webkit-appearance: none;
+  margin-top: -6px; /* centers thumb vertically */
+}
+
+input[type="range"].range-slider::-moz-range-thumb {
+  @apply w-4 h-4 bg-apart2 rounded-full;
+}

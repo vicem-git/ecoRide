@@ -1,0 +1,18 @@
+<form id="filters-form" class="flex flex-col rounded-sm gap-2 h-auto">
+  <div id="filter-container" class="p-4 flex flex-col bg-ground2 gap-2 rounded-sm">
+    <div class="p-2 flex items-center gap-4 mb-4">
+      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        {% include "graphics/filters_icon.html" %}
+      </svg>
+      <label class="font-semibold">Filtres</label>
+    </div>
+    <div class="flex items-center gap-6 mb-2">
+      <label for="eco-filter">Voyages<br>écologiques</label>
+      <input id="eco-filter" value="true" type="checkbox" name="eco-filter" class="rounded-sm"></input>
+    </div> 
+    <label for="price-filter-input" class="text-ground4">Prix maximum</label>
+    <input id="price-filter" name="price-filter" type="range" min="0" max="50" step="1" class="range-slider mb-2"></input>
+    <label for="driver-rating-filter-input" class="text-ground4">Note du conducteur</label>
+    <input id="driver-rating-filter" name="driver-rating-filter" type="range" min="0" max="5" step="1" class="range-slider"></input>
+  </div> 
+</form>

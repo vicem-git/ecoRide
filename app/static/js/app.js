@@ -4,12 +4,14 @@ import { toggleHidden } from '@/js/modules/domUtils.js';
 // import { toggleTheme } from '@/js/toggle-theme.js';
 import 'tom-select/dist/css/tom-select.css';
 import TomSelect from 'tom-select';
+import Alpine from 'alpinejs'
 
+
+window.Alpine = Alpine
+Alpine.start()
 
 window.htmx = htmx;
 window.toggleHidden = toggleHidden;
-
-
 
 document.body.addEventListener("htmx:beforeSwap", () => {
   document.querySelectorAll(".dropdown").forEach((dropdown) => {
