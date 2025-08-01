@@ -28,7 +28,7 @@ def edit_roles():
             current_roles = user_crud.get_user_roles(conn, current_user.user_id)
 
             return render_template(
-                "partials/edit_roles_form.html",
+                "users/edit_roles_form.html",
                 all_roles=all_roles,
                 current_roles=current_roles,
             )
@@ -62,4 +62,4 @@ def edit_roles():
 def get_account_credits():
     with current_app.db_manager.connection() as conn:
         credits = user_crud.get_user_credits(conn, current_user.user_id)
-    return render_template("partials/credits_fragment.html", credits=credits)
+    return render_template("users/credits_fragment.html", credits=credits)

@@ -32,8 +32,10 @@ document.body.addEventListener("htmx:afterOnLoad", (evt) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  new TomSelect('#start-point-search', { create: false, maxItems: 1 });
-  new TomSelect('#end-point-search', { create: false, maxItems: 1 });
+  new TomSelect('#start_city_param', { create: false, maxItems: 1 });
+  new TomSelect('#end_city_param', { create: false, maxItems: 1 });
+  new TomSelect('#home_start_city_param', { create: false, maxItems: 1 });
+  new TomSelect('#home_end_city_param', { create: false, maxItems: 1 });
 });
 
 

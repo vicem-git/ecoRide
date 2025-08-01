@@ -6,7 +6,7 @@
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/loc-point.html" %}    
     </svg>
-    <select id="start-point-search" name="start_city" placeholder="Départ..." class="w-full">
+    <select id="home_start_city_param" name="start_city" placeholder="Départ..." class="w-full" required>
       <option value="">Sélectionner une ville</option>
       {% for city in cities %}
         <option value="{{ city }}">{{ city }}</option>
@@ -17,7 +17,7 @@
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/loc-point.html" %}    
     </svg>
-    <select id="end-point-search" name="end_city" placeholder="Arrivée..." class="w-full">
+    <select id="home_end_city_param" name="end_city" placeholder="Arrivée..." class="w-full" required>
       <option value="">Sélectionner une ville</option>
       {% for city in cities %}
         <option value="{{ city }}">{{ city }}</option>
@@ -28,9 +28,9 @@
     <svg viewBox="0 0 24 24" class="mx-4 w-[24px] h-[24px]">
       {% include "graphics/users-icon.html" %}
     </svg>
-    <input type="number" id="passenger-nr" name="passenger_nr" min="1" max="6" placeholder="1" class="p-4 h-[48px] rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none"/>
+    <input type="number" id="home_passenger_nr" name="passenger_nr" min="1" max="6" placeholder="1" class="p-4 h-[48px] rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none"/>
   </div> 
-  <input type="date" id="start-date" name="start_date" class="h-[48px] w-[106px] p-2 rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none" />
+  <input type="date" id="home_start_date" name="start_date" class="h-[48px] w-[106px] p-2 rounded-sm focus:ring-2 focus:ring-lime-400 focus:outline-none" />
   <button
     type="submit"
     class="h-[48px] px-4 rounded-sm bg-ground2 hover:bg-ground3 focus:ring-2 focus:ring-lime-400 focus:outline-none">

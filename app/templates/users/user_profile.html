@@ -2,10 +2,10 @@
   <div id="user-profile-server-messages">
   </div>
   <div class="flex flex-col justify-center gap-4 p-4 w-full">
-    {% include "partials/profile_summary.html" %}
+    {% include "user/profile_summary.html" %}
     {% if "driver" in roles %}
-      {% include "partials/driver_info.html" %}
+      {% include "drivers/driver_info.html" %}
     {% endif %}
-    {% include "partials/user_trips.html" %}
+    {% include "trips/user_trips.html" %}
   </div>
   {% endblock %}

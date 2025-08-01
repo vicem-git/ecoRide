@@ -1,4 +1,4 @@
-from typing_extensions import Self
+from typing_extensions import Self, Optional
 import re
 from typing import List
 from pydantic import (
@@ -10,6 +10,7 @@ from pydantic import (
     constr,
     UUID4,
 )
+from datetime import datetime
 
 
 class RegistrationData(BaseModel):
@@ -97,6 +98,39 @@ class LoginData(BaseModel):
                 f"Le mot de passe il comporte au moins {min_length} caractères."
             )
         return cleaned_password
+
+
+class TripSearchData(BaseModel):
+    start_city: str = Field(
+        ...,
+    )
+    end_city: str = Field(
+        ...,
+    )
+    start_date: Optional[str] = None
+    passenger_nr: Optional[int] = Field(default=1)
+    max_price: Optional[int] = None
+    driver_rating: Optional[int] = None
+    eco_filter: bool = False
+
+    @field_validator("passenger_nr")
+    def default_passenger_nr(v):
+        return int(v) if v is not None else 1
+
+    @field_validator("start_date")
+    def validate_start_date(value):
+        if not value:
+            value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    @field_validator("start_city", "end_city")
+    def validate_city(value):
+        if not value or not value.strip():
+            raise ValueError("La ville départ/ arrivée ne peut pas être vide.")
+        return value.strip()
+
+    @property
+    def energy_type(self):
+        return "electrique" if self.eco_filter else None
 
 
 # SEARCH FORMS ??

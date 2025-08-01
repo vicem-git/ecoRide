@@ -6,11 +6,15 @@ Recherche de voyages
 
 {% block main %}
 <main id="index-main" class="pt-2 pb-8 flex flex-col min-h-screen w-full">
-  {% include "partials/searchbar.html" %} 
+  <div id="searchbar">
+    {% include "partials/searchbar.html" %}
+    <div id="search_error_msg"></div>
+  </div>
   <div id="trip-search-main" class="flex w-full pt-4 gap-4">
-    {% include "partials/trip_filters.html" %}
-    <div id="trip-container" class="w-full"> 
-      {% include "partials/trip_results.html" %} 
+    {% include "trips/trip_filters.html" %}
+    <div id="trips-container" class="w-full">
+      <div id="search_error_msg" class="hidden"></div>
+      {% include "trips/trip_results.html" %} 
     </div>
   </div>
 </main>

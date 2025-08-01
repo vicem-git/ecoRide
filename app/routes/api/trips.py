@@ -4,6 +4,7 @@ from flask import (
     Blueprint,
     request,
     render_template,
+    make_response,
 )
 import logging
 from app.db_store import driver_crud, trips_crud
@@ -11,6 +12,8 @@ from datetime import datetime
 from flask_login import login_required, current_user
 from app.utils.static_resolvers import static_name_resolver
 from app.utils.custom_decorators import require_ownership
+from app.models import TripSearchData
+from pydantic import ValidationError
 
 trips_bp = Blueprint("trips", __name__, url_prefix="/trips")
 
@@ -26,30 +29,61 @@ def create_trip():
 
 @trips_bp.route("/query_trips")
 def query_trips():
-    start_city = request.args.get("start_city")
-    end_city = request.args.get("end_city")
-    start_date = request.args.get("start_date") or datetime.now().isoformat()
-    passenger_nr = request.args.get("passenger_nr")
+    params = request.args
 
     with current_app.db_manager.connection() as conn:
-        results = trips_crud.search_summaries_asst(
-            conn,
-            start_city,
-            end_city,
-            passenger_nr,
-            start_date,
-        )
+        try:
+            search_data = TripSearchData(**params)
+            energy_type = search_data.energy_type
 
-    return render_template(
-        "partials/trip_results.html", page_wrap="query_trips", trips=results
-    )
+            results = trips_crud.search_summaries_asst(
+                conn=conn,
+                start_city=search_data.start_city,
+                end_city=search_data.end_city,
+                passenger_nr=search_data.passenger_nr,
+                start_date=search_data.start_date,
+                max_price=search_data.max_price,
+                driver_rating=search_data.driver_rating,
+                energy_type=energy_type,
+            )
+
+            return render_template(
+                "trips/trip_results.html", page_wrap="query_trips", trips=results
+            )
+
+        except ValidationError as ve:
+            logger.error("Validation error during trip query: %s", ve.errors())
+            errors = ve.errors()
+            messages = [
+                error["msg"].removeprefix("Value error, ").strip() for error in errors
+            ]
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html", messages=messages, msg_case="error"
+                ),
+                400,
+            )
+            return response
+
+        except Exception as e:
+            logger.error("Error during trip query: %s", e)
+            messages = [
+                "Un erreur s'est produite lors de la recherche de trajets. reessayez plus tard."
+            ]
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html", messages=messages, msg_case="error"
+                ),
+                500,
+            )
+            return response
 
 
 @trips_bp.route("/view_trip/<trip_id>")
 @htmx_login_required
 def view_trip():
     trip_id = request.view_args.get("trip_id")
-    return render_template("partials/trip_detail.html", trip_id=trip_id)
+    return render_template("trips/trip_detail.html", trip_id=trip_id)
 
 
 @trips_bp.route("/passenger-trips/<status>")
@@ -69,7 +103,7 @@ def passenger_trips_by_status(status):
     with current_app.db_manager.connection() as conn:
         trips = trips_crud.get_passenger_trips(conn, user_id, status_id)
 
-    return render_template("/partials/profile_trip_item.html", trips=trips or [])
+    return render_template("trips/profile_trip_item.html", trips=trips or [])
 
 
 @trips_bp.route("/driver-trips/<status>")
@@ -93,4 +127,4 @@ def driver_trips_by_status(status):
 
         trips = trips_crud.get_driver_trips(conn, driver_id, status)
 
-    return render_template("/partials/profile_trip_item.html", trips=trips or [])
+    return render_template("trips/profile_trip_item.html", trips=trips or [])

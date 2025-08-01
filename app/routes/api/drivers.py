@@ -39,7 +39,7 @@ def get_driver_data(user_id):
             }
 
     return render_template(
-        "partials/driver_info.html",
+        "drivers/driver_info.html",
         driver_data=driver_info,
         owner=owner,
     )
@@ -74,7 +74,7 @@ def edit_driver_preferences():
         updated_prefs = driver_crud.get_driver_preferences(conn, driver_id)
         print(f"Updated preferences: {updated_prefs}")
         return render_template(
-            "partials/driver_preferences.html", preferences=updated_prefs, owner=True
+            "drivers/driver_preferences.html", preferences=updated_prefs, owner=True
         )
 
 
@@ -109,7 +109,7 @@ def add_vehicle():
             driver_crud.add_vehicles(conn, driver_id, data)
             vehicles = driver_crud.get_driver_vehicles(conn, driver_id)
         return render_template(
-            "partials/driver_vehicles.html", vehicles=vehicles, owner=True
+            "drivers/driver_vehicles.html", vehicles=vehicles, owner=True
         )
 
 
@@ -128,5 +128,5 @@ def remove_vehicle(vehicle_id):
         driver_crud.remove_vehicles(conn, driver_id, [vehicle_id])
         vehicles = driver_crud.get_driver_vehicles(conn, driver_id)
     return render_template(
-        "partials/driver_vehicles.html", vehicles=vehicles, owner=True
+        "drivers/driver_vehicles.html", vehicles=vehicles, owner=True
     )

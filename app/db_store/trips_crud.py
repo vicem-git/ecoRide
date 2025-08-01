@@ -136,6 +136,8 @@ def search_summaries_asst(
     passenger_nr=None,
     start_date=None,
     max_price=None,
+    energy_type=None,
+    driver_rating=None,
 ):
     conn.autocommit = True
     query = """
@@ -147,11 +149,11 @@ def search_summaries_asst(
 
     if start_city:
         query += " AND summary->>'start_city' = %s"
-        params.append(start_city)
+        params.append(start_city.strip())
 
     if end_city:
         query += " AND summary->>'end_city' = %s"
-        params.append(end_city)
+        params.append(end_city.strip())
 
     if passenger_nr:
         query += " AND available_seats >= %s"
@@ -164,6 +166,14 @@ def search_summaries_asst(
     if max_price:
         query += " AND (summary->>'price')::int <= %s"
         params.append(max_price)
+
+    if energy_type:
+        query += " AND summary -> 'vehicle' ->>'energy' = %s"
+        params.append(energy_type)
+
+    if driver_rating:
+        query += " AND (summary->>'driver_rating')::float >= %s"
+        params.append(int(driver_rating))
 
     query += " ORDER BY (summary->>'start_time')::timestamp ASC"
 

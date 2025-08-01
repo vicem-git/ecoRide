@@ -3,12 +3,21 @@ from flask import (
     render_template,
     request,
     current_app,
+    make_response,
+    redirect,
+    url_for,
+    flash,
 )
+import logging
 from datetime import datetime
 from flask_login import login_required, current_user
 from app.utils import static_id_resolver
 from app.db_store import user_crud, trips_crud
 from app.faker.villes import villes
+
+# MODULE LOGGER
+logger = logging.getLogger(__name__)
+
 
 pages_bp = Blueprint("pages", __name__, template_folder="../templates")
 
@@ -60,17 +69,32 @@ def search_trips():
     start_city = request.args.get("start_city")
     end_city = request.args.get("end_city")
     start_date = request.args.get("start_date") or datetime.now().isoformat()
-    passenger_nr = request.args.get("passenger_nr")
+    passenger_nr = int(request.args.get("passenger_nr") or 1)
 
     # NEED TO ESCAPE SMTH ?
     with current_app.db_manager.connection() as conn:
-        trips = trips_crud.search_summaries_asst(
-            conn,
-            start_city=start_city,
-            end_city=end_city,
-            passenger_nr=passenger_nr,
-            start_date=start_date,
-        )
+        try:
+            trips = trips_crud.search_summaries_asst(
+                conn,
+                start_city=start_city,
+                end_city=end_city,
+                passenger_nr=passenger_nr,
+                start_date=start_date,
+            )
+        except ValueError as e:
+            flash("Veuillez sélectionner un point de départ et d’arrivée.")
+            return redirect(url_for("pages.index"))
+
+        except Exception as e:
+            logger.error(f"Error searching trips: {e}")
+            messages = ["Une erreur s'est produite. Réessayez plus tard."]
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html", messages=messages, msg_case="error"
+                ),
+                500,
+            )
+            return response
 
     return render_template(
         "pages/search_trips.html",
