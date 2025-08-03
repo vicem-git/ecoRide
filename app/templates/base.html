@@ -9,26 +9,48 @@
     <script type="module" src="http://localhost:5173/js/app.js"></script>
     {% endblock %}
   </head>
-  <body class="flex flex-col bg-ground text-contrast2 font-sans font-semibold items-center">
-   <div id="banner">
-     {% block banner %}
+  <body x-data :class="{ 'dark': $store.darkMode.on }" class="flex flex-col bg-ground text-contrast2 font-sans font-semibold items-center transition duration-200">
+    <div id="banner">
+      {% block banner %}
       {% include "partials/banner.html" %}
-     {% endblock %}
-   </div>
-   <div id="header" class="fixed top-2 flex flex-col justify-center items-center w-full h-[72px] z-99">
-     {% block header %}
+      {% endblock %}
+    </div>
+    <div id="header" class="fixed top-2 flex flex-col justify-center items-center w-full h-[72px] z-99">
+      {% block header %}
       {% include "partials/header.html" %}
-     {% endblock %}
-   </div>
-   <div id="main-content" class="w-[70%] bg-ground">
-     {% block main %}
+      {% endblock %}
+    </div>
+    <div id="main-content" class="w-[70%] bg-ground transition duration-200">
+      {% block main %}
       MAIN CONTENT
-     {% endblock %}
-   </div>
-   <footer id="footer" class="flex w-full p-4 bg-ground3 justify-center items-center">
-     {% block foot %}
+      {% endblock %}
+    </div>
+    <footer id="footer" class="flex w-full p-4 bg-ground3 justify-center items-center">
+      {% block foot %}
       {% include "partials/footer.html" %}
-     {% endblock %}
-   </footer>
+      {% endblock %}
+    </footer>
+    <div  
+      x-show="$store.modal.show" 
+      x-cloak 
+      class="fixed inset-0 bg-ground2/50 backdrop-blur-sm z-100 flex items-center justify-center"
+      x-transition
+      id="modal-backdrop">
+      <div
+        class="flex flex-col bg-white rounded-sm shadow-lg max-w-2xl w-full p-6 relative"
+        @click.outside="$store.modal.close()"
+        x-transition>
+        <button 
+          @click="$store.modal.close()"
+          class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+          ✕
+        </button>
+        <div id="global-modal" class="w-full">
+            <template x-if="$store.modal.errorMessage">
+              <div class="text-red-600 p-4 border border-red-300 rounded" x-html="$store.modal.errorMessage"></div>
+            </template>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

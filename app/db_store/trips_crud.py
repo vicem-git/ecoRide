@@ -181,7 +181,7 @@ def search_summaries_asst(
         cur.execute(query, params)
         trips = cur.fetchall()
 
-    return trips if trips else None
+    return trips
 
 
 def get_trip_summary(conn, trip_id):

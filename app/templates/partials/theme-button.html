@@ -1,3 +1,20 @@
-<button class="p-2 rounded-xl hover:bg-ground3 transition-colors duration-200">
-  <img src="{{ url_for('static', filename='graphics/eclipse-alt.svg') }}" alt="Theme Icon" class="w-[24px] h-[24px]"/>
-</button>
+<div class="p-2 flex items-center gap-1">
+  <svg viewBox="0 0 24 24" class="w-4 h-4">
+    {% include "graphics/sun_icon.html" %}
+  </svg>
+  <button
+    type="button"
+    @click="$store.darkMode.toggle()"
+    :class="$store.darkMode.on ? 'bg-eco text-ground2' : 'bg-ground4 text-ground4'"
+    class="relative w-12 h-6 transition-colors rounded-full duration-200"
+  >
+    <span
+      :class="$store.darkMode.on ? 'translate-x-6' : 'translate-x-1'"
+      class="absolute top-1 left-1 w-4 h-4 bg-contrast2 rounded-full transition-transform duration-200"
+    ></span>
+  </button>
+  <svg viewBox="0 0 24 24" class="w-4 h-4">
+    {% include "graphics/moon_icon.html" %}
+  </svg>
+</div>
+

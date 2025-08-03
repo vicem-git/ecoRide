@@ -11,17 +11,19 @@
 @theme {
   --color-eco: oklch(0.8383 0.2037 131.93);
   --color-eco-ground: oklch(0.9282 0.0679 131.93);
+  --color-eco-ground2: oklch(0.8882 0.0679 131.93);
+  --color-eco-ground3: oklch(0.7882 0.0679 131.93);
   --color-apart: oklch(0.6573 0.0456 275.07);
   --color-apart2: oklch(0.5861 0.0532 275.07);
   --color-apart3: oklch(0.5119 0.0532 275.07);
-  --color-ground: oklch(0.9799 0.0093 106.57);
-  --color-ground1: oklch(0.9532 0.0093 106.57);
-  --color-ground2: oklch(0.9036 0.0093 106.57);
-  --color-ground3: oklch(0.7671 0.0093 113.77);
-  --color-ground4: oklch(0.5988 0.0093 113.77);
-  --color-contrast: oklch(0.581 0.0616 148.17);
-  --color-contrast2: oklch(0.489 0.0616 148.17);
-  --color-contrast3: oklch(0.4471 0.0616 148.17);
+  --color-ground: oklch(0.970 0.0093 106.57);
+  --color-ground1: oklch(0.950 0.0093 106.57);
+  --color-ground2: oklch(0.920 0.0093 106.57);
+  --color-ground3: oklch(0.890 0.0093 113.77);
+  --color-ground4: oklch(0.850 0.0093 113.77);
+  --color-contrast: oklch(0.350 0.0616 148.17);
+  --color-contrast2: oklch(0.450 0.0616 148.17);
+  --color-contrast3: oklch(0.550 0.0616 148.17);
   --color-success: oklch(0.822 0.0831 147.34);
   --color-error: oklch(0.6565 0.1689 24.16);
 
@@ -29,10 +31,25 @@
 }
 
 .dark {
-  --color-base: oklch(0.3561 0.0706 147.88);
-  --color-base2: oklch(0.316 0.0228 192.02);
-  --color-contrast: oklch(0.386 0.0228 192.02);
-  --color-contrast2: oklch(0.4471 0.0616 148.17);
+  --color-eco: oklch(0.7091 0.1702 153.85);
+  --color-eco-ground: oklch(0.412 0.0563 146.44);
+  --color-eco-ground2: oklch(0.512 0.0563 146.44);
+  --color-eco-ground3: oklch(0.612 0.0563 146.44);
+  --color-apart: oklch(0.400 0.0518 202.55);
+  --color-apart2: oklch(0.500 0.0518 202.55);
+  --color-apart3: oklch(0.600 0.0518 202.55);
+  --color-ground: oklch(0.150 0.0456 275.07);
+  --color-ground1: oklch(0.190 0.0456 275.07);
+  --color-ground2: oklch(0.240 0.0456 275.07);
+  --color-ground3: oklch(0.270 0.0456 275.07);
+  --color-ground4: oklch(0.300 0.0456 275.07);
+  --color-contrast: oklch(0.600 0.1151 155.96);
+  --color-contrast2: oklch(0.500 0.1151 155.96);
+  --color-contrast3: oklch(0.450 0.1151 155.96);
+  --color-success: oklch(0.5424 0.0839 157.02);
+  --color-error: oklch(0.4297 0.1293 13.02);
+
+  --font-sans: "Open Sans", sans-serif;
 }
 
 html {
@@ -58,3 +75,13 @@ input[type="range"].range-slider::-webkit-slider-thumb {
 input[type="range"].range-slider::-moz-range-thumb {
   @apply w-4 h-4 bg-apart2 rounded-full;
 }
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+

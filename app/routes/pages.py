@@ -13,7 +13,8 @@ from datetime import datetime
 from flask_login import login_required, current_user
 from app.utils import static_id_resolver
 from app.db_store import user_crud, trips_crud
-from app.faker.villes import villes
+from app.models import TripSearchData
+from pydantic import ValidationError
 
 # MODULE LOGGER
 logger = logging.getLogger(__name__)
@@ -27,7 +28,6 @@ def index():
     return render_template(
         "pages/index.html",
         page_wrap="home",
-        cities=list(villes.keys()),
     )
 
 
@@ -68,26 +68,49 @@ def profile(user_id):
 def search_trips():
     start_city = request.args.get("start_city")
     end_city = request.args.get("end_city")
-    start_date = request.args.get("start_date") or datetime.now().isoformat()
-    passenger_nr = int(request.args.get("passenger_nr") or 1)
 
-    # NEED TO ESCAPE SMTH ?
+    if not start_city or not end_city:
+        return render_template("pages/search_trips.html")
+
+    params = request.args
+
     with current_app.db_manager.connection() as conn:
         try:
-            trips = trips_crud.search_summaries_asst(
-                conn,
-                start_city=start_city,
-                end_city=end_city,
-                passenger_nr=passenger_nr,
-                start_date=start_date,
+            search_data = TripSearchData(**params)
+            energy_type = search_data.energy_type
+
+            results = trips_crud.search_summaries_asst(
+                conn=conn,
+                start_city=search_data.start_city,
+                end_city=search_data.end_city,
+                passenger_nr=search_data.passenger_nr,
+                start_date=search_data.start_date,
+                max_price=search_data.max_price,
+                driver_rating=search_data.driver_rating,
+                energy_type=energy_type,
             )
-        except ValueError as e:
-            flash("Veuillez sélectionner un point de départ et d’arrivée.")
-            return redirect(url_for("pages.index"))
+
+            return render_template("pages/search_trips.html", trips=results)
+
+        except ValidationError as ve:
+            logger.error("Validation error during trip query: %s", ve.errors())
+            errors = ve.errors()
+            messages = [
+                error["msg"].removeprefix("Value error, ").strip() for error in errors
+            ]
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html", messages=messages, msg_case="error"
+                ),
+                400,
+            )
+            return response
 
         except Exception as e:
-            logger.error(f"Error searching trips: {e}")
-            messages = ["Une erreur s'est produite. Réessayez plus tard."]
+            logger.error("Error during trip query: %s", e)
+            messages = [
+                "Un erreur s'est produite lors de la recherche de trajets. reessayez plus tard."
+            ]
             response = make_response(
                 render_template(
                     "partials/server_msg.html", messages=messages, msg_case="error"
@@ -95,13 +118,6 @@ def search_trips():
                 500,
             )
             return response
-
-    return render_template(
-        "pages/search_trips.html",
-        page_wrap="search_trips",
-        trips=trips,
-        cities=list(villes.keys()),
-    )
 
 
 @pages_bp.route("/contact")

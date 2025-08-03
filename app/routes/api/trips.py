@@ -35,6 +35,7 @@ def query_trips():
         try:
             search_data = TripSearchData(**params)
             energy_type = search_data.energy_type
+            print(search_data)
 
             results = trips_crud.search_summaries_asst(
                 conn=conn,
@@ -47,9 +48,7 @@ def query_trips():
                 energy_type=energy_type,
             )
 
-            return render_template(
-                "trips/trip_results.html", page_wrap="query_trips", trips=results
-            )
+            return render_template("trips/trip_results.html", trips=results)
 
         except ValidationError as ve:
             logger.error("Validation error during trip query: %s", ve.errors())
@@ -86,6 +85,7 @@ def view_trip():
     return render_template("trips/trip_detail.html", trip_id=trip_id)
 
 
+@trips_bp.route("/join_trip/<trip_id>")
 @trips_bp.route("/passenger-trips/<status>")
 @htmx_login_required
 @require_ownership("for_user")

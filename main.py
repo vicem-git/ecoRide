@@ -10,7 +10,7 @@ from app.models import session_user_loader
 import atexit
 from datetime import datetime
 import locale
-from app.faker import seed_data
+from app.faker import seed_data, villes
 
 # Might raise error on some systems, TEST FOR DOCKER
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
@@ -29,6 +29,11 @@ def create_app():
     @app.context_processor
     def inject_year():
         return {"current_year": datetime.now().year}
+
+    @app.context_processor
+    def inject_cities():
+        cities = list(villes.keys())
+        return {"cities": cities}
 
     logging.basicConfig(
         level=logging.INFO,

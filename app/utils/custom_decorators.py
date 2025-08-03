@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import abort, redirect, url_for, request, make_response
+from flask import abort, redirect, url_for, request, make_response, render_template
 from flask_login import current_user
 
 
@@ -7,9 +7,14 @@ def htmx_login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
+            messages = ["Connectez-vous pour accéder à ce contenu."]
             if request.headers.get("HX-Request"):
-                response = make_response("", 401)
-                response.headers["HX-Redirect"] = url_for("auth.login")
+                response = make_response(
+                    render_template(
+                        "partials/server_msg.html", messages=messages, msg_case="error"
+                    ),
+                    401,
+                )
                 return response
             else:
                 return redirect(url_for("auth.login"))

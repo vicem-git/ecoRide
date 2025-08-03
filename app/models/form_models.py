@@ -109,23 +109,32 @@ class TripSearchData(BaseModel):
     )
     start_date: Optional[str] = None
     passenger_nr: Optional[int] = Field(default=1)
-    max_price: Optional[int] = None
-    driver_rating: Optional[int] = None
+    max_price: Optional[int] = Field(default=25)
+    driver_rating: Optional[int] = Field(default=3)
     eco_filter: bool = False
 
-    @field_validator("passenger_nr")
+    @field_validator("passenger_nr", mode="before")
     def default_passenger_nr(v):
-        return int(v) if v is not None else 1
+        return int(v) if v not in (None, "") else 1
+
+    @field_validator("max_price", mode="before")
+    def default_max_price(v):
+        return int(v) if v not in (None, "") else 25
+
+    @field_validator("driver_rating", mode="before")
+    def default_driver_rating(v):
+        return int(v) if v not in (None, "") else 3
 
     @field_validator("start_date")
     def validate_start_date(value):
         if not value:
             value = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return value.strip()
 
     @field_validator("start_city", "end_city")
     def validate_city(value):
         if not value or not value.strip():
-            raise ValueError("La ville départ/ arrivée ne peut pas être vide.")
+            raise ValueError("veuillez choisir une ville de départ/ arrivée.")
         return value.strip()
 
     @property

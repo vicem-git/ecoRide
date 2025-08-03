@@ -8,12 +8,36 @@ Recherche de voyages
 <main id="index-main" class="pt-2 pb-8 flex flex-col min-h-screen w-full">
   <div id="searchbar">
     {% include "partials/searchbar.html" %}
-    <div id="search_error_msg"></div>
   </div>
   <div id="trip-search-main" class="flex w-full pt-4 gap-4">
-    {% include "trips/trip_filters.html" %}
     <div id="trips-container" class="w-full">
       <div id="search_error_msg" class="hidden"></div>
+      {% if not trips %}
+        <div class="p-4 flex flex-col bg-ground1 text-contrast items-center gap-4">
+          <p class="text-lg">veuillez choisir une ville de départ/ arrivée.</p>
+          <p>Voici quelques exemples de trajets populaires :</p>
+          <ul class="flex-col p-6 bg-ground2 rounded-sm space-y-4">
+            <li>
+              <a href="/search_trips?start_city=Paris&end_city=Lyon&eco_filter=true" class="flex gap-2 whitespace-nowrap text-lg text-contrast2 hover:bg-ground4">
+                Paris → Lyon,
+                <svg viewBox="0 0 24 24" class="w-6 h-6">
+                  {% include "graphics/eco-trip.html" %}
+                </svg>
+                <p class="text-sm text-eco">eco voyage</p>
+              </a>
+            </li>
+            <li>
+              <a href="/search_trips?start_city=Marseille&end_city=Nice&eco_filter=true" class="flex gap-2  whitespace-nowrap text-lg text-contrast2 hover:bg-ground4">
+                Marseille → Nice, 
+                <svg viewBox="0 0 24 24" class="w-6 h-6">
+                  {% include "graphics/eco-trip.html" %}
+                </svg>
+                <p class="text-sm text-eco">eco voyage</p>
+              </a>
+            </li>
+          </ul>
+        </div>
+      {% endif %}
       {% include "trips/trip_results.html" %} 
     </div>
   </div>

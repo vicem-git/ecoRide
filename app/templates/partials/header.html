@@ -1,7 +1,9 @@
 <div class='flex w-[68%] h-fit'>
-  <header class="flex p-2 w-full rounded-xs bg-ground2 justify-between items-center z-10"> 
+  <header class="flex p-2 w-full rounded-xs bg-ground2 opacity-95 justify-between items-center z-99"> 
     <div class="flex items-center">
-      <img src="{{ url_for('static', filename='graphics/logo2.svg') }}" class="h-fit"/>
+      <svg viewBox="0 0 209 37" class="ml-6 w-[209px] h-[48px]">
+        {% include "graphics/logo.html" %}
+      </svg>
     </div>
     <div class="flex items-center">
       {% include "partials/navbar.html" %}

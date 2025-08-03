@@ -1,42 +1,44 @@
-<form
-  id="filters-form"
-  x-data="{ eco: false, price: 25, rating: 3 }"
-  hx-get="{{ url_for('trips.query_trips') }}"
-  hx-target="#trips-container"
-  hx-trigger="click from:#apply-filters"
-  hx-include="#start_city_param, #end_city_param, #passenger_nr_filter, #start_date_filter, #eco_filter, #price_filter, #driver_rating_filter""
-  hx-on::response-error="document.querySelector('#trips-container').innerHTML = event.detail.xhr.response;"
+<div class="relative inline-block" x-data="{ dropdownOpen: false }">
+  <button
+    type="button"
+    @click="dropdownOpen = !dropdownOpen"
+    class="p-2 flex rounded-sm hover:bg-ground4 transition-colors duration-200"
   >
-  <div id="filters-container" class="p-4 flex flex-col bg-ground2 gap-2 rounded-sm">
-    <label class="p-2 flex items-center justify-center gap-4 mb-4">
-      <svg viewBox="0 0 24 24" class="w-[32px] h-[32px]">
-        {% include "graphics/filters_icon.html" %}
-      </svg>
-    </label>
-    <div x-data="{ eco:false }" class="flex items-center gap-3">
+    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+      {% include "graphics/filters_icon.html" %}
+    </svg>
+  </button>
+  <div
+    id="filters-dropdown"
+    x-cloak
+    x-show="dropdownOpen"
+    @click.outside="dropdownOpen = false"
+    x-transition
+    class="p-4 absolute flex flex-col bg-ground2 gap-1 rounded-sm z-99"
+  >
+    <div class="flex items-center gap-3">
       <label for="eco-filter">eco voyages</label>
       <button
         type="button"
-        @click="eco = !eco"
-        :class="eco ? 'bg-eco text-ground3' : 'bg-ground3 text-ground4'"
-        class="w-12 h-6 transition-colors rounded-full duration-200 relative"
+        @click="$store.tripSearch.tripEco = !$store.tripSearch.tripEco"
+        :class="$store.tripSearch.tripEco ? 'bg-eco' : 'bg-ground4'"
+        class="w-12 h-6 transition-colors rounded-full duration-200 relative z-0"
       >
         <span
-          :class="eco ? 'translate-x-6' : 'translate-x-1'"
-          class="absolute left-1 top-1 w-4 h-4 bg-ground2 rounded-full transition-transform duration-200"
+          :class="$store.tripSearch.tripEco ? 'translate-x-6' : 'translate-x-1'"
+          class="absolute left-1 top-1 w-4 h-4 bg-contrast2 rounded-full transition-transform duration-200"
         ></span>
-      </button>
-      <input id="eco_filter" type="hidden" name="eco_filter" :value="eco ? 'true' : 'false'">
+      </button> 
     </div>
 
-    <div class="flex flex-col space-y-4">
-      <label for="price_filter" class="flex text-ground4 items-center gap-2">
+    <div class="flex flex-col">
+      <label for="price_filter" class="flex text-contrast2 text-sm items-center gap-2">
         Prix maximum
-        <span x-text="price + '€'"></span>
+        <span x-text="$store.tripSearch.price + ' €'"></span>
       </label>
       <input
         id="price_filter"
-        x-model="price"
+        x-model="$store.tripSearch.price"
         type="range"
         name="max_price"
         min="0"
@@ -44,13 +46,13 @@
         step="1"
         class="range-slider mb-2"
       ></input>
-      <label for="driver_rating_filter" class="text-ground4">
+      <label for="driver_rating_filter" class="text-contrast2 text-sm gap-2">
         Note du conducteur
-        <span x-text="rating + '★' "></span>
+        <span x-text="$store.tripSearch.rating + ' ★' "></span>
       </label>
       <input
         id="driver_rating_filter"
-        x-model="rating"
+        x-model="$store.tripSearch.rating"
         type="range"
         name="driver_rating_filter"
         min="0"
@@ -59,11 +61,6 @@
         class="range-slider"
       ></input>
     </div>
-    <button 
-      id="apply-filters" 
-      type="button"
-      class="mt-4 px-4 py-2 bg-ground3 hover:bg-ground4 text-ground2 rounded-sm">
-      Appliquer les filtres
-    </button>
   </div>
-</form>
+</div>
+
