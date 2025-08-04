@@ -9,7 +9,7 @@
           </svg>
           {{ trip.summary.end_city }}
         </div>
-        <div class="flex text-base text-apart3 space-x-6 items-end">
+        <div class="flex text-base font-normal text-apart3 space-x-6 items-end">
           <p>{{ trip.summary.start_time|fr_date }}</p>
           <p class="text-lg">·····</p>
           <p>{{ trip.summary.estimated_duration_min }} min</p>
@@ -28,8 +28,8 @@
           <div class="w-16 h-16 rounded-full overflow-hidden">
             <img src="{{ trip.summary.driver_photo }}"/>
           </div>
-          <div class="flex flex-col items-end justify-between">
-            <p class="text-xl text-apart2">{{ trip.summary.driver_name }}</p>
+           <div class="flex flex-col font-normal text-apart3 items-end justify-between">
+            <p class="text-xl font-semibold">{{ trip.summary.driver_name }}</p>
             <p>
               {% for r in range(trip.summary.driver_rating) %}
                 ★
@@ -38,31 +38,29 @@
                 ☆
               {% endfor %}
             </p>
-            <p class="text-sm">
-              {{ trip.summary.vehicle.brand }} {{ trip.summary.vehicle.model }}
-            </p>
-            <p class="text-sm">
-              {{ trip.available_seats }} pl. dispo
-            </p>
+            <span class="text-apart2">
+              places :
+              {{ trip.available_seats }}
+            </span>
           </div>
         </div>
-        <div class="flex flex-col text-ground4 gap-4 items-center">
+        <div class="flex flex-col text-apart3 gap-4 items-center">
+          <p>
+            <strong>{{ trip.summary.price }} €</strong>
+          </p>
           <button
             hx-get="{{ url_for('trips.view_trip', trip_id=trip.trip_id) }}"
             hx-target="#global-modal"
             hx-swap="innerHTML"
             hx-on::after-request="window.Alpine.store('modal').open()"
             hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-            class="p-4 rounded bg-eco-ground2 text-apart3 hover:bg-eco-ground3 hover:text-apart2 transition-colors">
-            Voir détail
+            class="p-2 rounded bg-eco-ground2 text-apart3 hover:bg-eco-ground3 hover:text-apart2 transition-colors">
+            détail
           </button>
-          <p class="text-apart3">
-            <strong>{{ trip.summary.price }}€</strong>
-          </p>
         </div>
       </div> 
     </div>
   {% else %}
     <p>Aucun voyage trouvé.</p>
-    {% endfor %}
+  {% endfor %}
 </div>

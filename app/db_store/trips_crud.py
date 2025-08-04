@@ -61,6 +61,14 @@ def get_trip_by_id(conn, trip_id):
         return trip_data if trip_data else None
 
 
+def join_trip(conn, trip_id, user_id):
+    now = datetime.now()
+    # trip status ok
+    # enough credits ?
+    # enough seats ?
+    return False
+
+
 def update_trip_status(conn, trip_id, new_status):
     conn.autocommit = True
     with conn.cursor() as cur:
@@ -184,13 +192,13 @@ def search_summaries_asst(
     return trips
 
 
-def get_trip_summary(conn, trip_id):
+def get_trip_summary_asst(conn, trip_id):
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             """
-            SELECT s.*
-            FROM trip_summaries s
-            WHERE s.trip_id = %s
+            SELECT *
+            FROM trip_summaries_asst t
+            WHERE t.trip_id = %s
             """,
             (trip_id,),
         )

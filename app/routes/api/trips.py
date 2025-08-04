@@ -80,20 +80,53 @@ def query_trips():
 
 @trips_bp.route("/view_trip/<trip_id>")
 @htmx_login_required
-def view_trip():
+def view_trip(trip_id):
     trip_id = request.view_args.get("trip_id")
-    return render_template("trips/trip_detail.html", trip_id=trip_id)
+
+    with current_app.db_manager.connection() as conn:
+        result = trips_crud.get_trip_summary_asst(conn, trip_id)
+        return render_template("trips/trip_detail.html", trip=result)
 
 
-@trips_bp.route("/join_trip/<trip_id>")
+@trips_bp.route("/join_trip/<trip_id>", methods=["GET", "POST"])
+@htmx_login_required
+def join_trip(trip_id):
+    if request.method == "GET":
+        return render_template("trips/join_trip.html", trip_id=trip_id)
+
+    trip_id = request.form.get("trip_id")
+    user_id = current_user.user_id
+
+    with current_app.db_manager.connection() as conn:
+        try:
+            trips_crud.join_trip(conn, trip_id, user_id)
+            messages = ["Vous avez rejoint le trajet avec succès."]
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html", messages=messages, msg_case="success"
+                ),
+                200,
+            )
+            return response
+
+        except Exception as e:
+            logger.error("Error joining trip: %s", e)
+            messages = ["Une erreur s'est produite, reessayez plus tard."]
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html", messages=messages, msg_case="error"
+                ),
+                500,
+            )
+            return response
+
+
 @trips_bp.route("/passenger-trips/<status>")
 @htmx_login_required
 @require_ownership("for_user")
 def passenger_trips_by_status(status):
     status = request.view_args.get("status")
     user_id = current_user.user_id
-
-    print(status)
 
     try:
         status_id = static_name_resolver("trip_status", status)

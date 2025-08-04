@@ -3,6 +3,7 @@ from flask import current_app
 import logging
 from psycopg.rows import dict_row
 from app.models import SessionUser
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +29,23 @@ def get_user_by_account_id(conn, account_id):
         return user_id if user_id else None
 
 
-def get_user_public_data(conn, user_id):
+def get_user_public_data(conn, identifier):
     conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            "SELECT id, username, photo_url FROM users WHERE id = %s", (user_id,)
-        )
+        try:
+            uuid_obj = uuid.UUID(identifier, version=4)
+            cur.execute(
+                "SELECT id, username, photo_url FROM users WHERE id = %s",
+                (str(uuid_obj),),
+            )
+        except ValueError:
+            cur.execute(
+                "SELECT id, username, photo_url FROM users WHERE username = %s",
+                (identifier,),
+            )
+        except Exception as e:
+            return {"error": str(e)}
+
         user_data = cur.fetchone()
         return user_data if user_data else None
 

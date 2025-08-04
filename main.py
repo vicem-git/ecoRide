@@ -24,17 +24,6 @@ def create_app():
 
     app.jinja_env.filters["fr_date"] = fr_date
 
-    # CONTEXT PROCESSOR TEST cool
-    # use to inject variables into templates globally
-    @app.context_processor
-    def inject_year():
-        return {"current_year": datetime.now().year}
-
-    @app.context_processor
-    def inject_cities():
-        cities = list(villes.keys())
-        return {"cities": cities}
-
     logging.basicConfig(
         level=logging.INFO,
         format="%(message)s",
@@ -92,6 +81,15 @@ def create_app():
     app.register_blueprint(users_bp)
     app.register_blueprint(drivers_bp)
     app.register_blueprint(trips_bp)
+
+    @app.context_processor
+    def inject_year():
+        return {"current_year": datetime.now().year}
+
+    @app.context_processor
+    def inject_cities():
+        cities = list(villes.keys())
+        return {"cities": cities}
 
     login_manager.login_view = "pages.login"
 

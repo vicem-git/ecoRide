@@ -18,10 +18,11 @@ logger = logging.getLogger(__name__)
 
 @drivers_bp.route("/driver_data/<user_id>")
 @htmx_login_required
-@require_ownership("user_id")
 def get_driver_data(user_id):
     user_id = request.view_args.get("user_id")
     owner = str(current_user.user_id) == str(user_id)
+
+    print(f"Fetching driver data for user_id: {user_id}, owner: {owner}")
 
     driver_info = {}
     with current_app.db_manager.connection() as conn:
@@ -47,18 +48,18 @@ def get_driver_data(user_id):
 
 @drivers_bp.route("/edit_driver_preferences", methods=["GET", "POST"])
 @htmx_login_required
-@require_ownership("user_id")
+@require_ownership("for_user")
 def edit_driver_preferences():
     with current_app.db_manager.connection() as conn:
         driver_data = driver_crud.get_driver_data(conn, current_user.user_id)
         driver_id = driver_data["id"] if driver_data else None
 
         if request.method == "GET":
-            prefs = driver_crud.get_driver_preferences(conn, driver_id)
+            prefs = driver_crud.get_driver_preferences(conn, driver_id) or []
             all_prefs = driver_crud.get_all_driver_preferences(conn)
 
             return render_template(
-                "partials/driver_preferences_form.html",
+                "drivers/driver_preferences_form.html",
                 selected_prefs=prefs,
                 all_prefs=all_prefs,
             )
@@ -67,12 +68,11 @@ def edit_driver_preferences():
         driver_id = driver_data["id"] if driver_data else None
 
         new_prefs = request.form.getlist("preferences")
-        print(f"New preferences from form: {new_prefs}")
         driver_crud.set_driver_preferences(conn, driver_id, new_prefs)
 
         # Re-fetch updated prefs for display
         updated_prefs = driver_crud.get_driver_preferences(conn, driver_id)
-        print(f"Updated preferences: {updated_prefs}")
+
         return render_template(
             "drivers/driver_preferences.html", preferences=updated_prefs, owner=True
         )
@@ -80,14 +80,14 @@ def edit_driver_preferences():
 
 @drivers_bp.route("add_vehicle", methods=["GET", "POST"])
 @htmx_login_required
-@require_ownership("user_id")
+@require_ownership("for_user")
 def add_vehicle():
     if request.method == "GET":
         with current_app.db_manager.connection() as conn:
             brands = driver_crud.get_vehicle_brands(conn)
             energy_types = driver_crud.get_energy_types(conn)
         return render_template(
-            "partials/add_vehicle_form.html", brands=brands, energy_types=energy_types
+            "drivers/add_vehicle_form.html", brands=brands, energy_types=energy_types
         )
 
     elif request.method == "POST":
@@ -115,7 +115,7 @@ def add_vehicle():
 
 @drivers_bp.route("/remove_vehicle/<uuid:vehicle_id>", methods=["POST"])
 @htmx_login_required
-@require_ownership("user_id")
+@require_ownership("for_user")
 def remove_vehicle(vehicle_id):
     with current_app.db_manager.connection() as conn:
         driver_data = driver_crud.get_driver_data(conn, current_user.user_id)

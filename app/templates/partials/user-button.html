@@ -11,6 +11,7 @@
     x-cloak
     x-show="dropdownOpen"
     x-transition
+    @click.outside="dropdownOpen = false"
     class="p-2 absolute flex flex-col bg-ground2 gap-1 rounded-sm z-99"
   >
     {% if not current_user.is_authenticated %}
@@ -22,7 +23,7 @@
         <p> Inscription </p>
       </a>
     {% elif current_user.is_authenticated and current_user.user_id %}
-      <a href="{{ url_for('pages.profile', user_id=current_user.user_id) }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+      <a href="{{ url_for('pages.profile', identifier=current_user.user_id) }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
         <p> Tableau de bord </p>
       </a>
 

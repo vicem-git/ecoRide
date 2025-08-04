@@ -1,6 +1,11 @@
-<section class="p-4 flex flex-col gap-8 justify-center items-center">
-  <h2 class="text-xl font-bold">Informations du conducteur</h2>
-  {% include "drivers/driver_preferences.html" %} 
+<section class="p-4 flex flex-col rounded-sm w-full bg-ground3 gap-2 justify-center items-start">
+  <div class="flex items-center">
+    <h2 class="text-lg font-bold">Informations conducteur.ice</h2>
+    <p class="ml-12">rating : {{ driver_data.data.rating }} </p>
+  </div>
+  <section class="flex items-center"> 
+    {% include "drivers/driver_preferences.html" %}
+  </section>
   {% include "drivers/driver_vehicles.html" %}
 </section>
 

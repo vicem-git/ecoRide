@@ -55,7 +55,7 @@ def get_all_driver_preferences(conn):
 def add_vehicles(conn, driver_id, vehicle_data):
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO vehicles (driver_id, model, registration_date, plate_number, color, number_of_seats, brand, energy_type_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+            "INSERT INTO vehicles (driver_id, model, registration_date, plate_number, color, number_of_seats, brand, energy_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
             (
                 driver_id,
                 vehicle_data["model"],
@@ -85,7 +85,7 @@ def get_driver_vehicles(conn, driver_id):
     conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
-            "SELECT v.id, v.model, v.registration_date, v.plate_number, v.color, v.number_of_seats, b.name AS brand, e.name AS energy_type FROM vehicles v JOIN vehicle_brand b ON v.brand = b.id JOIN energy_types e ON v.energy_type_id = e.id WHERE v.driver_id = %s",
+            "SELECT v.id, v.model, v.registration_date, v.plate_number, v.color, v.number_of_seats, b.name AS brand, e.name AS energy_type FROM vehicles v JOIN vehicle_brand b ON v.brand = b.id JOIN energy_types e ON v.energy_type = e.id WHERE v.driver_id = %s",
             (driver_id,),
         )
         vehicles = cur.fetchall()

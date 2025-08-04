@@ -1,33 +1,24 @@
-<section class="flex flex-col gap-4 justify-center w-full">
-  <div class="flex flex-row gap-4 bg-ground2 justify-left items-center">
+<section class="flex flex-col bg-ground2 rounded-sm gap-4 justify-center">
+  <div class="flex flex-row gap-4 justify-left items-center">
     <div class="p-4 w-48 h-48">
-      <img src="{{ profile_user.photo_url or url_for('static', filename='graphics/default-profile2.jpg') }}" alt="profile-pic" class="object-cover rounded-full">
+      <img src="/{{ profile_user.photo_url }}" alt="profile-pic" class="object-cover rounded-full">
     </div>
     <div class="p-4 flex gap-4">
       <div class="p-4">
-        <h2 class="text-xl font-semibold mb-2">Your Profile</h2>
-        <p>Username: {{ profile_user.username }}</p>
-        <p>Email: {{ profile_user.email }}</p>
+        <h2 class="text-xl font-semibold">{{ profile_user.username }}</h2>
+        <p>{{ profile_user.email }}</p>
         {% if owner %}
-        <div id="credits-container" hx-get="{{ url_for('users.get_account_credits', for_user=current_user.user_id) }}" hx-trigger="load" hx-swap="innerHTML">
+          <div id="credits-container" hx-get="{{ url_for('users.get_account_credits', for_user=current_user.user_id) }}" hx-trigger="load" hx-swap="innerHTML">
             Loading credits...
           </div> 
         {% endif %}
-      </div> 
-      <div id="roles-container" class="flex flex-col p-4 gap-4">
-        <p>Rôles: {{ roles }}</p>
+      </div>
+      <div id="roles-container" class="flex p-4 gap-6">
+        <p>Rôles :{% for role in roles %}<span class="text-apart"><br>{{ role }}</span>{% endfor %}</p>
         {% if owner %}
-          <button
-            class="p-2 bg-ground3 text-ground1 rounded-sm hover:bg-ground4"
-            hx-get="{{ url_for('users.edit_roles', for_user=current_user.user_id) }}"
-            hx-target="#roles-container"
-            hx-swap="innerHTML"
-          >
-          Modifier les rôles
-          </button>
         {% endif %}
       </div>
-    </div>
+    </div> 
   </div>
 </section>
 

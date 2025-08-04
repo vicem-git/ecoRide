@@ -63,7 +63,7 @@ def register_user():
                     render_template(
                         "partials/server_msg.html", message=message, msg_case="error"
                     ),
-                    200,
+                    400,
                 )
 
             if user_crud.check_username(conn, reg_data.username):
@@ -72,7 +72,7 @@ def register_user():
                     render_template(
                         "partials/server_msg.html", message=message, msg_case="error"
                     ),
-                    200,
+                    400,
                 )
 
             hashed_pw = bcrypt.generate_password_hash(reg_data.password, 14).decode(
@@ -121,7 +121,7 @@ def register_user():
             render_template(
                 "partials/server_msg.html", messages=messages, msg_case="error"
             ),
-            200,
+            400,
         )
 
     except Exception as e:
@@ -154,7 +154,7 @@ def login():
                     render_template(
                         "partials/server_msg.html", messages=messages, msg_case="error"
                     ),
-                    200,
+                    400,
                 )
                 return response
 
@@ -165,7 +165,7 @@ def login():
                     render_template(
                         "partials/server_msg.html", messages=messages, msg_case="error"
                     ),
-                    200,
+                    400,
                 )
                 return response
 
@@ -185,7 +185,7 @@ def login():
                     render_template(
                         "partials/server_msg.html", messages=messages, msg_case="error"
                     ),
-                    200,
+                    400,
                 )
                 return response
 
@@ -212,7 +212,7 @@ def login():
             elif access_level == "moderator":
                 url = url_for("pages.moderator_dashboard")
             elif access_level == "user" and session_user.user_id is not None:
-                url = url_for("pages.profile", user_id=session_user.user_id)
+                url = url_for("pages.profile", identifier=session_user.user_id)
             elif access_level == "user" and session_user.user_id is None:
                 url = url_for("pages.onboard")
             else:
@@ -234,7 +234,7 @@ def login():
             render_template(
                 "partials/server_msg.html", messages=messages, msg_case="error"
             ),
-            200,
+            400,
         )
 
     except Exception as e:

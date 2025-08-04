@@ -15,9 +15,11 @@ Connexion
       id="login-form"
       method="POST"
       hx-post="{{ url_for('auth.login') }}"
-      hx-target="#login-server-messages"
+      hx-target="#global-modal"
       hx-swap="innerHTML"
       hx-trigger="submit"
+      hx-on::after-request="window.Alpine.store('modal').open()"
+      hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
       class="flex flex-col items-center"
     >
       <div class="text-xl flex flex-col items-center justify-center mb-12 gap-3">

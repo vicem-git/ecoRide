@@ -1,7 +1,6 @@
 import '@/css/tw-output.css'
 import htmx from 'htmx.org';
 import { toggleHidden } from '@/js/modules/domUtils.js';
-import 'tom-select/dist/css/tom-select.css';
 import Alpine from 'alpinejs'
 import persist from '@alpinejs/persist'
 
@@ -45,9 +44,12 @@ Alpine.store('tripSearch', {
 
 Alpine.start();
 
-
 window.htmx = htmx;
 window.toggleHidden = toggleHidden;
+
+window.addEventListener('pageshow', () => {
+  Alpine.store('modal').close();
+});
 
 document.body.addEventListener("htmx:beforeSwap", () => {
   document.querySelectorAll(".dropdown").forEach((dropdown) => {

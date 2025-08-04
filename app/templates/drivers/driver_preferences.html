@@ -1,23 +1,29 @@
-<div id="driver-preferences" class="flex flex-col rounded-sm gap-4 p-4 bg-[var(--color-base2)] justify-center items-center w-full">
-  <p>préférences du conducteur</p>
-  {% if driver_info and driver_info.preferences %}
-    {% set preferences = driver_info.preferences %}
-  {% elif preferences is not defined %}
-    {% set preferences = [] %}
-    <p class="text-ground3">Aucune préférence définie.</p>
-  {% endif %}
-  {% if preferences %}
-    <p class="text-sm text-gray-700">
-      {{ preferences | map(attribute='name') | join(' — ') }}
-    </p>
-  {% else %}
-    <p class="text-ground3">Aucune préférence définie.</p>
-  {% endif %}
+<div class="flex items-center justify-center gap-4 p-4">
+  <div id="driver-preferences" class="flex flex-col rounded-sm gap-4 p-4 justify-center items-center w-full">
+    <p>préférences du conducteur</p>
+    {% if driver_data and driver_data.preferences %}
+      {% set preferences = driver_data.preferences %}
+    {% elif preferences is not defined %}
+      {% set preferences = [] %}
+      <p class="text-ground3">Aucune préférence définie.</p>
+    {% endif %}
+    {% if preferences %}
+      <p class="flex flex-col">
+        {% for preference in preferences %}
+          <span class="text-sm text-contrast3">{{ preference.name }}</span>
+        {% endfor %}
+      </p>
+    {% else %}
+      <p class="text-ground3">Aucune préférence définie.</p>
+    {% endif %}
+  </div>
   {% if owner %}
     <button 
-      hx-get="{{ url_for('drivers.edit_driver_preferences') }}"
-      hx-target="#driver-preferences"
-      hx-swap="outerHTML"
+      hx-get="{{ url_for('drivers.edit_driver_preferences', for_user=current_user.user_id) }}"
+      hx-target="#global-modal"
+      hx-swap="innerHTML"
+      hx-on::after-request="window.Alpine.store('modal').open()"
+      hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
       class="p-2 bg-ground2"
     >Modifier</button>
   {% endif %}

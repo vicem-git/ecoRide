@@ -12,6 +12,33 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO e
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "postgis";
 
+CREATE TABLE platform_balance (
+  id BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (id),
+  balance INTEGER NOT NULL DEFAULT 0 CHECK (balance >= 0)
+);
+
+CREATE TABLE tx_status (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(50) UNIQUE NOT NULL
+);
+
+INSERT INTO tx_status (name) VALUES
+('completed'),
+('pending'),
+('refunded'),
+('archived'),
+('cancelled'),
+('failed');
+
+CREATE TABLE transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tx_from UUID NOT NULL REFERENCES users(id),
+  tx_to UUID NOT NULL REFERENCES users(id),
+  amount INTEGER NOT NULL CHECK (amount > 0),
+  trip_id UUID NOT NULL REFERENCES trips(id),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status UUID NOT NULL REFERENCES tx_status(id)
+);
 
 CREATE TABLE account_access (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -38,8 +65,8 @@ CREATE TABLE accounts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    account_access_id UUID NOT NULL REFERENCES account_access(id) ON DELETE CASCADE, 
-    account_status_id UUID NOT NULL REFERENCES account_status(id) ON DELETE CASCADE,
+    account_access_id UUID NOT NULL REFERENCES account_access(id), 
+    account_status_id UUID NOT NULL REFERENCES account_status(id),
     created_at TIMESTAMP DEFAULT now()
 );
 
@@ -55,7 +82,7 @@ INSERT INTO roles (name) VALUES
 
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    account_id UUID UNIQUE NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    account_id UUID UNIQUE NOT NULL REFERENCES accounts(id) ON DELETE SET NULL,
     username VARCHAR(30) UNIQUE NOT NULL,
     photo_url VARCHAR(255) NULL,
     credits INTEGER DEFAULT 20 CHECK (credits >= 0)

@@ -3,7 +3,7 @@
   <head>
     {% block head %}
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='graphics/ecoride-logo.svg') }}" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='graphics/fav-ecoride.svg') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %} - ecoRide</title>
     <script type="module" src="http://localhost:5173/js/app.js"></script>
@@ -37,17 +37,17 @@
       x-transition
       id="modal-backdrop">
       <div
-        class="flex flex-col bg-white rounded-sm shadow-lg max-w-2xl w-full p-6 relative"
+        class="flex flex-col bg-ground rounded-sm shadow-lg p-6 relative"
         @click.outside="$store.modal.close()"
         x-transition>
         <button 
           @click="$store.modal.close()"
-          class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+          class="absolute p-2 top-2 right-2 text-gray-500 hover:text-gray-700">
           ✕
         </button>
         <div id="global-modal" class="w-full">
             <template x-if="$store.modal.errorMessage">
-              <div class="text-red-600 p-4 border border-red-300 rounded" x-html="$store.modal.errorMessage"></div>
+              <div class="text-error p-4" x-html="$store.modal.errorMessage"></div>
             </template>
         </div>
       </div>

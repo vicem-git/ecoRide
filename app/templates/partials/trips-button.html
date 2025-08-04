@@ -15,6 +15,7 @@
     id="trips-dropdown" 
     x-cloak
     x-show="dropdownOpen"
+    @click.outside="dropdownOpen = false"
     x-transition
     class="p-2 absolute flex flex-col rounded-sm gap-2 bg-ground2">
     <a
