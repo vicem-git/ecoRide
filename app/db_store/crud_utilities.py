@@ -27,6 +27,7 @@ def configure_conn(conn, schema_name):
 
 
 STATIC_TABLES = [
+    "tx_status",
     "account_access",
     "account_status",
     "roles",

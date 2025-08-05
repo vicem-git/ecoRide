@@ -5,21 +5,22 @@ Tableau de bord
 {% endblock %}
 
 {% block main %}
-<main class="p-8 min-h-screen">
-  <div class="flex flex-col justify-center gap-4 p-4 w-full">
+<section class="p-8 flex w-full min-h-screen">
+  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center justify-center w-[90%]">
     {% include "users/profile_summary.html" %}
-    {% if "driver" in roles %} 
-        <div 
-          hx-get="{{ url_for('drivers.get_driver_data', user_id=profile_user.id) }}" 
-          hx-trigger="load"
-          hx-target="#driver-profile-container" 
-          hx-swap="innerHTML"
-        ></div>
-        <div id="driver-profile-container"></div>
+    {% if "driver" in roles %}
+      <div 
+        hx-get="{{ url_for('drivers.get_driver_data', user_id=profile_user.id) }}" 
+        hx-trigger="load"
+        hx-target="#driver-profile-container" 
+        hx-swap="innerHTML"
+      ></div>
+      <div id="driver-profile-container"></div>
     {% endif %}
+
     {% if owner %}
       {% include "trips/user_trips.html" %}
     {% endif %}
   </div>
-</main>
+</section>
 {% endblock %}

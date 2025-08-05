@@ -22,8 +22,6 @@ def get_driver_data(user_id):
     user_id = request.view_args.get("user_id")
     owner = str(current_user.user_id) == str(user_id)
 
-    print(f"Fetching driver data for user_id: {user_id}, owner: {owner}")
-
     driver_info = {}
     with current_app.db_manager.connection() as conn:
         driver_data = driver_crud.get_driver_data(conn, user_id)
@@ -104,7 +102,6 @@ def add_vehicle():
         with current_app.db_manager.connection() as conn:
             driver_data = driver_crud.get_driver_data(conn, current_user.user_id)
             driver_id = driver_data["id"] if driver_data else None
-            print(f"Driver ID: {driver_id}")
 
             driver_crud.add_vehicles(conn, driver_id, data)
             vehicles = driver_crud.get_driver_vehicles(conn, driver_id)

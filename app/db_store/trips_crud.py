@@ -1,34 +1,50 @@
+from flask import current_app
 from psycopg.rows import dict_row
 from datetime import datetime
 import json
 from geopy.distance import geodesic
+from uuid import uuid4
+
+villes = {
+    "Paris": {"lat": 48.85341, "lng": 2.34880},
+    "Marseille": {"lat": 43.29695, "lng": 5.38107},
+    "Lyon": {"lat": 45.74846, "lng": 4.84671},
+    "Toulouse": {"lat": 43.60426, "lng": 1.44367},
+    "Nice": {"lat": 43.70313, "lng": 7.26608},
+    "Nantes": {"lat": 47.21725, "lng": -1.55336},
+    "Strasbourg": {"lat": 48.58392, "lng": 7.74553},
+    "Montpellier": {"lat": 43.61092, "lng": 3.87723},
+    "Bordeaux": {"lat": 44.84044, "lng": -0.58050},
+    "Lille": {"lat": 50.63297, "lng": 3.05858},
+    "Rennes": {"lat": 48.11198, "lng": -1.67429},
+    "Reims": {"lat": 49.25000, "lng": 4.03333},
+    "Le Havre": {"lat": 49.49380, "lng": 0.10767},
+    "Grenoble": {"lat": 45.17155, "lng": 5.72239},
+    "Dijon": {"lat": 47.31667, "lng": 5.01667},
+}
 
 
 def reverse_lookup_coords(lat, lng):
-    villes = {
-        "Paris": {"lat": 48.85341, "lng": 2.34880},
-        "Marseille": {"lat": 43.29695, "lng": 5.38107},
-        "Lyon": {"lat": 45.74846, "lng": 4.84671},
-        "Toulouse": {"lat": 43.60426, "lng": 1.44367},
-        "Nice": {"lat": 43.70313, "lng": 7.26608},
-        "Nantes": {"lat": 47.21725, "lng": -1.55336},
-        "Strasbourg": {"lat": 48.58392, "lng": 7.74553},
-        "Montpellier": {"lat": 43.61092, "lng": 3.87723},
-        "Bordeaux": {"lat": 44.84044, "lng": -0.58050},
-        "Lille": {"lat": 50.63297, "lng": 3.05858},
-        "Rennes": {"lat": 48.11198, "lng": -1.67429},
-        "Reims": {"lat": 49.25000, "lng": 4.03333},
-        "Le Havre": {"lat": 49.49380, "lng": 0.10767},
-        "Grenoble": {"lat": 45.17155, "lng": 5.72239},
-        "Dijon": {"lat": 47.31667, "lng": 5.01667},
-    }
     for city, coords in villes.items():
         if abs(coords["lat"] - lat) < 0.05 and abs(coords["lng"] - lng) < 0.05:
             return city
     return "Unknown"
 
 
-def create_tripp(conn, trip_data):
+def city_to_coords(city):
+    if city in villes:
+        coords = villes[city]
+        if not coords:
+            raise ValueError(f"City '{city}' not found in predefined cities.")
+
+        point_wkt = f"POINT({coords['lng']} {coords['lat']})"
+        return point_wkt
+
+
+def create_trip(conn, driver_id, vehicle_id, start_city, end_city, start_time, price):
+    upcoming_status = current_app.static_ids["trip_status"]["upcoming"]
+    start_point = city_to_coords(start_city)
+    end_point = city_to_coords(end_city)
     with conn.cursor() as cur:
         cur.execute(
             """INSERT INTO trips 
@@ -36,21 +52,21 @@ def create_tripp(conn, trip_data):
             start_location, 
             end_location, start_time, 
             price, trip_status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s, %s, %s)
             RETURNING id""",
             (
-                trip_data["driver_id"],
-                trip_data["start_location"],
-                trip_data["end_location"],
-                trip_data["start_time"],
-                trip_data["end_time"],
-                trip_data["price"],
-                trip_data["trip_status"],
+                driver_id,
+                vehicle_id,
+                start_point,
+                end_point,
+                start_time,
+                price,
+                upcoming_status,
             ),
         )
         trip_id = cur.fetchone()[0]
         conn.commit()
-        return trip_id
+        return trip_id if trip_id else None
 
 
 def get_trip_by_id(conn, trip_id):
@@ -61,12 +77,17 @@ def get_trip_by_id(conn, trip_id):
         return trip_data if trip_data else None
 
 
-def join_trip(conn, trip_id, user_id):
-    now = datetime.now()
-    # trip status ok
-    # enough credits ?
-    # enough seats ?
-    return False
+def get_trip_driver_id(conn, trip_id):
+    conn.autocommit = True
+    with conn.cursor() as cur:
+        cur.execute("SELECT driver_id FROM trips WHERE id = %s", (trip_id,))
+        driver_id = cur.fetchone()
+        return driver_id[0] if driver_id else None
+
+
+def add_user_to_trip(conn, trip_id, user_id):
+    added_psg = ""  # insert into trip_passengers
+    return True if added_psg else False
 
 
 def update_trip_status(conn, trip_id, new_status):
@@ -101,13 +122,13 @@ def get_passenger_trips(conn, user_id, status=None):
             WHERE tp.user_id = %s
         """
         params = [user_id]
-        if status:
+        if status is not None:
             query += " AND t.status = %s"
             params.append(status)
         query += " ORDER BY (t.summary->>'start_time')::timestamp DESC"
         cur.execute(query, params)
         trips = cur.fetchall()
-        return trips if trips else None
+        return trips if trips else []
 
 
 def get_driver_trips(conn, driver_id, status=None):
@@ -118,13 +139,14 @@ def get_driver_trips(conn, driver_id, status=None):
             WHERE driver_id = %s
         """
         params = [driver_id]
-        if status:
+        if status is not None:
             query += " AND status = %s"
             params.append(status)
+
         query += " ORDER BY (t.summary->>'start_time')::timestamp DESC"
         cur.execute(query, params)
         trips = cur.fetchall()
-        return trips if trips else None
+        return trips if trips else []
 
 
 def set_trip_rating(conn, trip_id, rating):

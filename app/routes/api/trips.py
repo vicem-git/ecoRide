@@ -7,12 +7,11 @@ from flask import (
     make_response,
 )
 import logging
-from app.db_store import driver_crud, trips_crud
+from app.db_store import user_crud, driver_crud, trips_crud, tx_crud
 from datetime import datetime
 from flask_login import login_required, current_user
-from app.utils.static_resolvers import static_name_resolver
-from app.utils.custom_decorators import require_ownership
-from app.models import TripSearchData
+from app.utils import static_name_resolver, require_ownership, render_pydantic_errors
+from app.models import TripSearchData, CreateTripData
 from pydantic import ValidationError
 
 trips_bp = Blueprint("trips", __name__, url_prefix="/trips")
@@ -21,10 +20,139 @@ trips_bp = Blueprint("trips", __name__, url_prefix="/trips")
 logger = logging.getLogger(__name__)
 
 
-@trips_bp.route("/create_trip")
-@login_required
-def create_trip():
-    return render_template("pages/create_trip.html", page_wrap="create_trip")
+@trips_bp.route("/create_trip", methods=["GET", "POST"])
+@trips_bp.route("/create_trip/<driver_id>", methods=["GET", "POST"])
+@htmx_login_required
+def create_trip(driver_id=None):
+    user_id = current_user.user_id
+
+    if request.method == "GET":
+        with current_app.db_manager.connection() as conn:
+            try:
+                driver_data = driver_crud.get_driver_data(conn, user_id)
+                driver_id = driver_data.get("id") if driver_data else None
+
+                if not driver_id:
+                    response = make_response(
+                        render_template(
+                            "partials/server_msg.html",
+                            messages=[
+                                "Vous devez être conducteur pour créer un trajet. modifier les paramètres de votre profil"
+                            ],
+                            msg_case="info",
+                        ),
+                        400,
+                    )
+                    return response
+
+                driver_preferences = driver_crud.get_driver_preferences(conn, driver_id)
+                driver_vehicles = driver_crud.get_driver_vehicles(conn, driver_id)
+
+                driver_info = {
+                    "data": driver_data,
+                    "preferences": driver_preferences,
+                    "vehicles": driver_vehicles,
+                }
+
+                if not driver_info:
+                    raise Exception("Driver info not found")
+
+                return render_template(
+                    "trips/create_trip.html", driver_info=driver_info
+                )
+
+            except ValueError as ve:
+                logger.error("Validation error during driver status check: %s", ve)
+                messages = ["Une erreur s'est produite, veuillez réessayer plus tard."]
+                return make_response(
+                    render_template(
+                        "partials/server_msg.html", messages=messages, msg_case="error"
+                    ),
+                    400,
+                )
+
+            except Exception as e:
+                logger.error("Error checking driver status: %s", e)
+                messages = ["Une erreur s'est produite, veuillez réessayer plus tard."]
+                response = make_response(
+                    render_template(
+                        "partials/server_msg.html",
+                        messages=messages,
+                        msg_case="error",
+                    ),
+                    500,
+                )
+                return response
+
+    if request.method == "POST":
+        print(f"driver id :{driver_id}")
+
+        start_date = request.form.get("start_date")
+        start_time = request.form.get("start_time")
+        start_datetime = datetime.strptime(
+            f"{start_date} {start_time}", "%Y-%m-%d %H:%M"
+        )
+
+        start_city = request.form.get("start_city")
+        end_city = request.form.get("end_city")
+        vehicle_id = request.form.get("vehicle_id")
+        price = request.form.get("price")
+
+        try:
+            create_params = CreateTripData(
+                start_city=start_city,
+                end_city=end_city,
+                start_datetime=start_datetime,
+                vehicle_id=vehicle_id,
+                price=price,
+            )
+
+            with current_app.db_manager.connection() as conn:
+                new_trip = trips_crud.create_trip(
+                    conn,
+                    driver_id=driver_id,
+                    vehicle_id=create_params.vehicle_id,
+                    start_city=create_params.start_city,
+                    end_city=create_params.end_city,
+                    start_time=create_params.start_datetime,
+                    price=create_params.price,
+                )
+                if not new_trip:
+                    raise Exception("Trip creation failed")
+
+                response = make_response(
+                    render_template(
+                        "partials/server_msg.html",
+                        messages=["Trajet créé avec succès."],
+                        msg_case="success",
+                    ),
+                    200,
+                )
+                return response
+        except ValidationError as ve:
+            logger.error("Validation error during trip creation: %s", ve.errors())
+            errors = render_pydantic_errors(ve)
+            print(errors)
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html", messages=errors, msg_case="error"
+                ),
+                400,
+            )
+            return response
+
+        except Exception as e:
+            logger.error("Error parsing trip data: %s", e)
+            messages = ["Une erreur s'est produite, veuillez réessayer plus tard."]
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html",
+                    messages=messages,
+                    msg_case="error",
+                ),
+                500,
+            )
+            return response
 
 
 @trips_bp.route("/query_trips")
@@ -92,14 +220,70 @@ def view_trip(trip_id):
 @htmx_login_required
 def join_trip(trip_id):
     if request.method == "GET":
-        return render_template("trips/join_trip.html", trip_id=trip_id)
+        user_id = current_user.user_id
 
-    trip_id = request.form.get("trip_id")
+        with current_app.db_manager.connection() as conn:
+            allow_join = tx_crud.allow_tx(conn, user_id, trip_id)
+            allow_ok = allow_join.get("allow_ok")
+            trip_price = allow_join.get("trip_price")
+            user_balance = allow_join.get("user_balance")
+
+            if not allow_ok:
+                response = make_response(
+                    render_template(
+                        "partials/server_msg.html",
+                        messages=[
+                            "Vous n'avez pas assez de fonds pour rejoindre ce trajet."
+                        ],
+                        msg_case="error",
+                    ),
+                    400,
+                )
+                return response
+
+        return render_template(
+            "trips/join_trip.html",
+            trip_id=trip_id,
+            trip_price=trip_price,
+            user_balance=user_balance,
+        )
+
+    trip_id = request.view_args.get("trip_id")
     user_id = current_user.user_id
 
     with current_app.db_manager.connection() as conn:
+        driver_id = trips_crud.get_trip_driver_id(conn, trip_id)
+        if not driver_id:
+            raise Exception("Driver ID not found for trip")
+
+        allow_join = tx_crud.allow_tx(conn, user_id, trip_id)
+        allow_ok = allow_join.get("allow_ok")
+        trip_price = allow_join.get("trip_price")
+
+        if not allow_ok:
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html",
+                    messages=[
+                        "Vous n'avez pas assez de fonds pour rejoindre ce trajet."
+                    ],
+                    msg_case="error",
+                ),
+                400,
+            )
+            return response
+
         try:
-            trips_crud.join_trip(conn, trip_id, user_id)
+            psg_added = trips_crud.add_user_to_trip(conn, trip_id, user_id)
+            if not psg_added:
+                raise Exception("Failed to add passenger to trip")
+
+            tx_created = tx_crud.create_tx(
+                conn, user_id, driver_id, trip_price, trip_id
+            )
+            if not tx_created:
+                raise Exception("Transaction creation failed")
+
             messages = ["Vous avez rejoint le trajet avec succès."]
             response = make_response(
                 render_template(
@@ -136,7 +320,7 @@ def passenger_trips_by_status(status):
     with current_app.db_manager.connection() as conn:
         trips = trips_crud.get_passenger_trips(conn, user_id, status_id)
 
-    return render_template("trips/profile_trip_item.html", trips=trips or [])
+    return render_template("trips/passenger_trip_item.html", trips=trips or [])
 
 
 @trips_bp.route("/driver-trips/<status>")
@@ -158,6 +342,6 @@ def driver_trips_by_status(status):
 
         driver_id = driver_data.get("id")
 
-        trips = trips_crud.get_driver_trips(conn, driver_id, status)
+        trips = trips_crud.get_driver_trips(conn, driver_id, status_id)
 
-    return render_template("trips/profile_trip_item.html", trips=trips or [])
+    return render_template("trips/driver_trip_item.html", trips=trips or [])

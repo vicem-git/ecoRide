@@ -1,0 +1,14 @@
+{% for trip in trips %}
+  <div class="p-2 flex font-normal text-apart gap-8 items-center justify-between">
+    <section>
+      <p>{{ trip.summary.start_city }}</strong> → {{ trip.summary.end_city }}</strong></p>
+      <p>Vehicle : {{ trip.summary.vehicle.brand }} - {{ trip.summary.vehicle.plate }}</p>
+    </section>
+    <section class="flex flex-col">
+      <p>Départ : {{ trip.summary.start_time[:16] }}</p>
+      <p>Durée : {{ trip.summary.estimated_duration_min }} min </p>
+    </section>
+  </div>
+{% else %}
+  <p class="text-ground3">Aucun voyage.</p>
+{% endfor %}

@@ -19,6 +19,7 @@ Alpine.store('darkMode', {
 Alpine.store('modal', {
   show: Alpine.$persist(false).as('modal_show'),
   errorMessage: Alpine.$persist('').as('modal_error'),
+
   open() {
     this.show = true
   },
@@ -29,6 +30,11 @@ Alpine.store('modal', {
   setError(message) {
     this.errorMessage = message;
     this.open();
+  },
+  replaceContent(html) {
+    this.errorMessage = '';
+    this.open();
+    document.querySelector('#global-modal').innerHTML = html;
   }
 });
 

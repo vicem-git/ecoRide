@@ -142,10 +142,33 @@ class TripSearchData(BaseModel):
         return "electrique" if self.eco_filter else None
 
 
-# SEARCH FORMS ??
-# WHAT OTHER FORMS ?
-# search ? not needed id think
-# vehicle add ?
-# role edit
-# review forms
-# ??
+class CreateTripData(BaseModel):
+    start_city: str = Field(
+        ...,
+    )
+    end_city: str = Field(
+        ...,
+    )
+    start_datetime: datetime = Field(
+        ...,
+    )
+    price: int = Field(
+        ...,
+    )
+    vehicle_id: UUID4 = Field(
+        ...,
+    )
+
+    @field_validator("start_city", "end_city")
+    def not_empty(v):
+        if not v.strip():
+            raise ValueError("La ville de départ/ arrivée ne peut pas être vide.")
+        return v
+
+    @model_validator(mode="after")
+    def validate_cities(self):
+        if self.start_city == self.end_city:
+            raise ValueError(
+                "La ville de départ et d'arrivée ne peuvent pas être identiques."
+            )
+        return self

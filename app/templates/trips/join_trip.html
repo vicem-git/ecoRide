@@ -1,16 +1,18 @@
 <section id="join-trip-container" class="flex flex-col items-center justify-center gap-4 p-4 w-full">
-  <div>YOUR CREDITS</div>
+  <div> summary </div>
   <div class="text-contrast2 font-semibold text-2xl">
-    {{ current_user.credits }}
+    your balance  : {{ user_balance }}
   </div>
   <div class="text-contrast2 font-semibold text-2xl">
-    total price : {{ trip.price }}
+    total price : {{ trip_price }}
   </div>
   <button
-    hx-post="{{ url_for('trips.join_trip', trip_id=trip.id) }}"
+    hx-post="{{ url_for('trips.join_trip', trip_id=trip_id) }}"
     hx-target="#join-trip-container"
     hx-swap="innerHTML"
-    class="bg-ground3 hover:bg-ground2 text-contrast2 font-semibold py-2 px-4 rounded-sm transition-colors duration-300""
+    hx-ox::after-request="window.Alpine.store('modal').replaceContent(event.detail.xhr.response)"
+    class="bg-ground3 hover:bg-ground2 text-contrast2 font-semibold py-2 px-4 rounded-sm transition-colors duration-300"
   >
+    participer
   </button>
 </section>

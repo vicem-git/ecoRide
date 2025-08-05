@@ -10,4 +10,10 @@ export function toggleHidden(el) {
   }
 }
 
-
+/*
+export function reloadVehicleSelect() {
+  document.querySelectorAll('.vehicle-select') => {
+    
+  }
+}
+*/

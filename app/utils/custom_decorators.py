@@ -11,7 +11,7 @@ def htmx_login_required(f):
             if request.headers.get("HX-Request"):
                 response = make_response(
                     render_template(
-                        "partials/server_msg.html", messages=messages, msg_case="error"
+                        "partials/server_msg.html", messages=messages, msg_case="info"
                     ),
                     401,
                 )
