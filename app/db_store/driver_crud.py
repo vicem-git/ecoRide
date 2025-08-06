@@ -2,7 +2,6 @@ from psycopg.rows import dict_row
 
 
 def get_driver_data(conn, user_id):
-    conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "SELECT id, rating FROM driver_data WHERE user_id = %s",
@@ -10,6 +9,18 @@ def get_driver_data(conn, user_id):
         )
         driver_data = cur.fetchone()
         return driver_data if driver_data else None
+
+
+def get_driver_user(conn, driver_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT user_id FROM driver_data WHERE id = %s
+        """,
+            (driver_id,),
+        )
+        user_id = cur.fetchone()
+        return user_id[0] if user_id else None
 
 
 def create_driver(conn, user_id):
@@ -29,12 +40,10 @@ def set_driver_preferences(conn, driver_id, preferences):
                 "INSERT INTO driver_preferences (driver_id, preference_id) VALUES (%s, %s)",
                 (driver_id, preference),
             )
-        conn.commit()
         return True
 
 
 def get_driver_preferences(conn, driver_id):
-    conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "SELECT p.name FROM preferences p JOIN driver_preferences dp ON dp.preference_id = p.id WHERE dp.driver_id = %s",
@@ -45,7 +54,6 @@ def get_driver_preferences(conn, driver_id):
 
 
 def get_all_driver_preferences(conn):
-    conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute("SELECT id, name FROM preferences ORDER BY name")
         preferences = cur.fetchall()
@@ -67,7 +75,6 @@ def add_vehicles(conn, driver_id, vehicle_data):
                 vehicle_data["energy_type"],
             ),
         )
-        conn.commit()
         return True
 
 
@@ -77,12 +84,10 @@ def remove_vehicles(conn, driver_id, vehicle_ids):
             "DELETE FROM vehicles WHERE driver_id = %s AND id = ANY(%s)",
             (driver_id, vehicle_ids),
         )
-        conn.commit()
         return True
 
 
 def get_driver_vehicles(conn, driver_id):
-    conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "SELECT v.id, v.model, v.registration_date, v.plate_number, v.color, v.number_of_seats, b.name AS brand, e.name AS energy_type FROM vehicles v JOIN vehicle_brand b ON v.brand = b.id JOIN energy_types e ON v.energy_type = e.id WHERE v.driver_id = %s",
@@ -93,7 +98,6 @@ def get_driver_vehicles(conn, driver_id):
 
 
 def get_vehicle_by_id(conn, vehicle_id):
-    conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "SELECT v.id, v.driver_id, v.registration_date, v.plate_number, v.color, v.number_of_seats, b.name AS brand, e.name AS energy_type FROM vehicles v JOIN vehicle_brand b ON v.brand = b.id JOIN energy_types e ON v.energy_type_id = e.id WHERE v.id = %s",
@@ -119,7 +123,6 @@ def set_driver_rating(conn, driver_id):
             "UPDATE driver_data SET rating = %s WHERE user_id = %s",
             (average, driver_id),
         )
-        conn.commit()
 
 
 def get_vehicle_brands(conn):

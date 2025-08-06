@@ -17,12 +17,10 @@ def create_account(conn, email, hashed_password):
             (email, hashed_password, access_id, status_id),
         )
         account_id = cur.fetchone()[0]
-        conn.commit()
         return account_id
 
 
 def get_user_by_account_id(conn, account_id):
-    conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM users WHERE account_id = %s", (account_id,))
         user_id = cur.fetchone()
@@ -30,7 +28,6 @@ def get_user_by_account_id(conn, account_id):
 
 
 def get_user_public_data(conn, identifier):
-    conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         try:
             uuid_obj = uuid.UUID(identifier, version=4)
@@ -57,12 +54,10 @@ def create_user(conn, account_id, username):
             (username, account_id),
         )
         user_id = cur.fetchone()[0]
-        conn.commit()
         return user_id
 
 
 def request_login(conn, email):
-    conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "SELECT id, account_access_id, account_status_id FROM accounts WHERE email = %s ",
@@ -73,7 +68,6 @@ def request_login(conn, email):
 
 
 def retrieve_password(conn, account_id):
-    conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute(
             "SELECT password_hash FROM accounts WHERE id = %s",
@@ -86,7 +80,6 @@ def retrieve_password(conn, account_id):
 
 
 def check_username(conn, username):
-    conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute("SELECT username FROM users WHERE username = %s", (username,))
         result = cur.fetchone()
@@ -98,12 +91,10 @@ def check_username(conn, username):
 def set_username(conn, user_id, username):
     with conn.cursor() as cur:
         cur.execute("UPDATE users SET username = %s WHERE id = %s", (username, user_id))
-        conn.commit()
     return True
 
 
 def get_user_by_email(conn, email):
-    conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM accounts WHERE email = %s", (email,))
         found = cur.fetchone()
@@ -111,7 +102,6 @@ def get_user_by_email(conn, email):
 
 
 def get_user_object(conn, account_id):
-    conn.autocommit = True
     with conn.cursor() as cursor:
         cursor.execute(
             "SELECT a.id, a.email, a.account_status_id, a.account_access_id, u.id, u.username FROM accounts a LEFT JOIN users u ON u.account_id = a.id WHERE a.id = %s",
@@ -148,7 +138,6 @@ def get_roles_list(conn):
 
 
 def get_user_roles(conn, user_id):
-    conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute(
             "SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id = %s",
@@ -167,12 +156,10 @@ def set_user_roles(conn, user_id, roles):
                 "INSERT INTO user_roles (user_id, role_id) VALUES (%s, %s)",
                 (user_id, role),
             )
-        conn.commit()
         return True
 
 
 def get_user_credits(conn, user_id):
-    conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute(
             "SELECT credits FROM users WHERE id = %s",

@@ -236,6 +236,32 @@ CREATE TABLE trip_passengers (
   PRIMARY KEY (trip_id, user_id)
 );
 
+CREATE OR REPLACE VIEW trip_owner AS
+SELECT
+    t.id AS trip_id,
+    u.id AS user_id
+FROM
+    trips t
+JOIN driver_data d ON t.driver_id = d.id
+JOIN users u ON d.user_id = u.id;
+
+CREATE OR REPLACE VIEW trip_passengers_userdata AS
+SELECT
+    tp.trip_id,
+    u.id, u.username AS user_id,
+    u.username,
+    a.email
+FROM
+    trip_passengers tp
+JOIN users u ON tp.user_id = u.id
+JOIN accounts a ON u.account_id = a.id;
+
+CREATE TABLE trip_txs (
+  trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+  tx_id UUID NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+  priMARY KEY (trip_id, tx_id)
+);
+
 CREATE OR REPLACE VIEW trip_available_seats AS
 SELECT
   t.id AS trip_id,

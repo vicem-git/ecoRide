@@ -3,7 +3,9 @@ from psycopg.rows import dict_row
 from datetime import datetime
 import json
 from geopy.distance import geodesic
-from uuid import uuid4
+import logging
+
+logger = logging.getLogger(__name__)
 
 villes = {
     "Paris": {"lat": 48.85341, "lng": 2.34880},
@@ -41,6 +43,43 @@ def city_to_coords(city):
         return point_wkt
 
 
+def add_user_to_trip(conn, trip_id, user_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO trip_passengers (trip_id, user_id)
+            VALUES (%s, %s)
+            ON CONFLICT (trip_id, user_id) DO NOTHING
+            """,
+            (trip_id, user_id),
+        )
+        added_psg = cur.rowcount > 0
+        return True if added_psg else False
+
+
+def remove_user_from_trip(conn, trip_id, user_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            DELETE FROM trip_passengers WHERE trip_id = %s AND user_id = %s
+        """,
+            (trip_id, user_id),
+        )
+        return cur.rowcount > 0
+
+
+def update_trip_status(conn, trip_id, new_status):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE trips SET trip_status = %s
+            WHERE id = %s
+        """,
+            (new_status, trip_id),
+        )
+        return cur.rowcount > 0
+
+
 def create_trip(conn, driver_id, vehicle_id, start_city, end_city, start_time, price):
     upcoming_status = current_app.static_ids["trip_status"]["upcoming"]
     start_point = city_to_coords(start_city)
@@ -65,12 +104,21 @@ def create_trip(conn, driver_id, vehicle_id, start_city, end_city, start_time, p
             ),
         )
         trip_id = cur.fetchone()[0]
-        conn.commit()
         return trip_id if trip_id else None
 
 
+def cancel_trip(conn, trip_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            DELETE FROM trips WHERE id = %s
+        """,
+            (trip_id,),
+        )
+        return cur.rowcount > 0
+
+
 def get_trip_by_id(conn, trip_id):
-    conn.autocommit = True
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute("SELECT * FROM trips WHERE id = %s", (trip_id,))
         trip_data = cur.fetchone()
@@ -78,24 +126,10 @@ def get_trip_by_id(conn, trip_id):
 
 
 def get_trip_driver_id(conn, trip_id):
-    conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute("SELECT driver_id FROM trips WHERE id = %s", (trip_id,))
         driver_id = cur.fetchone()
         return driver_id[0] if driver_id else None
-
-
-def add_user_to_trip(conn, trip_id, user_id):
-    added_psg = ""  # insert into trip_passengers
-    return True if added_psg else False
-
-
-def update_trip_status(conn, trip_id, new_status):
-    conn.autocommit = True
-    with conn.cursor() as cur:
-        cur.execute("UPDATE trips SET status = %s WHERE id = %s", (new_status, trip_id))
-        conn.commit()
-        return True
 
 
 def get_trip_available_seats(conn, trip_id):
@@ -111,6 +145,32 @@ def get_trip_available_seats(conn, trip_id):
         result = cur.fetchone()
         available_seats = result[0] if result else None
         return available_seats
+
+
+def get_trip_passengers(conn, trip_id):
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT user_id FROM trip_passengers
+            WHERE trip_id = %s
+        """,
+            (trip_id,),
+        )
+        result = cur.fetchall()
+        return [row["user_id"] for row in result] if result else []
+
+
+def get_trip_passengers_userdata(conn, trip_id):
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT user_id, username, email
+            FROM trip_passengers_userdata
+            WHERE trip_id = %s
+            """,
+            (trip_id,),
+        )
+        return cur.fetchall() or []
 
 
 def get_passenger_trips(conn, user_id, status=None):
@@ -155,7 +215,6 @@ def set_trip_rating(conn, trip_id, rating):
             "UPDATE trips SET rating = %s WHERE id = %s",
             (rating, trip_id),
         )
-        conn.commit()
         return True
 
 
@@ -169,7 +228,6 @@ def search_summaries_asst(
     energy_type=None,
     driver_rating=None,
 ):
-    conn.autocommit = True
     query = """
         SELECT *
         FROM trip_summaries_asst
@@ -228,7 +286,7 @@ def get_trip_summary_asst(conn, trip_id):
         return trip_summary if trip_summary else None
 
 
-def generate_trip_summary(conn, trip_id, commit=True):
+def generate_trip_summary(conn, trip_id):
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -260,6 +318,7 @@ def generate_trip_summary(conn, trip_id, commit=True):
         )
 
         row = cur.fetchone()
+        logger.debug(f"Generating summary for trip ID: {trip_id}")
         if not row:
             raise ValueError(f"No trip found with ID: {trip_id}")
 
@@ -311,8 +370,6 @@ def generate_trip_summary(conn, trip_id, commit=True):
             "INSERT INTO trip_summaries (trip_id, summary) VALUES (%s, %s) ON CONFLICT (trip_id) DO UPDATE SET summary = EXCLUDED.summary",
             (trip_id, json.dumps(summary)),
         )
-        if commit:
-            conn.commit()
 
 
 def regenerate_all_missing_summaries(conn):

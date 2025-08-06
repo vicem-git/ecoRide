@@ -8,6 +8,10 @@ load_dotenv(".env")
 class Config:
     SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
 
+    MAIL_API_URL = os.getenv("MAIL_API_URL", "")
+    MAIL_API_KEY = os.getenv("MAIL_API_KEY", "")
+    MAIL_TEST_RECIPIENT = os.getenv("MAIL_TEST_RECIPIENT", "")
+
     # Session config
     PERMANENT_SESSION_LIFETIME = timedelta(hours=1)
     SESSION_COOKIE_NAME = "session"

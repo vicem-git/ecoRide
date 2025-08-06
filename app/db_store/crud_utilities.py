@@ -1,11 +1,13 @@
 from flask import current_app
 from psycopg import sql
 from psycopg.rows import dict_row
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def test_connection(conn):
     try:
-        conn.autocommit = True
         with conn.cursor() as cur:
             cur.execute("SELECT 1;")
             result = cur.fetchone()
@@ -42,10 +44,15 @@ STATIC_TABLES = [
 def load_static_ids(db_manager):
     ids = {}
     with db_manager.connection() as conn:
-        conn.autocommit = True
-        with conn.cursor(row_factory=dict_row) as cur:
-            for table in STATIC_TABLES:
-                cur.execute(f"SELECT name, id FROM {table};")
-                ids[table] = {row["name"]: str(row["id"]) for row in cur.fetchall()}
-
+        try:
+            with conn.cursor(row_factory=dict_row) as cur:
+                for table in STATIC_TABLES:
+                    query = f'SELECT name, id FROM "{table}";'
+                    cur.execute(query)
+                    ids[table] = {row["name"]: str(row["id"]) for row in cur.fetchall()}
+            conn.commit()  # not strictly needed for SELECTs, but safe
+        except Exception as e:
+            conn.rollback()  # important!
+            logger.error(f"Failed to load static ids : {e}")
+            raise
     return ids

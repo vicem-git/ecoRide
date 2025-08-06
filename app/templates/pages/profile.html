@@ -6,7 +6,7 @@ Tableau de bord
 
 {% block main %}
 <section class="p-8 flex w-full min-h-screen">
-  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center justify-center w-[90%]">
+  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center justify-center w-full">
     {% include "users/profile_summary.html" %}
     {% if "driver" in roles %}
       <div 

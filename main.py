@@ -25,7 +25,7 @@ def create_app():
     app.jinja_env.filters["fr_date"] = fr_date
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="%(message)s",
         datefmt="[%X]",
         handlers=[RichHandler(markup=True)],
@@ -62,7 +62,13 @@ def create_app():
                 logging.info("DB SEED : Seeding skipped: users already exist.")
 
         with db_manager.connection() as conn:
-            count = trips_crud.regenerate_all_missing_summaries(conn)
+            try:
+                count = trips_crud.regenerate_all_missing_summaries(conn)
+                conn.commit()
+            except Exception as e:
+                conn.rollback()
+                raise e
+
             if count:
                 logging.info(f"BATCH SUMMARIES: {count} summaries generated.")
             else:

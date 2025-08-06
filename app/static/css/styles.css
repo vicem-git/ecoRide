@@ -33,6 +33,7 @@
   --color-contrast3: oklch(0.550 0.0616 148.17);
   --color-success: oklch(0.822 0.0831 147.34);
   --color-error: oklch(0.6565 0.1689 24.16);
+  --color-error2: oklch(0.6165 0.1689 24.16);
 
   --font-sans: "Open Sans", sans-serif;
 }
