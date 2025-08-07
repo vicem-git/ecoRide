@@ -72,7 +72,7 @@ def update_trip_status(conn, trip_id, new_status):
     with conn.cursor() as cur:
         cur.execute(
             """
-            UPDATE trips SET trip_status = %s
+            UPDATE trips SET status = %s
             WHERE id = %s
         """,
             (new_status, trip_id),
@@ -81,7 +81,6 @@ def update_trip_status(conn, trip_id, new_status):
 
 
 def create_trip(conn, driver_id, vehicle_id, start_city, end_city, start_time, price):
-    upcoming_status = current_app.static_ids["trip_status"]["upcoming"]
     start_point = city_to_coords(start_city)
     end_point = city_to_coords(end_city)
     with conn.cursor() as cur:
@@ -90,18 +89,10 @@ def create_trip(conn, driver_id, vehicle_id, start_city, end_city, start_time, p
             (driver_id, vehicle_id,
             start_location, 
             end_location, start_time, 
-            price, trip_status)
+            price, (SELECT id FROM trip_status WHERE name = 'upcoming'))
             VALUES (%s, %s, ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s, %s, %s)
             RETURNING id""",
-            (
-                driver_id,
-                vehicle_id,
-                start_point,
-                end_point,
-                start_time,
-                price,
-                upcoming_status,
-            ),
+            (driver_id, vehicle_id, start_point, end_point, start_time, price),
         )
         trip_id = cur.fetchone()[0]
         return trip_id if trip_id else None
@@ -111,7 +102,7 @@ def cancel_trip(conn, trip_id):
     with conn.cursor() as cur:
         cur.execute(
             """
-            DELETE FROM trips WHERE id = %s
+            UPDATE SET status = 'cancelled' FROM trips WHERE id = %s
         """,
             (trip_id,),
         )
@@ -318,7 +309,6 @@ def generate_trip_summary(conn, trip_id):
         )
 
         row = cur.fetchone()
-        logger.debug(f"Generating summary for trip ID: {trip_id}")
         if not row:
             raise ValueError(f"No trip found with ID: {trip_id}")
 
@@ -367,9 +357,18 @@ def generate_trip_summary(conn, trip_id):
         }
 
         cur.execute(
-            "INSERT INTO trip_summaries (trip_id, summary) VALUES (%s, %s) ON CONFLICT (trip_id) DO UPDATE SET summary = EXCLUDED.summary",
+            """
+            INSERT INTO trip_summaries (trip_id, summary) 
+            VALUES (%s, %s)
+            ON CONFLICT (trip_id)
+            DO UPDATE SET summary = EXCLUDED.summary
+            RETURNING trip_id
+        """,
             (trip_id, json.dumps(summary)),
         )
+
+        summary_id = cur.fetchone()[0]
+        return summary_id if summary_id else None
 
 
 def regenerate_all_missing_summaries(conn):

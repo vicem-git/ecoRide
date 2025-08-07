@@ -23,12 +23,6 @@ def allow_tx(conn, user_id, trip_id):
 
 
 def create_tx(conn, tx_from, tx_to, amount, trip_id):
-    pending_status = current_app.static_ids["tx_status"]["pending"]
-    print(
-        f"Creating transaction from {tx_from} to {tx_to} with amount {amount}, status {pending_status}"
-    )
-    # deduce @from
-    # create transaction
     with conn.cursor() as cur:
         cur.execute(
             "UPDATE users SET credits = credits - %s WHERE id = %s",
@@ -38,20 +32,55 @@ def create_tx(conn, tx_from, tx_to, amount, trip_id):
         cur.execute(
             """
             INSERT INTO transactions (tx_from, tx_to, amount, trip_id, status)
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, (SELECT id from tx_status WHERE name = 'pending'))
             RETURNING id
             """,
-            (tx_from, tx_to, amount, trip_id, pending_status),
+            (tx_from, tx_to, amount, trip_id),
         )
         tx_id = cur.fetchone()[0]
 
         cur.execute(
             """
             INSERT INTO trip_txs (trip_id, tx_id)
+            VALUES (%s, %s)
         """,
-            (tx_id,),
+            (
+                trip_id,
+                tx_id,
+            ),
         )
     return tx_id if tx_id else None
+
+
+def complete_tx(conn, trip_id):
+    platform_fee = 2
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE transactions
+            SET status = (SELECT id FROM tx_status WHERE name = 'completed')
+            WHERE id = %s
+            RETURNING id, amount
+        """,
+            (trip_id,),
+        )
+        tx_id = cur.fetchone()[0]
+        tx_amount = cur.fetchone()[1]
+
+        cur.execute(
+            """
+            UPDATE users
+            SET credits = credits + %s - %s
+            WHERE id = (SELECT tx_to FROM transactions WHERE tx_id = %s)
+        """,
+            (tx_amount, platform_fee, tx_id),
+        )
+
+        cur.execute(
+            "UPDATE platform_balance SET balance = balance + %s", (platform_fee,)
+        )
+
+        return tx_id if tx_id else None
 
 
 def update_tx_status(conn, tx_id, status):
@@ -74,31 +103,3 @@ def get_trip_txs(conn, trip_id):
         result = cur.fetchall()
         trip_txs = [tx[0] for tx in result]
         return trip_txs
-
-
-def rollback_tx(conn, tx_id):
-    logger.info(f"Rolling back transaction {tx_id}")
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            UPDATE transactions
-            SET status = %s
-            WHERE id = %s
-            RETURNING tx_from
-            """,
-            (current_app.static_ids["tx_status"]["failed"], tx_id),
-        )
-        tx_from = cur.fetchone()[0]
-
-        # refund @from
-        cur.execute(
-            """
-            UPDATE users SET credits = credits + (
-                SELECT amount FROM transactions WHERE id = %s
-            )
-            WHERE id = (
-                SELECT tx_from FROM transactions WHERE id = %s
-            )
-        """,
-            (tx_from, tx_id),
-        )

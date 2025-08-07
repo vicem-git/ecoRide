@@ -11,6 +11,7 @@ class Config:
     MAIL_API_URL = os.getenv("MAIL_API_URL", "")
     MAIL_API_KEY = os.getenv("MAIL_API_KEY", "")
     MAIL_TEST_RECIPIENT = os.getenv("MAIL_TEST_RECIPIENT", "")
+    MAIL_SANDBOX_POSTMASTER = os.getenv("MAIL_SANDBOX_POSTMASTER", "")
 
     # Session config
     PERMANENT_SESSION_LIFETIME = timedelta(hours=1)

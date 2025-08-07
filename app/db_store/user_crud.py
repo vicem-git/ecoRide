@@ -1,5 +1,3 @@
-# user CRUD operations for user management
-from flask import current_app
 import logging
 from psycopg.rows import dict_row
 from app.models import SessionUser
@@ -9,12 +7,18 @@ logger = logging.getLogger(__name__)
 
 
 def create_account(conn, email, hashed_password):
-    access_id = current_app.static_ids["account_access"]["user"]
-    status_id = current_app.static_ids["account_status"]["active"]
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO accounts (email, password_hash, account_access_id, account_status_id) VALUES (%s, %s, %s, %s) RETURNING id",
-            (email, hashed_password, access_id, status_id),
+            """
+            INSERT INTO accounts (email, password_hash, access_type, status) 
+            VALUES (%s, %s, (
+                SELECT id FROM account_access_type WHERE name = "user"
+                ), (
+                SELECT id FROM account_status WHERE name = 'active'
+                )
+            ) 
+            RETURNING id""",
+            (email, hashed_password),
         )
         account_id = cur.fetchone()[0]
         return account_id
@@ -60,7 +64,7 @@ def create_user(conn, account_id, username):
 def request_login(conn, email):
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
-            "SELECT id, account_access_id, account_status_id FROM accounts WHERE email = %s ",
+            "SELECT id, access_type, status FROM accounts WHERE email = %s ",
             (email,),
         )
         account_found = cur.fetchone()
@@ -104,7 +108,7 @@ def get_user_by_email(conn, email):
 def get_user_object(conn, account_id):
     with conn.cursor() as cursor:
         cursor.execute(
-            "SELECT a.id, a.email, a.account_status_id, a.account_access_id, u.id, u.username FROM accounts a LEFT JOIN users u ON u.account_id = a.id WHERE a.id = %s",
+            "SELECT a.id, a.email, a.status, a.access_type, u.id, u.username FROM accounts a LEFT JOIN users u ON u.account_id = a.id WHERE a.id = %s",
             (account_id,),
         )
         row = cursor.fetchone()
@@ -114,8 +118,8 @@ def get_user_object(conn, account_id):
         (
             account_id,
             email,
-            account_status_id,
-            account_access_id,
+            status,
+            access_type,
             user_id,
             username,
         ) = row
@@ -123,8 +127,8 @@ def get_user_object(conn, account_id):
         return SessionUser(
             account_id=account_id,
             email=email,
-            account_status_id=account_status_id,
-            account_access_id=account_access_id,
+            status=status,
+            access_type=access_type,
             user_id=user_id,
             username=username,
         )

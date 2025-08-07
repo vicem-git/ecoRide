@@ -30,7 +30,7 @@ def configure_conn(conn, schema_name):
 
 STATIC_TABLES = [
     "tx_status",
-    "account_access",
+    "account_access_type",
     "account_status",
     "roles",
     "preferences",
@@ -50,9 +50,9 @@ def load_static_ids(db_manager):
                     query = f'SELECT name, id FROM "{table}";'
                     cur.execute(query)
                     ids[table] = {row["name"]: str(row["id"]) for row in cur.fetchall()}
-            conn.commit()  # not strictly needed for SELECTs, but safe
+            conn.commit()
         except Exception as e:
-            conn.rollback()  # important!
+            conn.rollback()
             logger.error(f"Failed to load static ids : {e}")
             raise
     return ids

@@ -65,15 +65,15 @@ def require_ownership(param="for_user"):
         @wraps(f)
         def ownership_wrapper(conn, *args, **kwargs):
             try:
-                logger.debug("Checking ownership with user param")
                 if param == "for_user":
+                    logger.debug(f"Checking ownership for : {param}")
                     user_id = request.args.get(param)
                     if not user_id or str(user_id) != str(current_user.user_id):
                         abort(403)
 
                 elif param == "for_trip":
                     trip_id = request.args.get(param)
-                    logger.debug(f"Checking ownership for trip_id: {trip_id}")
+                    logger.debug(f"Checking ownership for: {trip_id}")
                     if not trip_id:
                         abort(403, "missing trip_id")
 

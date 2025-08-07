@@ -56,7 +56,13 @@ def create_app():
                 user_count = cur.fetchone()[0]
                 conn.commit()
             if user_count < 10:
-                seed_data(conn, num_drivers=1000, num_users=3000, trips_per_driver=5)
+                seed_data(
+                    conn,
+                    num_drivers=500,
+                    num_users=100,
+                    completed_trips=3,
+                    upcoming_trips=5,
+                )
                 logging.info("DB SEED : Database seeded.")
             else:
                 logging.info("DB SEED : Seeding skipped: users already exist.")

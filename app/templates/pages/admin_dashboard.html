@@ -1,0 +1,56 @@
+{% extends "base.html"" %}
+
+{% block title %}
+  Tableau Administrateur
+{% endblock %}
+
+{% block main %}
+<section class="p-8 flex w-full min-h-screen">
+  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center justify-center w-full">
+    
+    <section>
+      <!-- WIDGETS -->
+      
+      <div
+        hx-get="{{ url_for('admin.get_total_profits') }}"
+        hx-trigger="load"
+        hx-target="#total-profits"
+      >
+        <div id="total-profits" class="p-4 bg-ground1 rounded-sm shadow-sm">
+          <h2>Total Profits</h2>
+          <p>Loading...</p>
+        </div>
+      </div>
+
+      <div
+        hx-get="{{ url_for('admin.get_trips_per_day') }}"
+        hx-trigger="load"
+        hx-target="#trips-per-day"
+      >
+        <div id="trips-per-day" class="p-4 bg-ground1 rounded-sm shadow-sm">
+          <h2>Trips Per Day</h2>
+          <p>Loading...</p>
+        </div>
+      </div>
+
+      <div
+        hx-get="{{ url_for('admin.get_profits_per_day') }}"
+      >
+        <div>
+          <h2>Profits Per Day</h2>
+          <p>Loading...</p>
+        </div>
+      </div>
+
+    </section>
+
+    <section>
+      EMPLOYEES
+    </section>
+
+    <section>
+      USER MANAGEMENT
+    </section>
+  </div>
+</section>
+{% endblock %}

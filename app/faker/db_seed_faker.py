@@ -10,6 +10,39 @@ logger = logging.getLogger(__name__)
 
 fake = Faker("fr_FR")
 
+photo_urls = [
+    "graphics/profiles/profile1.jpg",
+    "graphics/profiles/profile2.jpg",
+    "graphics/profiles/profile3.jpg",
+    "graphics/profiles/profile4.jpg",
+    "graphics/profiles/profile5.jpg",
+    "graphics/profiles/profile6.jpg",
+    "graphics/profiles/profile7.jpg",
+    "graphics/profiles/profile8.jpg",
+    "graphics/profiles/profile9.jpg",
+    "graphics/profiles/profile10.jpg",
+    "graphics/profiles/profile11.jpg",
+    "graphics/profiles/profile12.jpg",
+    "graphics/profiles/profile13.jpg",
+    "graphics/profiles/profile14.jpg",
+    "graphics/profiles/profile15.jpg",
+    "graphics/profiles/profile16.jpg",
+    "graphics/profiles/profile17.jpg",
+    "graphics/profiles/profile18.jpg",
+    "graphics/profiles/profile19.jpg",
+    "graphics/profiles/profile20.jpg",
+    "graphics/profiles/profile21.jpg",
+    "graphics/profiles/profile22.jpg",
+    "graphics/profiles/profile23.jpg",
+    "graphics/profiles/profile24.jpg",
+    "graphics/profiles/profile25.jpg",
+    "graphics/profiles/profile26.jpg",
+    "graphics/profiles/profile27.jpg",
+    "graphics/profiles/profile28.jpg",
+    "graphics/profiles/profile29.jpg",
+]
+
+
 car_models = [
     ("citadine", 4),  # city car
     ("berline", 5),  # sedan
@@ -57,6 +90,11 @@ def get_unique_username(cur, max_attempts=20):
     raise ValueError("Unable to generate unique username")
 
 
+def random_photo_url():
+    photo = random.choice(photo_urls)
+    return photo
+
+
 def get_unique_license_plate(cur, max_attempts=20):
     for _ in range(max_attempts):
         plate = fake.license_plate()
@@ -76,16 +114,14 @@ def get_id(cur, table, name):
     return row[0]
 
 
-def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
+def seed_data(conn, num_drivers, num_users, completed_trips, upcoming_trips):
     try:
         with conn.cursor() as cur:
             # Get static IDs
-            access_id = get_id(cur, "account_access", "user")
+            access_id = get_id(cur, "account_access_type", "user")
             status_id = get_id(cur, "account_status", "active")
             driver_role_id = get_id(cur, "roles", "driver")
             passenger_role_id = get_id(cur, "roles", "passenger")
-            cur.execute("SELECT id FROM trip_status")
-            trip_status_ids = [row[0] for row in cur.fetchall()]
 
             # Create users
             passenger_ids = []
@@ -94,13 +130,14 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                 username = get_unique_username(cur)
                 account_id = str(uuid4())
                 user_id = str(uuid4())
+                photo = random_photo_url()
                 cur.execute(
-                    "INSERT INTO accounts (id, email, password_hash, account_access_id, account_status_id) VALUES (%s, %s, %s, %s, %s)",
+                    "INSERT INTO accounts (id, email, password_hash, access_type, status) VALUES (%s, %s, %s, %s, %s)",
                     (account_id, email, "fakehash", access_id, status_id),
                 )
                 cur.execute(
-                    "INSERT INTO users (id, account_id, username) VALUES (%s, %s, %s)",
-                    (user_id, account_id, username),
+                    "INSERT INTO users (id, account_id, username, photo_url) VALUES (%s, %s, %s, %s)",
+                    (user_id, account_id, username, photo),
                 )
                 cur.execute(
                     "INSERT INTO user_roles (user_id, role_id) VALUES (%s, %s)",
@@ -114,13 +151,14 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                 user_id = str(uuid4())
                 email = get_unique_email(cur)
                 username = get_unique_username(cur)
+                photo = random_photo_url()
                 cur.execute(
-                    "INSERT INTO accounts (id, email, password_hash, account_access_id, account_status_id) VALUES (%s, %s, %s, %s, %s)",
+                    "INSERT INTO accounts (id, email, password_hash, access_type, status) VALUES (%s, %s, %s, %s, %s)",
                     (account_id, email, "fakehash", access_id, status_id),
                 )
                 cur.execute(
-                    "INSERT INTO users (id, account_id, username) VALUES (%s, %s, %s)",
-                    (user_id, account_id, username),
+                    "INSERT INTO users (id, account_id, username, photo_url) VALUES (%s, %s, %s, %s)",
+                    (user_id, account_id, username, photo),
                 )
                 cur.execute(
                     "INSERT INTO user_roles (user_id, role_id) VALUES (%s, %s)",
@@ -160,8 +198,8 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                     ),
                 )
 
-                # Insert trips for this driver
-                for _ in range(trips_per_driver):
+                # Insert UPCOMING trips for this driver
+                for _ in range(upcoming_trips):
                     start = random_ville()
                     end = random_ville()
                     trip_id = str(uuid4())
@@ -170,22 +208,20 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                     start_time = fake.date_time_between(
                         start_date="+1d", end_date="+30d"
                     )
-                    price = random.randint(5, 30)
-                    trip_status = random.choice(trip_status_ids)
+                    price = random.randint(5, 15)
 
                     cur.execute(
                         """
                         INSERT INTO trips (
                             id, driver_id, vehicle_id,
                             start_location, end_location,
-                            start_time, price, trip_status
+                            start_time, price, status
                         ) VALUES (
                             %s, %s, %s,
                             ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
                             ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
-                            %s, %s, %s
-                        )
-                    """,
+                            %s, %s, (SELECT id FROM trip_status WHERE name = 'upcoming')
+                        )""",
                         (
                             trip_id,
                             driver_id,
@@ -196,7 +232,6 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                             end_lat,
                             start_time,
                             price,
-                            trip_status,
                         ),
                     )
 
@@ -215,12 +250,90 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                             (trip_id, pid),
                         )
 
-                    # Add reviews
+                # Insert PAST trips for this driver
+                for _ in range(completed_trips):
+                    start = random_ville()
+                    end = random_ville()
+                    trip_id = str(uuid4())
+                    start_lat, start_lng = start["lat"], start["lng"]
+                    end_lat, end_lng = end["lat"], end["lng"]
+                    start_time = fake.date_time_between(
+                        start_date="-30d", end_date="-1d"
+                    )
+                    price = random.randint(5, 15)
+                    completed_at = start_time
+
+                    cur.execute(
+                        """
+                        INSERT INTO trips (
+                            id, driver_id, vehicle_id,
+                            start_location, end_location,
+                            start_time, price, status, completed_at
+                        ) VALUES (
+                            %s, %s, %s,
+                            ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
+                            ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
+                            %s, %s, (SELECT id FROM trip_status WHERE name ='completed'), %s
+                        ) RETURNING id""",
+                        (
+                            trip_id,
+                            driver_id,
+                            vehicle_id,
+                            start_lng,
+                            start_lat,
+                            end_lng,
+                            end_lat,
+                            start_time,
+                            price,
+                            completed_at,
+                        ),
+                    )
+
+                    trip_id = cur.fetchone()[0]
+
+                    cur.execute(
+                        "SELECT number_of_seats FROM vehicles WHERE id = %s",
+                        (vehicle_id,),
+                    )
+                    max_passengers = cur.fetchone()[0]
+
+                    num_passengers = random.randint(1, min(3, max_passengers))
+                    chosen_passengers = random.sample(passenger_ids, num_passengers)
+
+                    for pid in chosen_passengers:
+                        cur.execute(
+                            "INSERT INTO trip_passengers (trip_id, user_id) VALUES (%s, %s)",
+                            (trip_id, pid),
+                        )
+
+                    # create TX
+                    for pid in chosen_passengers:
+                        tx_from = pid
+                        tx_to = user_id
+                        amount = price
+                        trip_id = trip_id
+                        completed_at = completed_at
+
+                        cur.execute(
+                            """
+                            INSERT INTO transactions (
+                                tx_from, tx_to, amount, trip_id, completed_at, status
+                            ) VALUES (%s, %s, %s, %s, %s, (SELECT id FROM tx_status WHERE name = 'completed'))
+                            """,
+                            (tx_from, tx_to, amount, trip_id, completed_at),
+                        )
+
+                        cur.execute(
+                            "UPDATE platform_balance SET balance = balance + 2 "
+                        )
+
+                    # Add PENDING reviews for moderation TEST
+                    # RATE TRIP
                     for pid in chosen_passengers:
                         review_id = str(uuid4())
                         rating = random.randint(3, 5)
                         comment = fake.sentence()
-                        review_status_id = get_id(cur, "review_status", "approved")
+                        review_status_id = get_id(cur, "review_status", "pending")
                         cur.execute(
                             """
                             INSERT INTO reviews (
@@ -236,7 +349,6 @@ def seed_data(conn, num_drivers=1000, num_users=1500, trips_per_driver=5):
                                 review_status_id,
                             ),
                         )
-
         conn.commit()
     except Exception as e:
         logger.error(f"DB SEED ERROR : {e}")

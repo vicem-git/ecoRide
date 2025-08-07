@@ -1,10 +1,14 @@
 import requests
 from config import Config
 from urllib.parse import urlparse
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 api_url: str = Config.MAIL_API_URL
 api_key: str = Config.MAIL_API_KEY
+sandbox_postmaster: str = Config.MAIL_SANDBOX_POSTMASTER
 
 parsed_url = urlparse(api_url)
 if not (parsed_url.scheme and parsed_url.netloc):
@@ -15,16 +19,24 @@ if not api_key or not isinstance(api_key, str):
 
 
 def send_email(username, address, subject, text):
-    response = requests.post(
-        api_url,
-        auth=("api", api_key),
-        data={
-            "from": "EcoRide <postmaster@vem-drop.xyz>",
-            "to": f"{username} <{address}>",
-            "subject": f"{subject}",
-            "text": f"{text}",
-        },
-    )
+    payload = {
+        "from": f"EcoRide <{sandbox_postmaster}>",
+        "to": f"{username} <{address}>",
+        "subject": subject,
+        "text": text,
+    }
+
+    try:
+        response = requests.post(
+            api_url,
+            auth=("api", f"{api_key}"),
+            data=payload,
+        )
+        logger.debug(f"Response status: {response.status_code}")
+        logger.debug(f"Response body: {response.text}")
+    except requests.RequestException as e:
+        logger.error(f"Request failed: {e}")
+        return {"success": False, "error": str(e)}
 
     if response.status_code == 200:
         return {"success": True, "message": response.json().get("message")}

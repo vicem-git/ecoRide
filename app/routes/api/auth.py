@@ -85,8 +85,8 @@ def register_user(conn):
         session_user = SessionUser(
             account_id=account_id,
             email=reg_data.email,
-            account_status_id=static_id_resolver("account_status", "active"),
-            account_access_id=static_id_resolver("account_access", "user"),
+            status=static_id_resolver("account_status", "active"),
+            access_type=static_id_resolver("account_access_type", "user"),
             user_id=user_id,
             username=reg_data.username,
         )
@@ -151,7 +151,7 @@ def login(conn):
             )
             return response
 
-        if login_response["account_status_id"] == "suspended":
+        if login_response["status"] == "suspended":
             # if account found, but not suspended, return error
             messages = ["This account has been suspended."]
             response = make_response(
@@ -162,7 +162,7 @@ def login(conn):
             )
             return response
 
-        # if account found, and account_status_id != "suspended", try to retrieve the password hash
+        # if account found, and account_status != "suspended", try to retrieve the password hash
         hashed_pw = user_crud.retrieve_password(conn, account_id=login_response["id"])
 
         password_to_check = str(login_data.password)
@@ -187,7 +187,7 @@ def login(conn):
         # resolve access level
 
         access_level = static_id_resolver(
-            "account_access", session_user.account_access_id
+            "account_access_type", session_user.access_type
         )
 
         response = make_response(
@@ -199,9 +199,9 @@ def login(conn):
         )
 
         if access_level == "admin":
-            url = url_for("pages.admin_dashboard")
+            url = url_for("pages.admin_dashboard", identifier=session_user.id)
         elif access_level == "moderator":
-            url = url_for("pages.moderator_dashboard")
+            url = url_for("pages.moderator_dashboard", identifier=session_user.id)
         elif access_level == "user" and session_user.user_id is not None:
             url = url_for("pages.profile", identifier=session_user.user_id)
         elif access_level == "user" and session_user.user_id is None:

@@ -122,8 +122,6 @@ def create_trip(conn, driver_id=None):
             if not new_trip:
                 raise Exception("Trip creation failed")
 
-            print(f"New trip created: {new_trip}")
-
             # GENERATE SUMMARY
             summary = trips_crud.generate_trip_summary(conn, new_trip)
 
@@ -192,9 +190,12 @@ def cancel_trip(conn, trip_id):
 
         # email all passengers
         email_subject = "Annulation de votre trajet"
-        email_text = (
-            "Votre trajet a été annulé par le conducteur. Vous avez été remboursé."
-        )
+        email_text = """
+                Bonjour Test User,
+                Votre trajet prévu a été annulé par le conducteur. Vous avez été remboursé.
+                Merci de vérifier votre application EcoRide pour plus d'informations.
+
+                L’équipe EcoRideVotre"""
 
         # NORMALLY WE WOULD USE REAL USER EMAILS HERE
         # ALSO BACKGROUND EMAIL SENDING IS NOT SET UP FOR THIS TEST
@@ -254,7 +255,6 @@ def query_trips(conn):
     try:
         search_data = TripSearchData(**params)
         energy_type = search_data.energy_type
-        print(search_data)
 
         results = trips_crud.search_summaries_asst(
             conn=conn,
@@ -266,8 +266,6 @@ def query_trips(conn):
             driver_rating=search_data.driver_rating,
             energy_type=energy_type,
         )
-
-        print(f"Search results: {results}")
 
         return render_template("trips/trip_results.html", trips=results)
 

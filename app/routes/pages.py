@@ -68,6 +68,35 @@ def profile(conn, identifier):
     )
 
 
+@pages_bp.route("/admin")
+@login_required
+@transactional(commit=False)
+def admin_dashboard(conn, identifier):
+    # rides per day
+    # total earned
+    # earned by day
+    # create_moderator, query_moderators, suspend_moderator_by_id
+    # query users, suspend_user_by_id
+    admin_template = render_template(
+        "pages/admin_dashboard.html", page_wrap="admin", identifier=identifier
+    )
+    response = make_response(admin_template, 200)
+    return response
+
+
+@pages_bp.route("/moderator")
+@login_required
+@transactional()
+def mod_dashboard(conn, identifier):
+    # query all pending ok reviews, approve/ reject
+    # query all pending bad reviews w/trip summary, approve/ reject
+    mod_dashboard = render_template(
+        "pages/mod_dashboard.html", page_wrap="mod", identifier=identifier
+    )
+    response = make_response(mod_dashboard, 200)
+    return response
+
+
 @pages_bp.route("/search_trips")
 @transactional()
 def search_trips(conn):

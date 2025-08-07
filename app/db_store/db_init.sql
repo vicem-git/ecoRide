@@ -12,40 +12,22 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO e
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "postgis";
 
+SET TIME ZONE 'Europe/Paris';
+
 CREATE TABLE platform_balance (
   id BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (id),
   balance INTEGER NOT NULL DEFAULT 0 CHECK (balance >= 0)
 );
 
-CREATE TABLE tx_status (
+INSERT INTO platform_balance (id, balance) VALUES (TRUE, 0)
+ON CONFLICT DO NOTHING;
+
+CREATE TABLE account_access_type (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(50) UNIQUE NOT NULL
 );
 
-INSERT INTO tx_status (name) VALUES
-('completed'),
-('pending'),
-('refunded'),
-('archived'),
-('cancelled'),
-('failed');
-
-CREATE TABLE transactions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tx_from UUID NOT NULL REFERENCES users(id),
-  tx_to UUID NOT NULL REFERENCES users(id),
-  amount INTEGER NOT NULL CHECK (amount > 0),
-  trip_id UUID NOT NULL REFERENCES trips(id),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  status UUID NOT NULL REFERENCES tx_status(id)
-);
-
-CREATE TABLE account_access (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(50) UNIQUE NOT NULL
-);
-
-INSERT INTO account_access (name) VALUES
+INSERT INTO account_access_type (name) VALUES
 ('user'),
 ('admin'),
 ('moderator');
@@ -65,8 +47,8 @@ CREATE TABLE accounts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    account_access_id UUID NOT NULL REFERENCES account_access(id), 
-    account_status_id UUID NOT NULL REFERENCES account_status(id),
+    access_type UUID NOT NULL REFERENCES account_access_type(id), 
+    status UUID NOT NULL REFERENCES account_status(id),
     created_at TIMESTAMP DEFAULT now()
 );
 
@@ -195,12 +177,10 @@ CREATE TABLE trip_status (
 );
 
 INSERT INTO trip_status (name) values
-('pending'),
 ('upcoming'),
 ('in_progress'),
 ('completed'),
 ('cancelled');
-
 
 CREATE TABLE trips (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -210,8 +190,9 @@ CREATE TABLE trips (
     end_location GEOGRAPHY(POINT, 4326) NOT NULL,
     start_time TIMESTAMP NOT NULL,
     price INTEGER NOT NULL,
-    trip_status UUID NOT NULL REFERENCES trip_status(id) ON DELETE CASCADE,
+    status UUID NOT NULL REFERENCES trip_status(id) ON DELETE CASCADE,
     rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
+    completed_at TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
 );
@@ -228,6 +209,24 @@ CREATE TRIGGER set_timestamp
 BEFORE UPDATE ON trips
 FOR EACH ROW
 EXECUTE FUNCTION update_timestamp();
+
+CREATE OR REPLACE FUNCTION mark_trip_completed_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.status IN (
+    (SELECT id FROM trip_status WHERE name = 'completed'),
+    (SELECT id FROM trip_status WHERE name = 'cancelled')
+  ) AND OLD.status IS DISTINCT FROM NEW.status THEN
+    NEW.completed_at := now();
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_mark_trip_completed_at
+BEFORE UPDATE ON trips
+FOR EACH ROW
+EXECUTE FUNCTION mark_trip_completed_at();
 
 
 CREATE TABLE trip_passengers (
@@ -255,6 +254,47 @@ FROM
     trip_passengers tp
 JOIN users u ON tp.user_id = u.id
 JOIN accounts a ON u.account_id = a.id;
+
+CREATE TABLE tx_status (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(50) UNIQUE NOT NULL
+);
+
+INSERT INTO tx_status (name) VALUES
+('completed'),
+('pending'),
+('refunded');
+
+CREATE TABLE transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tx_from UUID NOT NULL REFERENCES users(id),
+  tx_to UUID NOT NULL REFERENCES users(id),
+  amount INTEGER NOT NULL CHECK (amount > 0),
+  trip_id UUID NOT NULL REFERENCES trips(id),
+  status UUID NOT NULL REFERENCES tx_status(id),
+  completed_at TIMESTAMP DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT now(),
+  updated_at TIMESTAMP DEFAULT now()
+);
+
+CREATE OR REPLACE FUNCTION mark_tx_completed_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.status IN (
+    (SELECT id FROM tx_status WHERE name = 'completed'),
+    (SELECT id FROM tx_status WHERE name = 'refunded')
+  ) AND OLD.status IS DISTINCT FROM NEW.status THEN
+    NEW.completed_at := now();
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_mark_tx_completed_at
+BEFORE UPDATE ON transactions
+FOR EACH ROW
+EXECUTE FUNCTION mark_tx_completed_at();
+
 
 CREATE TABLE trip_txs (
   trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
@@ -318,7 +358,7 @@ SELECT
   s.name AS status,
   ts.summary
 FROM trips t
-JOIN trip_status s ON t.status_id = s.id
+JOIN trip_status s ON t.status = s.id
 LEFT JOIN trip_summaries ts ON ts.trip_id = t.id;
 
 CREATE OR REPLACE VIEW trip_summaries_asst AS
@@ -330,3 +370,6 @@ SELECT
   tas.available_seats
 FROM trip_with_status_and_summary twss
 JOIN trip_available_seats tas ON twss.trip_id = tas.trip_id;
+
+
+
