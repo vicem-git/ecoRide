@@ -1,0 +1,13 @@
+{% if chart_data %}
+  <div 
+    id="income-timeline"
+    data-chart-labels='{{ labels|tojson }}'
+    data-chart-values='{{ values|tojson }}'
+  >
+    <h2 class="text-lg font-semibold mb-4">Revenu par jour</h2>
+    <hr/>
+    <canvas id="income-timeline-chart" class="p-18 w-[400px] h-[400px]"></canvas>
+  </div>
+{% else %}
+  <p>not found</p>
+{% endif %}

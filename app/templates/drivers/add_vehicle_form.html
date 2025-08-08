@@ -3,20 +3,24 @@
   hx-target="#driver-vehicles" 
   hx-swap="innerHTML"
   hx-on::after-request="window.Alpine.store('modal').close()"
+  hx-on::response-error="window.Alpine.store('modal').replaceContent(event.detail.xhr.response)"
   class="space-y-2 bg-ground2 p-8 rounded mt-4"
 >
   <div class="grid grid-cols-2 gap-4">
-    <select name="brand_id" class="input input-sm" required>
+    <select name="brand_id" class="font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required>
       <option value="">Marque</option>
       {% for brand in brands %}
         <option value="{{ brand.id }}">{{ brand.name }}</option>
       {% endfor %}
     </select>
+    <label for="registration_date" class="text-contrast2 mb-2">
+      Date d'immatriculation<br>
+      <input name="registration_date" type="date" class="font-normal p-3 bg-ground3 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none">
+    </label>
     <input name="model" type="text" placeholder="Modèle" class="font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required>
     <input name="plate_number" type="text" placeholder="Plaque d'immatriculation" class="font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required>
     <input name="color" type="text" placeholder="Couleur" class="font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none">
     <input name="number_of_seats" type="number" min="1" max="9" placeholder="Places" class="font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none">
-    <input name="registration_date" type="date" class="font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none">
     <select name="energy_type_id" class="font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required>
       <option value="">Énergie</option>
       {% for energy in energy_types %}

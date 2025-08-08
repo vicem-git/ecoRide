@@ -9,8 +9,8 @@ from flask import (
 )
 import json
 import logging
-from app.db_store import crud_utilities, user_crud, driver_crud
-from app.models import RegistrationData, LoginData, SessionUser
+from app.db_store import crud_utilities, user_crud, driver_crud, auth_crud
+from app.models import RegistrationData, LoginData, SessionUser, SessionAdmin
 from pydantic import ValidationError
 from app.utils import bcrypt
 from flask_login import login_user, logout_user, login_required
@@ -180,15 +180,49 @@ def login(conn):
             )
             return response
 
-        session_user = user_crud.get_user_object(conn, login_response["id"])
+        access_level = auth_crud.email_access_level(conn, login_data.email)
 
-        login_user(session_user)
+        print(f"Access level for {login_data.email}: {access_level}")
 
-        # resolve access level
+        access_name = static_id_resolver("account_access_type", access_level)
 
-        access_level = static_id_resolver(
-            "account_access_type", session_user.access_type
-        )
+        if access_name in ("admin", "moderator"):
+            session_obj = SessionAdmin(
+                account_id=login_response["id"],
+                email=login_data.email,
+                status=login_response["status"],
+                access_type=login_response["access_type"],
+            )
+        else:
+            session_obj = SessionUser(
+                account_id=login_response["id"],
+                email=login_data.email,
+                status=login_response["status"],
+                access_type=login_response["access_type"],
+                user_id=login_response["user_id"],
+                username=login_response["username"],
+            )
+
+        print(f"Session object created: {session_obj}")
+
+        if not session_obj:
+            raise Exception("Could not retrieve user object after login.")
+
+        login_user(session_obj)
+
+        if access_name == "admin":
+            url = url_for("pages.admin_dashboard", identifier=session_obj.id)
+        elif access_name == "moderator":
+            url = url_for("pages.moderator_dashboard", identifier=session_obj.id)
+        elif access_name == "user" and session_obj.user_id is not None:
+            url = url_for("pages.profile", identifier=session_obj.user_id)
+        elif access_name == "user" and session_obj.user_id is None:
+            url = url_for("pages.onboard")
+        else:
+            logging.warning(
+                f"Unexpected login redirect state: access={access_name}, user_id={session_obj.user_id}"
+            )
+            url = url_for("pages.index")
 
         response = make_response(
             render_template(
@@ -197,20 +231,6 @@ def login(conn):
                 msg_case="success",
             )
         )
-
-        if access_level == "admin":
-            url = url_for("pages.admin_dashboard", identifier=session_user.id)
-        elif access_level == "moderator":
-            url = url_for("pages.moderator_dashboard", identifier=session_user.id)
-        elif access_level == "user" and session_user.user_id is not None:
-            url = url_for("pages.profile", identifier=session_user.user_id)
-        elif access_level == "user" and session_user.user_id is None:
-            url = url_for("pages.onboard")
-        else:
-            logging.warning(
-                f"Unexpected login redirect state: access={access_level}, user_id={session_user.user_id}"
-            )
-            url = url_for("pages.index")  # fallback
 
         response.headers["HX-Trigger"] = json.dumps({"redirectTo": url})
 

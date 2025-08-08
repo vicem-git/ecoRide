@@ -1,0 +1,13 @@
+{% if moderators %}
+  <section>
+    <h2 class="text-2xl font-bold mb-4">ACTIVE MODERATORS</h2>
+    {% for mod in moderators %}
+      <p class="flex p-4 bg-ground2 text-contrast3 rounded-sm">
+        <span class="font-semibold">{{ mod.username }}</span>
+        <span class="text-gray-500">({{ mod.email }})</span>
+      </p>
+    {% endfor %}
+  </section>
+{% else %}
+  <p>NO MODS FOUND
+{% endif %}

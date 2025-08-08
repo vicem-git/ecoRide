@@ -3,7 +3,7 @@ import json
 from datetime import date, timedelta
 
 
-def get_total_profits(conn):
+def get_platform_balance(conn):
     with conn.cursor() as cur:
         cur.execute("""
             SELECT balance FROM platform_balance 
@@ -35,14 +35,15 @@ def get_trips_per_day(conn, period_start, period_end):
         while current_date <= last_date:
             results.append(
                 {
-                    "date": current_date.isoformat(),
+                    "trip_date": current_date.isoformat(),
                     "total_trips": rows.get(current_date, 0),
                 }
             )
             current_date += timedelta(days=1)
+        return results
 
 
-def get_profits_per_day(conn, period_start, period_end):
+def get_income_per_day(conn, period_start, period_end):
     platform_fee = 2
     with conn.cursor() as cur:
         cur.execute(
@@ -70,11 +71,12 @@ def get_profits_per_day(conn, period_start, period_end):
         while current_date <= last_date:
             results.append(
                 {
-                    "date": current_date.isoformat(),
+                    "income_date": current_date.isoformat(),
                     "total_earned": rows.get(current_date, 0),
                 }
             )
             current_date += timedelta(days=1)
+        return results
 
 
 def get_moderators(conn):

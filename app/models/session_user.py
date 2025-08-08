@@ -1,22 +1,12 @@
 from flask_login import UserMixin
 
 
-class SessionUser(UserMixin):
-    def __init__(
-        self,
-        account_id,
-        email,
-        status,
-        access_type,
-        user_id=None,
-        username=None,
-    ):
-        self.id = str(account_id)
+class BaseSessionUser(UserMixin):
+    def __init__(self, account_id, email, status, access_type):
+        self.id = str(account_id)  # required by UserMixin
         self.email = email
         self.status = str(status)
         self.access_type = str(access_type)
-        self.user_id = str(user_id) if user_id is not None else None
-        self.username = username
 
     @property
     def is_active(self):
@@ -26,4 +16,17 @@ class SessionUser(UserMixin):
         return self.status == active_status_id
 
     def get_id(self):
-        return self.id
+        # KEEP CLASS REF TO KNOW WHICH TYPE TO LOAD
+        return f"{self.__class__.__name__}:{self.id}"
+
+
+class SessionUser(BaseSessionUser):
+    def __init__(self, account_id, email, status, access_type, user_id, username):
+        super().__init__(account_id, email, status, access_type)
+        self.user_id = str(user_id)
+        self.username = username
+
+
+class SessionAdmin(BaseSessionUser):
+    def __init__(self, account_id, email, status, access_type):
+        super().__init__(account_id, email, status, access_type)

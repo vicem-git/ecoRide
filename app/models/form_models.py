@@ -172,3 +172,32 @@ class CreateTripData(BaseModel):
                 "La ville de départ et d'arrivée ne peuvent pas être identiques."
             )
         return self
+
+
+class CreateModeratorData(BaseModel):
+    name: str = Field(
+        ...,
+    )
+    email: EmailStr = Field(
+        ...,
+    )
+    password: str = Field(
+        ...,
+    )
+
+    @field_validator("email")
+    def validate_email(value):
+        cleaned_email = value.strip().lower()
+        if "@" not in cleaned_email or "." not in cleaned_email:
+            raise ValueError("Veuillez fournir une adresse e-mail valide.")
+        return cleaned_email
+
+    @field_validator("password")
+    def validate_password(value):
+        min_length = 8
+        cleaned_password = value.strip()
+        if len(cleaned_password) < min_length:
+            raise ValueError(
+                f"Le mot de passe il comporte au moins {min_length} caractères."
+            )
+        return cleaned_password

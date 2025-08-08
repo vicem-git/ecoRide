@@ -1,56 +1,64 @@
-{% extends "base.html"" %}
+{% extends "base.html" %}
 
 {% block title %}
   Tableau Administrateur
 {% endblock %}
 
 {% block main %}
-<section class="p-8 flex w-full min-h-screen">
-  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center justify-center w-full">
+<main class="p-8 flex w-full">
+  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center w-full">
     
-    <section>
+    <section class="w-[80%]">
       <!-- WIDGETS -->
+      <section>
+        <div
+          hx-get="{{ url_for('admin.get_balance') }}"
+          hx-trigger="load"
+          hx-target="#platform-balance"
+          hx-swap="innerHTML"
+        ></div>
+        <div id="platform-balance"></div>
+      </section> 
       
-      <div
-        hx-get="{{ url_for('admin.get_total_profits') }}"
-        hx-trigger="load"
-        hx-target="#total-profits"
-      >
-        <div id="total-profits" class="p-4 bg-ground1 rounded-sm shadow-sm">
-          <h2>Total Profits</h2>
-          <p>Loading...</p>
-        </div>
-      </div>
-
-      <div
-        hx-get="{{ url_for('admin.get_trips_per_day') }}"
-        hx-trigger="load"
-        hx-target="#trips-per-day"
-      >
-        <div id="trips-per-day" class="p-4 bg-ground1 rounded-sm shadow-sm">
-          <h2>Trips Per Day</h2>
-          <p>Loading...</p>
-        </div>
-      </div>
-
-      <div
-        hx-get="{{ url_for('admin.get_profits_per_day') }}"
-      >
-        <div>
-          <h2>Profits Per Day</h2>
-          <p>Loading...</p>
-        </div>
-      </div>
-
+      <section>
+        <div
+          hx-get="{{ url_for('admin.get_trips_timeline') }}"
+          hx-trigger="load"
+          hx-target="#trips-timeline"
+          hx-swap="innerHTML"
+        ></div>
+        <div id="trips-timeline"></div>
+      </section>
+            
+      <section>
+        <div
+          hx-get="{{ url_for('admin.get_income_timeline') }}"
+          hx-trigger="load"
+          hx-target="#income-timeline"
+          hx-swap="innerHTML"
+        ></div>
+        <div id="income-timeline"></div>
+      </section>
     </section>
 
     <section>
-      EMPLOYEES
+      <div
+        hx-get="{{ url_for('admin.get_moderators') }}"
+        hx-trigger="load"
+        hx-target="#moderators-view"
+        hx-swap="innerHTML"
+      ></div>
+      <div id="moderators-view"></div>
     </section>
 
     <section>
-      USER MANAGEMENT
+      <form>
+        <!-- USERS ACTIVE SEARCH -->
+      <input type="text" name="username" placeholder="Rechercher un utilisateur" class="input input-bordered w-full max-w-xs">
+      </form>
+      <div id="user-view"></div>
     </section>
+    
   </div>
-</section>
+</main>
 {% endblock %}

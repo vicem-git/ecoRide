@@ -2,8 +2,46 @@ import logging
 from psycopg.rows import dict_row
 from app.models import SessionUser
 import uuid
+import random
 
 logger = logging.getLogger(__name__)
+
+photo_urls = [
+    "graphics/profiles/profile1.jpg",
+    "graphics/profiles/profile2.jpg",
+    "graphics/profiles/profile3.jpg",
+    "graphics/profiles/profile4.jpg",
+    "graphics/profiles/profile5.jpg",
+    "graphics/profiles/profile6.jpg",
+    "graphics/profiles/profile7.jpg",
+    "graphics/profiles/profile8.jpg",
+    "graphics/profiles/profile9.jpg",
+    "graphics/profiles/profile10.jpg",
+    "graphics/profiles/profile11.jpg",
+    "graphics/profiles/profile12.jpg",
+    "graphics/profiles/profile13.jpg",
+    "graphics/profiles/profile14.jpg",
+    "graphics/profiles/profile15.jpg",
+    "graphics/profiles/profile16.jpg",
+    "graphics/profiles/profile17.jpg",
+    "graphics/profiles/profile18.jpg",
+    "graphics/profiles/profile19.jpg",
+    "graphics/profiles/profile20.jpg",
+    "graphics/profiles/profile21.jpg",
+    "graphics/profiles/profile22.jpg",
+    "graphics/profiles/profile23.jpg",
+    "graphics/profiles/profile24.jpg",
+    "graphics/profiles/profile25.jpg",
+    "graphics/profiles/profile26.jpg",
+    "graphics/profiles/profile27.jpg",
+    "graphics/profiles/profile28.jpg",
+    "graphics/profiles/profile29.jpg",
+]
+
+
+def random_photo():
+    photo = random.choice(photo_urls)
+    return photo
 
 
 def create_account(conn, email, hashed_password):
@@ -12,7 +50,7 @@ def create_account(conn, email, hashed_password):
             """
             INSERT INTO accounts (email, password_hash, access_type, status) 
             VALUES (%s, %s, (
-                SELECT id FROM account_access_type WHERE name = "user"
+                SELECT id FROM account_access_type WHERE name = 'user'
                 ), (
                 SELECT id FROM account_status WHERE name = 'active'
                 )
@@ -52,10 +90,11 @@ def get_user_public_data(conn, identifier):
 
 
 def create_user(conn, account_id, username):
+    photo = random_photo()
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO users (username, account_id) VALUES (%s, %s) RETURNING id",
-            (username, account_id),
+            "INSERT INTO users (username, account_id, photo_url) VALUES (%s, %s, %s) RETURNING id",
+            (username, account_id, photo),
         )
         user_id = cur.fetchone()[0]
         return user_id

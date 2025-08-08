@@ -1,0 +1,11 @@
+{% if balance %}
+  <section class="my-8 p-4 bg-apart rounded-sm w-full">
+    <h2 class="text-lg font-semibold mb-4">Balance</h2>
+    <div class="flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <span class="font-medium">Total Balance:</span>
+        <span class="text-xl text-eco">{{ balance }}</span>
+      </div>
+    </div>
+  </section>
+{% endif %}

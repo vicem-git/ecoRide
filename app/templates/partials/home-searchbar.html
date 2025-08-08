@@ -6,7 +6,7 @@
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/loc-point.html" %}    
     </svg>
-    <select id="home_start_city_param" name="start_city" placeholder="Départ..." class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
+    <select id="home_start_city_param" x-model="$store.tripSearch.start_city" name="start_city" placeholder="Départ..." class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
       <option value="">Départ...</option>
       {% for city in cities %}
         <option value="{{ city }}">{{ city }}</option>
@@ -17,7 +17,7 @@
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/loc-point.html" %}    
     </svg>
-    <select id="home_end_city_param" name="end_city" placeholder="Arrivée..." class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
+    <select id="home_end_city_param" name="end_city" x-model="$store.tripSearch.end_city" placeholder="Arrivée..." class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
       <option value="">Arrivée...</option>
       {% for city in cities %}
         <option value="{{ city }}">{{ city }}</option>

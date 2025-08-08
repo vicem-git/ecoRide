@@ -15,7 +15,7 @@
   
   <label for="start_time_filter" class="text-apart3">Date et heure de départ :</label>
   <div class="flex items-center gap-2"> 
-    <input type="date" id="start_date_filter" name="start_date" class="h-[48px] w-[106px] font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" />
+    <input type="date" id="start_date_filter" name="start_date" class="h-[48px] w-[106px] font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" required/>
     <input type="time" id="start_time_filter" name="start_time" class="h-[48px] w-[106px] font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" required />
   </div>
   
@@ -23,11 +23,12 @@
     <p class="text-apart3">Sélectionnez un véhicule pour ce voyage :</p>
     <p class="text-apart2">Si vous n'avez pas de véhicule,<br>vous pouvez en ajouter un depuis votre profil.</p>
     <select id="vehicle-select" name="vehicle_id" placeholder="sélectionner un véhicule" class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
-      {% for vehicle in driver_info.vehicles %}
-        <option value="{{ vehicle.id }}" >{{ vehicle.brand }} - {{ vehicle.model }}, {{ vehicle.plate_number }}</option>
-      {% endfor %}
       {% if not driver_info.vehicles %}
         <p class="text-apart2">Vous n'avez pas de véhicule enregistré.</p>
+      {% else %}
+        {% for vehicle in driver_info.vehicles %}
+          <option value="{{ vehicle.id }}" >{{ vehicle.brand }} - {{ vehicle.model }}, {{ vehicle.plate_number }}</option>
+        {% endfor %}
       {% endif %}
     </select>
   </section>

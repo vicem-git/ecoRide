@@ -23,7 +23,6 @@ def transactional(commit=True):
                 try:
                     result = f(conn, *args, **kwargs)
                     if commit:
-                        logger.info(f"commiting for {f}")
                         conn.commit()
                     return result
                 except Exception as te:
@@ -66,14 +65,12 @@ def require_ownership(param="for_user"):
         def ownership_wrapper(conn, *args, **kwargs):
             try:
                 if param == "for_user":
-                    logger.debug(f"Checking ownership for : {param}")
                     user_id = request.args.get(param)
                     if not user_id or str(user_id) != str(current_user.user_id):
                         abort(403)
 
                 elif param == "for_trip":
                     trip_id = request.args.get(param)
-                    logger.debug(f"Checking ownership for: {trip_id}")
                     if not trip_id:
                         abort(403, "missing trip_id")
 
@@ -87,8 +84,27 @@ def require_ownership(param="for_user"):
                     if not owner:
                         abort(
                             403,
-                            "la suppression d'un voyage qui ne vous appartient pas échoue",
+                            "Cette voyage ne vous appartient pas",
                         )
+
+                elif param == "for_participant":
+                    trip_id = kwargs.get("trip_id") or request.view_args.get("trip_id")
+                    user_id = current_user.user_id
+                    if not trip_id:
+                        abort(403, "missing trip_id")
+
+                    with conn.cursor() as cur:
+                        cur.execute(
+                            "SELECT 1 FROM trip_passengers WHERE trip_id = %s AND user_id = %s",
+                            (trip_id, user_id),
+                        )
+                        participant = cur.fetchone()
+                    if not participant:
+                        abort(
+                            403,
+                            "la suppression d'un voyage auquel vous n'êtes pas inscrit échoue",
+                        )
+
             except Exception as e:
                 logger.error(f"Error checking trip ownership: {e}")
                 abort(500, "Erreur interne du serveur")
@@ -98,3 +114,27 @@ def require_ownership(param="for_user"):
         return ownership_wrapper
 
     return ownership_decorator
+
+
+def internal_access(f):
+    @wraps(f)
+    def internal_access_wrapper(*args, **kwargs):
+        try:
+            access_type = current_user.access_type
+            internal_access_ids = []
+            internal_access_ids.append(
+                current_app.static_ids["account_access_type"]["admin"]
+            )
+            internal_access_ids.append(
+                current_app.static_ids["account_access_type"]["moderator"]
+            )
+
+            if access_type not in internal_access_ids:
+                abort(403, "Accès interdit")
+
+        except Exception as e:
+            logger.error(f"Error during internal access check: {e}")
+            abort(500, "Erreur interne du serveur")
+        return f(*args, **kwargs)
+
+    return internal_access_wrapper

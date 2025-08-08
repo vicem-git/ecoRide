@@ -3,7 +3,7 @@ from rich.logging import RichHandler
 import logging
 from app.db_store import DatabaseManager, crud_utilities, trips_crud
 from app.routes import pages_bp
-from app.routes.api import auth_bp, users_bp, drivers_bp, trips_bp
+from app.routes.api import admin_bp, auth_bp, users_bp, drivers_bp, trips_bp
 from config import db_config, Config
 from app.utils import bcrypt, login_manager, safe_close, fr_date
 from app.models import session_user_loader
@@ -88,6 +88,7 @@ def create_app():
     login_manager.init_app(app)
     session_user_loader(app)
 
+    app.register_blueprint(admin_bp)
     app.register_blueprint(pages_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)

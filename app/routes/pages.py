@@ -12,7 +12,7 @@ from flask import (
 import logging
 from datetime import datetime
 from flask_login import login_required, current_user
-from app.utils import static_id_resolver
+from app.utils import internal_access
 from app.db_store import user_crud, trips_crud
 from app.models import TripSearchData
 from pydantic import ValidationError
@@ -68,15 +68,11 @@ def profile(conn, identifier):
     )
 
 
-@pages_bp.route("/admin")
+@pages_bp.route("/admin/<identifier>")
 @login_required
+@internal_access
 @transactional(commit=False)
 def admin_dashboard(conn, identifier):
-    # rides per day
-    # total earned
-    # earned by day
-    # create_moderator, query_moderators, suspend_moderator_by_id
-    # query users, suspend_user_by_id
     admin_template = render_template(
         "pages/admin_dashboard.html", page_wrap="admin", identifier=identifier
     )
@@ -86,6 +82,7 @@ def admin_dashboard(conn, identifier):
 
 @pages_bp.route("/moderator")
 @login_required
+@internal_access
 @transactional()
 def mod_dashboard(conn, identifier):
     # query all pending ok reviews, approve/ reject

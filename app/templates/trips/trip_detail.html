@@ -31,7 +31,7 @@
     <section>
       <div class="flex gap-4 items-center">
         <div class="w-16 h-16 rounded-full overflow-hidden">
-          <img src="{{ trip.summary.driver_photo }}"/>
+          <img src="{{ url_for('static', filename=trip.summary.driver_photo) }}"/>
         </div>
           <div class="flex flex-col font-normal text-apart3 items-end justify-between">
         <a action="GET" href="{{ url_for('pages.profile', identifier=trip.summary.driver_name) }}" class="text-xl font-semibold">{{ trip.summary.driver_name }}</p>

@@ -3,10 +3,31 @@ import htmx from 'htmx.org';
 import { toggleHidden } from '@/js/modules/domUtils.js';
 import Alpine from 'alpinejs'
 import persist from '@alpinejs/persist'
+import collapse from '@alpinejs/collapse'
+import {
+  Chart,
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 
+Chart.register(
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Tooltip,
+  Legend
+);
 
 window.Alpine = Alpine;
 Alpine.plugin(persist);
+Alpine.plugin(collapse);
 
 Alpine.store('darkMode', {
   on: Alpine.$persist(false).as('darkMode_on'),
@@ -19,7 +40,6 @@ Alpine.store('darkMode', {
 Alpine.store('modal', {
   show: Alpine.$persist(false).as('modal_show'),
   errorMessage: Alpine.$persist('').as('modal_error'),
-
   open() {
     this.show = true
   },
@@ -74,3 +94,50 @@ document.body.addEventListener("htmx:afterOnLoad", (evt) => {
     }
   }
 });
+
+window.renderChart = function (canvasId, labels, values, datasetLabel = 'Income') {
+  const ctx = document.getElementById(canvasId)?.getContext('2d');
+  if (!ctx) return;
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: datasetLabel,
+        data: values,
+        borderColor: '#4CAF50',
+        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+        fill: true,
+      }]
+    },
+    options: {}
+  });
+};
+
+
+document.body.addEventListener('htmx:afterSwap', function (evt) {
+  if (evt.target.id === 'income-timeline') {
+    const el = evt.target.querySelector('[data-chart-labels]');
+    if (!el) return;
+
+    const labels = JSON.parse(el.dataset.chartLabels);
+    const values = JSON.parse(el.dataset.chartValues);
+
+    window.renderChart('income-timeline-chart', labels, values, 'Income');
+  }
+});
+
+
+document.body.addEventListener('htmx:afterSwap', function (evt) {
+  if (evt.target.id === 'trips-timeline') {
+    const el = evt.target.querySelector('[data-chart-labels]');
+    if (!el) return;
+
+    const labels = JSON.parse(el.dataset.chartLabels);
+    const values = JSON.parse(el.dataset.chartValues);
+
+    window.renderChart('trips-timeline-chart', labels, values, 'Trips');
+  }
+});
+

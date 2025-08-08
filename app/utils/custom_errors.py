@@ -6,6 +6,8 @@ VALIDATION_MESSAGES = {
     "start_datetime": "Veuillez entrer une date valide.",
     "price": "Veuillez entrer un prix valide.",
     "vehicle_id": "Veuillez sélectionner un véhicule.",
+    "email": "Veuillez fournir une adresse e-mail valide.",
+    "password": "Le mot de passe doit contenir au moins 8 caractères",
 }
 
 

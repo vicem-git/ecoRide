@@ -37,6 +37,7 @@ def create_trip(conn, driver_id=None):
         try:
             driver_data = driver_crud.get_driver_data(conn, user_id)
             driver_id = driver_data.get("id") if driver_data else None
+            print(driver_id)
 
             if not driver_id:
                 response = make_response(
@@ -53,6 +54,18 @@ def create_trip(conn, driver_id=None):
 
             driver_preferences = driver_crud.get_driver_preferences(conn, driver_id)
             driver_vehicles = driver_crud.get_driver_vehicles(conn, driver_id)
+
+            print(f"VEHICULES :{driver_vehicles}, PREFS : {driver_preferences}")
+
+            if not driver_vehicles:
+                messages = [
+                    "Veuillez ajouter un véhicule pour pouvoir créer des voyages"
+                ]
+                response = make_response(
+                    render_template(
+                        "partials/server_msg.html", messages=messages, msg_case="info"
+                    )
+                )
 
             driver_info = {
                 "data": driver_data,
@@ -223,14 +236,14 @@ def cancel_trip(conn, trip_id):
         if not mail_ok:
             raise Exception("Failed to send cancellation emails")
 
-        messages = [
-            "Trajet annulé avec succès. Un email de annulation a été envoyé aux passagers."
-        ]
+        roles = user_crud.get_user_roles(conn, current_user.user_id)
+
         response = make_response(
-            render_template(
-                "partials/server_msg.html", messages=messages, msg_case="success"
-            ),
+            render_template("trips/user_trips.html", roles=roles),
             200,
+        )
+        response.headers["HX-Message"] = (
+            "Trajet annulé avec succès. Un email de annulation a été envoyé aux passagers."
         )
         return response
 
@@ -238,6 +251,41 @@ def cancel_trip(conn, trip_id):
         conn.rollback()
         logger.error("Error canceling trip: %s", e)
         messages = ["Une erreur s'est, veuillez réessayer plus tard."]
+        response = make_response(
+            render_template(
+                "partials/server_msg.html", messages=messages, msg_case="error"
+            ),
+            500,
+        )
+        return response
+
+
+@trips_bp.route("/complete_trip/<trip_id>", methods=["POST"])
+@transactional()
+@htmx_login_required
+@require_ownership("for_trip")
+def complete_trip(conn, trip_id):
+    try:
+        completed_status = current_app.static_ids["trip_status"]["completed"]
+        completed = trips_crud.update_trip_status(conn, trip_id, completed_status)
+        if not completed:
+            raise Exception("Trip completion failed")
+
+        # send review request email to passengers
+        # release TXS ??
+
+        response = make_response(
+            render_template(
+                "trips/user_trips.html",
+            ),
+            200,
+        )
+        response.headers["HX-Message"] = "Trajet marqué comme terminé avec succès."
+        return response
+
+    except Exception as e:
+        logger.error("Error completing trip: %s", e)
+        messages = ["Une erreur s'est produite, veuillez réessayer plus tard."]
         response = make_response(
             render_template(
                 "partials/server_msg.html", messages=messages, msg_case="error"
@@ -365,7 +413,14 @@ def join_trip(conn, trip_id):
     try:
         psg_added = trips_crud.add_user_to_trip(conn, trip_id, user_id)
         if not psg_added:
-            raise Exception("Failed to add passenger to trip")
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html",
+                    messages=["Vous avez déjà rejoint ce trajet."],
+                    msg_case="info",
+                ),
+                400,
+            )
 
         tx_created = tx_crud.create_tx(conn, user_id, driver_user, trip_price, trip_id)
         if not tx_created:
@@ -392,43 +447,89 @@ def join_trip(conn, trip_id):
         return response
 
 
-@trips_bp.route("/passenger-trips/<status>")
+@trips_bp.route("/leave_trip/<trip_id>", methods=["POST"])
+@transactional()
+@htmx_login_required
+@require_ownership("for_participant")
+def leave_trip(conn, trip_id):
+    try:
+        left_trip = trips_crud.remove_user_from_trip(
+            conn, trip_id, current_user.user_id
+        )
+        if not left_trip:
+            raise Exception("Failed to leave trip")
+
+        roles = user_crud.get_user_roles(conn, current_user.user_id)
+
+        response = make_response(
+            render_template("trips/user_trips.html", roles=roles),
+            200,
+        )
+        response.headers["HX-Message"] = "Vous avez quitté le voyage."
+        return response
+
+    except Exception as e:
+        logger.error("Error leaving trip: %s", e)
+        messages = ["Une erreur s'est produite, reessayez plus tard."]
+        response = make_response(
+            render_template(
+                "trips/server_msg.html", messages=messages, msg_case="error"
+            ),
+            500,
+        )
+        return response
+
+
+@trips_bp.route("/passenger-trips")
 @transactional()
 @htmx_login_required
 @require_ownership("for_user")
-def passenger_trips_by_status(conn, status):
-    status = request.view_args.get("status")
-    user_id = current_user.user_id
-
+def passenger_trips(conn):
     try:
-        status_id = static_name_resolver("trip_status", status)
-    except Exception:
-        return "Invalid status", 400
+        user_id = current_user.user_id
+        trips = trips_crud.get_passenger_trips(conn, user_id)
+        trips = [t for t in trips if t["status"] != "cancelled"]
 
-    trips = trips_crud.get_passenger_trips(conn, user_id, status_id)
+        return render_template("trips/passenger_trip_items.html", trips=trips or [])
 
-    return render_template("trips/passenger_trip_item.html", trips=trips or [])
+    except Exception as e:
+        logger.error("Error retrieving passenger trips: %s", e)
+        response = make_response(
+            render_template(
+                "partials/server_msg.html",
+                messages=["Une erreur s'est produite, reessayez plus tard."],
+                msg_case="error",
+            ),
+            500,
+        )
+        return response
 
 
-@trips_bp.route("/driver-trips/<status>")
+@trips_bp.route("/driver-trips")
 @transactional()
 @htmx_login_required
 @require_ownership("for_user")
-def driver_trips_by_status(conn, status):
-    status = request.view_args.get("status")
-    user_id = current_user.user_id
-
+def driver_trips(conn):
     try:
-        status_id = static_name_resolver("trip_status", status)
-    except Exception:
-        return "Invalid status", 400
+        user_id = current_user.user_id
 
-    driver_data = driver_crud.get_driver_data(conn, user_id)
-    if not driver_data:
-        return "Driver data not found", 404
+        driver_data = driver_crud.get_driver_data(conn, user_id)
+        if not driver_data:
+            return "Driver data not found", 404
 
-    driver_id = driver_data.get("id")
+        driver_id = driver_data.get("id")
+        trips = trips_crud.get_driver_trips(conn, driver_id)
+        trips = [t for t in trips if t["status"] != "cancelled"]
 
-    trips = trips_crud.get_driver_trips(conn, driver_id, status_id)
+        return render_template("trips/driver_trip_items.html", trips=trips or [])
 
-    return render_template("trips/driver_trip_item.html", trips=trips or [])
+    except Exception as e:
+        logger.error("Error retrieving driver trips: %s", e)
+        messages = ["Une erreur s'est produite, reessayez plus tard."]
+        response = make_response(
+            render_template(
+                "partials/server_msg.html", messages=messages, msg_case="error"
+            ),
+            500,
+        )
+        return response

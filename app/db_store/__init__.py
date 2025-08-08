@@ -1,3 +1,4 @@
+from . import auth_crud
 from . import crud_utilities
 from . import user_crud
 from . import trips_crud

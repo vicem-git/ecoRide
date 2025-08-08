@@ -89,8 +89,8 @@ def create_trip(conn, driver_id, vehicle_id, start_city, end_city, start_time, p
             (driver_id, vehicle_id,
             start_location, 
             end_location, start_time, 
-            price, (SELECT id FROM trip_status WHERE name = 'upcoming'))
-            VALUES (%s, %s, ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s, %s, %s)
+            price, status)
+            VALUES (%s, %s, ST_GeomFromText(%s, 4326), ST_GeomFromText(%s, 4326), %s, %s, (SELECT id FROM trip_status WHERE name = 'upcoming'))
             RETURNING id""",
             (driver_id, vehicle_id, start_point, end_point, start_time, price),
         )
@@ -102,7 +102,7 @@ def cancel_trip(conn, trip_id):
     with conn.cursor() as cur:
         cur.execute(
             """
-            UPDATE SET status = 'cancelled' FROM trips WHERE id = %s
+            UPDATE trips SET status = (SELECT id FROM trip_status WHERE name = 'cancelled') WHERE id = %s
         """,
             (trip_id,),
         )
