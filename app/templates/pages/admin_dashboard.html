@@ -40,25 +40,55 @@
         <div id="income-timeline"></div>
       </section>
     </section>
-
-    <section>
-      <div
-        hx-get="{{ url_for('admin.get_moderators') }}"
-        hx-trigger="load"
-        hx-target="#moderators-view"
-        hx-swap="innerHTML"
-      ></div>
-      <div id="moderators-view"></div>
-    </section>
-
-    <section>
-      <form>
-        <!-- USERS ACTIVE SEARCH -->
-      <input type="text" name="username" placeholder="Rechercher un utilisateur" class="input input-bordered w-full max-w-xs">
-      </form>
-      <div id="user-view"></div>
-    </section>
     
+    <section class="flex flex-col w-[80%]">
+      <section>
+        <div
+          hx-get="{{ url_for('admin.get_moderators') }}"
+          hx-trigger="load"
+          hx-target="#moderators-view"
+          hx-swap="innerHTML"
+        ></div>
+        <h2 class="text-base lg:text-lg font-semibold text-contrast3">Moderators</h2>
+        <hr class="mb-4"/>
+        <button
+          hx-get="{{ url_for('admin.create_moderator') }}"
+          hx-target="#moderators-view"
+          hx-swap="innerHTML"
+          hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+          class="px-4 py-2 mb-4 rounded-sm bg-apart hover:bg-apart2 transition-colors duration-200"
+        >
+          Ajouter un moderateur
+        </button>
+        <div id="moderators-view"></div>
+      </section>
+
+      <section>
+        <h2 class="text-base lg:text-lg font-semibold text-contrast3">Utilisateurs</h2>
+        <hr class="mb-4"/>
+        <input 
+          type="search"
+          name="users-search"
+          placeholder="Rechercher un utilisateur"
+          hx-post="{{ url_for('admin.query_users') }}"
+          hx-target="#users-search-view"
+          hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+          class="p-2 bg-ground3 font-normal rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none">
+        <table class="w-full mt-4">
+          <thead>
+            <tr> 
+              <th class="text-left">Email</th>
+              <th class="text-left">Username</th>
+              <th class="text-left">Status</th>
+              <th class="text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-search-view">
+          </tbody>
+        </table>
+      </section>
+
+    </section>
   </div>
 </main>
 {% endblock %}

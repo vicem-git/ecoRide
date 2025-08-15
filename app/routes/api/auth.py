@@ -12,9 +12,8 @@ import logging
 from app.db_store import crud_utilities, user_crud, driver_crud, auth_crud
 from app.models import RegistrationData, LoginData, SessionUser, SessionAdmin
 from pydantic import ValidationError
-from app.utils import bcrypt
 from flask_login import login_user, logout_user, login_required
-from app.utils import transactional, static_id_resolver, static_name_resolver
+from app.utils import bcrypt, transactional, static_id_resolver, static_name_resolver
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 

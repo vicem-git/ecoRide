@@ -32,10 +32,6 @@
               hx-target="#user-trips"
               hx-swap="innerHTML"
               hx-confirm="Êtes-vous sûr.e de vouloir quitter ce voyage ?"
-              hx-on::after-request="
-                let msg = event.detail.xhr.response.getResponseHeader('X-Message');
-                if (msg) window.Alpine.store('modal').replaceContent(msg);
-              "
               hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
               class="py-2 px-4 bg-error text-ground1 hover:bg-error2 transition-colors duration-200 rounded-sm"
             >

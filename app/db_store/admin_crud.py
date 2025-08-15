@@ -1,4 +1,5 @@
 from flask import current_app
+from psycopg.rows import dict_row
 import json
 from datetime import date, timedelta
 
@@ -80,12 +81,73 @@ def get_income_per_day(conn, period_start, period_end):
 
 
 def get_moderators(conn):
-    pass
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT id, email, status
+            FROM accounts
+            WHERE access_type = (
+                SELECT id FROM account_access_type WHERE name = 'moderator'
+            )
+            ORDER BY created_at DESC
+        """
+        )
+        return cur.fetchall()
 
 
-def create_moderator(conn, name, email, password):
-    pass
+def create_moderator(conn, email, password):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO accounts (email, password_hash, access_type, status)
+            VALUES (%s, %s, (SELECT id FROM account_access_type WHERE name = 'moderator'), (SELECT id FROM account_status WHERE name = 'active'))
+            RETURNING id
+        """,
+            (email, password),
+        )
+        return cur.fetchone()[0]
 
 
 def suspend_account_by_id(conn, account_id):
-    pass
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE accounts a 
+            SET status = (SELECT id FROM account_status WHERE name = 'suspended')
+            WHERE a.id = %s
+        """,
+            (account_id,),
+        )
+        return cur.rowcount > 0
+
+
+def activate_account_by_id(conn, account_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE accounts a 
+            SET status = (SELECT id FROM account_status WHERE name = 'active')
+            WHERE a.id = %s
+        """,
+            (account_id,),
+        )
+        return cur.rowcount > 0
+
+
+def query_users(conn, search_term):
+    search_pattern = f"%{search_term.strip()}%" if search_term else "%"
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT a.id AS account_id, a.email, u.username, s.name AS status
+            FROM users u
+            JOIN accounts a ON u.account_id = a.id
+            JOIN account_status s ON a.status = s.id
+            WHERE a.email ILIKE %s
+               OR u.username ILIKE %s
+               OR s.name ILIKE %s
+            ORDER BY a.email
+            """,
+            (search_pattern, search_pattern, search_pattern),
+        )
+        return cur.fetchall()

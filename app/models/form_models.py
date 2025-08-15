@@ -175,9 +175,6 @@ class CreateTripData(BaseModel):
 
 
 class CreateModeratorData(BaseModel):
-    name: str = Field(
-        ...,
-    )
     email: EmailStr = Field(
         ...,
     )

@@ -242,9 +242,9 @@ def cancel_trip(conn, trip_id):
             render_template("trips/user_trips.html", roles=roles),
             200,
         )
-        response.headers["HX-Message"] = (
-            "Trajet annulé avec succès. Un email de annulation a été envoyé aux passagers."
-        )
+        response.headers["HX-Trigger"] = {
+            "serverMsg": "Trajet annulé avec succès. Un email de confirmation a été envoyé aux passagers."
+        }
         return response
 
     except Exception as e:
@@ -280,7 +280,7 @@ def complete_trip(conn, trip_id):
             ),
             200,
         )
-        response.headers["HX-Message"] = "Trajet marqué comme terminé avec succès."
+        response.headers["HX-Trigger"] = {"serverMsg": "Trajet complété avec succès."}
         return response
 
     except Exception as e:
@@ -465,7 +465,7 @@ def leave_trip(conn, trip_id):
             render_template("trips/user_trips.html", roles=roles),
             200,
         )
-        response.headers["HX-Message"] = "Vous avez quitté le voyage."
+        response.headers["HX-Trigger"] = {"serverMsg": "Vous avez quitté le voyage."}
         return response
 
     except Exception as e:

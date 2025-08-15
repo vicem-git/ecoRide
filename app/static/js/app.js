@@ -95,6 +95,10 @@ document.body.addEventListener("htmx:afterOnLoad", (evt) => {
   }
 });
 
+document.body.addEventListener("serverMsg", function (evt) {
+  Alpine.store('modal').replaceContent(evt.detail.value);
+});
+
 window.renderChart = function (canvasId, labels, values, datasetLabel = 'Income') {
   const ctx = document.getElementById(canvasId)?.getContext('2d');
   if (!ctx) return;

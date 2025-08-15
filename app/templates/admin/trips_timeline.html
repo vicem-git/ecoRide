@@ -1,13 +1,15 @@
-{% if chart_data %}
-  <div
-    id="trips-timeline"
-    data-chart-labels='{{ labels|tojson }}'
-    data-chart-values='{{ values|tojson }}'
-  >
-    <h2 class="text-lg font-semibold mb-4">Voyages par jour</h2>
-    <hr/>
-    <canvas id="trips-timeline-chart" class="p-18 w-[400px] h-[400px]"></canvas>
-  </div>
-{% else %}
-  <p>not found</p>
-{% endif %}
+<div class="mb-8">
+  <h2 class="text-base lg:text-lg font-semibold text-contrast3">Voyages par jour</h2>
+  <hr class="mb-4"/>
+  {% if chart_data %}
+    <div
+      id="trips-timeline"
+      data-chart-labels='{{ labels|tojson }}'
+      data-chart-values='{{ values|tojson }}'
+    >
+      <canvas id="trips-timeline-chart" class="p-4 md:p-6 lg:p-12 w-[400px] h-[400px]"></canvas>
+    </div>
+  {% else %}
+    <p>not found</p>
+  {% endif %}
+</div>
