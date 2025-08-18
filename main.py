@@ -5,7 +5,13 @@ from app.db_store import DatabaseManager, crud_utilities, trips_crud
 from app.routes import pages_bp
 from app.routes.api import admin_bp, auth_bp, users_bp, drivers_bp, trips_bp
 from config import db_config, Config
-from app.utils import bcrypt, login_manager, safe_close, fr_date
+from app.utils import (
+    bcrypt,
+    login_manager,
+    safe_close,
+    fr_date,
+    register_template_helpers,
+)
 from app.models import session_user_loader
 import atexit
 from datetime import datetime
@@ -49,6 +55,10 @@ def create_app():
     except Exception as e:
         logging.error(f"failed to load static ids: {str(e)}")
 
+    # STATIC IDS TEMPLATE HELPERS
+    register_template_helpers(app)
+
+    # DB SEEDING AND SUMMARY GENERATION
     try:
         with db_manager.connection() as conn:
             with conn.cursor() as cur:
@@ -103,6 +113,10 @@ def create_app():
     def inject_cities():
         cities = list(villes.keys())
         return {"cities": cities}
+
+    @app.context_processor
+    def inject_static_ids():
+        return dict(static_ids=app.static_ids)
 
     login_manager.login_view = "pages.login"
 

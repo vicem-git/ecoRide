@@ -1,14 +1,20 @@
-<nav class="flex flex-row items-center justify-center gap-4"> 
-  {% if page_wrap in ["home"] %}
-    {% include "partials/trips-button.html" %}
-    {% include "partials/user-button.html" %}
-  {% elif page_wrap in ["register", "login"] %}
+{% if current_user is anonymous or current_user is access("user") %}
+  <nav class="flex flex-row items-center justify-center gap-4"> 
+    {% if page_wrap in ["home"] %}
+      {% include "partials/trips-button.html" %}
+      {% include "partials/user-button.html" %}
+    {% elif page_wrap in ["register", "login"] %}
+      {% include "partials/home-button.html" %}
+    {% else %}
+      {% include "partials/home-button.html" %}
+      {% include "partials/trips-button.html" %}
+      {% include "partials/user-button.html" %}
+    {% endif %} 
+    {% include "partials/theme-button.html" %}
+  </nav>
+{% elif current_user is access("admin", "moderator") %}
+  <nav class="flex flex-row items-center justify-center gap-4">
     {% include "partials/home-button.html" %}
-  {% else %}
-    {% include "partials/home-button.html" %}
-    {% include "partials/trips-button.html" %}
-    {% include "partials/user-button.html" %}
-  {% endif %} 
-  {% include "partials/theme-button.html" %}
-</nav> 
-
+    {% include "partials/internal_access_button.html" %}
+  </nav>
+{% endif %}

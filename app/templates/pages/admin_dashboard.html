@@ -42,7 +42,7 @@
     </section>
     
     <section class="flex flex-col w-[80%]">
-      <section>
+      <section class="mb-8">
         <div
           hx-get="{{ url_for('admin.get_moderators') }}"
           hx-trigger="load"
@@ -68,22 +68,27 @@
         <hr class="mb-4"/>
         <input 
           type="search"
-          name="users-search"
+          name="search-term"
           placeholder="Rechercher un utilisateur"
           hx-post="{{ url_for('admin.query_users') }}"
           hx-target="#users-search-view"
-          hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+          hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
           class="p-2 bg-ground3 font-normal rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none">
         <table class="w-full mt-4">
-          <thead>
+          <thead class="bg-ground4 rounded-xs">
             <tr> 
-              <th class="text-left">Email</th>
-              <th class="text-left">Username</th>
-              <th class="text-left">Status</th>
-              <th class="text-left">Actions</th>
+              <th class="p-2 text-left">Email</th>
+              <th class="p-2 text-left">Username</th>
+              <th class="p-2 text-left">Status</th>
+              <th class="p-2 text-left">Actions</th>
             </tr>
           </thead>
           <tbody id="users-search-view">
+            <tr>
+              <td colspan="4" rowspan="4" class="text-center text-apart py-8">
+                Tapez pour rechercher un utilisateur...
+              </td>
+            </tr>
           </tbody>
         </table>
       </section>

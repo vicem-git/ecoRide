@@ -7,8 +7,6 @@
     --font-sans: "Open Sans", sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-red-500: oklch(63.7% 0.237 25.331);
-    --color-red-600: oklch(57.7% 0.245 27.325);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-700: oklch(52.7% 0.154 150.069);
     --color-gray-500: oklch(55.1% 0.027 264.364);
@@ -422,6 +420,9 @@
   .w-full {
     width: 100%;
   }
+  .table-fixed {
+    table-layout: fixed;
+  }
   .translate-x-1 {
     --tw-translate-x: calc(var(--spacing) * 1);
     translate: var(--tw-translate-x) var(--tw-translate-y);
@@ -539,9 +540,6 @@
   .bg-apart {
     background-color: var(--color-apart);
   }
-  .bg-apart2 {
-    background-color: var(--color-apart2);
-  }
   .bg-contrast2 {
     background-color: var(--color-contrast2);
   }
@@ -556,9 +554,6 @@
   }
   .bg-error {
     background-color: var(--color-error);
-  }
-  .bg-error2 {
-    background-color: var(--color-error2);
   }
   .bg-green-600 {
     background-color: var(--color-green-600);
@@ -628,6 +623,9 @@
   }
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
+  }
+  .py-8 {
+    padding-block: calc(var(--spacing) * 8);
   }
   .pt-2 {
     padding-top: calc(var(--spacing) * 2);
@@ -805,13 +803,6 @@
       }
     }
   }
-  .hover\:bg-apart3 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-apart3);
-      }
-    }
-  }
   .hover\:bg-eco-ground2 {
     &:hover {
       @media (hover: hover) {
@@ -830,20 +821,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-error2);
-      }
-    }
-  }
-  .hover\:bg-error3 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-error3);
-      }
-    }
-  }
-  .hover\:bg-error4 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-error4);
       }
     }
   }
