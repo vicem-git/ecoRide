@@ -134,7 +134,7 @@ def activate_account_by_id(conn, account_id):
         return cur.rowcount > 0
 
 
-def query_users(conn, search_term):
+def query_users(conn, search_term, limit=10):
     search_pattern = f"%{search_term.strip()}%" if search_term else "%"
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
@@ -147,7 +147,8 @@ def query_users(conn, search_term):
                OR u.username ILIKE %s
                OR s.name ILIKE %s
             ORDER BY a.email
+            LIMIT %s
             """,
-            (search_pattern, search_pattern, search_pattern),
+            (search_pattern, search_pattern, search_pattern, limit),
         )
         return cur.fetchall()

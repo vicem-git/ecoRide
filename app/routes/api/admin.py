@@ -188,7 +188,7 @@ def create_moderator(conn):
         if not new_mod:
             raise ValueError("Failed to create moderator")
 
-        response = make_response(render_template(""), 204)
+        response = make_response("", 204)
         response.headers["HX-Location"] = json.dumps(
             {
                 "path": url_for(
@@ -259,7 +259,7 @@ def suspend_account(conn, account_id):
         if not suspended:
             raise ValueError("Failed to suspend account")
 
-        response = make_response(render_template(""), 204)
+        response = make_response("", 204)
         response.headers["HX-Location"] = json.dumps(
             {
                 "path": url_for(
@@ -293,7 +293,7 @@ def activate_account(conn, account_id):
         if not activated:
             raise ValueError("Failed to activate account")
 
-        response = make_response(render_template(""), 204)
+        response = make_response("", 204)
         response.headers["HX-Location"] = json.dumps(
             {
                 "path": url_for(
@@ -303,6 +303,7 @@ def activate_account(conn, account_id):
                 "swap": "innerHTML",
             }
         )
+        print(response)
         return response
 
     except Exception as e:
@@ -323,7 +324,10 @@ def activate_account(conn, account_id):
 @htmx_login_required
 def query_users(conn):
     try:
-        search_term = request.form.get("search_term", "").strip()
+        print(request.form)
+        search_term = request.form.get("search-term", "").strip()
+        if not search_term.strip():
+            users = []
         users = admin_crud.query_users(conn, search_term)
 
         return make_response(

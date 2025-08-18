@@ -42,10 +42,14 @@ def login():
     return render_template("pages/login.html", page_wrap="login")
 
 
+@pages_bp.route("/profile", defaults={"identifier": None})
 @pages_bp.route("/profile/<identifier>")
 @login_required
 @transactional()
 def profile(conn, identifier):
+    if not identifier:
+        identifier = current_user.user_id
+
     profile_user = user_crud.get_user_public_data(conn, identifier)
 
     if not profile_user:
@@ -68,11 +72,16 @@ def profile(conn, identifier):
     )
 
 
+@pages_bp.route("/admin", defaults={"identifier": None})
 @pages_bp.route("/admin/<identifier>")
 @login_required
 @internal_access
 @transactional(commit=False)
 def admin_dashboard(conn, identifier):
+    if not identifier:
+        identifier = current_user.id
+
+    print(f"CURRENT_USER_ACCESS: {current_user.access_type}")
     admin_template = render_template(
         "pages/admin_dashboard.html", page_wrap="admin", identifier=identifier
     )

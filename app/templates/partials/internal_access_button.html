@@ -1,0 +1,37 @@
+<div class="relative inline-block" x-data="{ dropdownOpen: false }">
+  <button 
+    @click="dropdownOpen = !dropdownOpen"
+    class="p-2 flex rounded-sm hover:bg-ground4 transition-colors duration-200">
+    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+      {% include "graphics/user-icon.html" %}
+    </svg>
+  </button>
+  <div
+    id="internal-dropdown"
+    x-cloak
+    x-show="dropdownOpen"
+    x-transition
+    @click.outside="dropdownOpen = false"
+    class="p-2 absolute flex flex-col bg-ground2 gap-1 rounded-sm z-99"
+  >
+    {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('pages.login') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+        <p> Connexion </p>
+      </a>
+    {% elif current_user.is_authenticated %} 
+      {% if current_user is access("admin") %}
+        <a href="{{ url_for('pages.admin_dashboard', identifier=current_user.id) }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+          <p> Tableau de bord </p>
+        </a>
+      {% elif current_user is access("moderator") %}
+        <a href="{{ url_for('pages.mod_dashboard', identifier=current_user.id) }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+          <p> Tableau de bord </p>
+        </a>
+      {% endif %}
+      <a href="{{ url_for('auth.logout') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+        <p> Deconnexion </p>
+      </a>
+    {% endif %}
+  </div>
+</div>
+
