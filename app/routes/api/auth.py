@@ -181,8 +181,6 @@ def login(conn):
 
         access_level = auth_crud.email_access_level(conn, login_data.email)
 
-        print(f"Access level for {login_data.email}: {access_level}")
-
         access_name = static_id_resolver("account_access_type", access_level)
 
         if access_name in ("admin", "moderator"):
@@ -201,8 +199,6 @@ def login(conn):
                 user_id=login_response["user_id"],
                 username=login_response["username"],
             )
-
-        print(f"Session object created: {session_obj}")
 
         if not session_obj:
             raise Exception("Could not retrieve user object after login.")

@@ -40,18 +40,13 @@ def edit_roles(conn):
     elif request.method == "POST":
         new_roles = request.form.getlist("roles")
 
-        print(f"New roles from form: {new_roles}")
         new_roles_ids = [
             role_id
             for role_id in new_roles
             if static_id_resolver("roles", role_id) is not None
         ]
 
-        print(f"New roles IDs: {new_roles_ids}")
-
         worked = user_crud.set_user_roles(conn, current_user.user_id, new_roles_ids)
-
-        print(f"Roles update worked: {worked}")
 
         response = make_response("", 204)
         response.headers["HX-Redirect"] = url_for(

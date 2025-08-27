@@ -13,7 +13,7 @@ def test_connection(conn):
             result = cur.fetchone()
             return result[0] == 1
     except Exception as e:
-        print(f"Connection failed: {e}")
+        logger.error(f"Connection failed: {e}")
         return False
 
 
@@ -22,9 +22,9 @@ def configure_conn(conn, schema_name):
         with conn.cursor() as cur:
             query = sql.SQL("SET search_path TO {}").format(sql.Identifier(schema_name))
             cur.execute(query)
-            print(f"Search path set to : {schema_name}")
+            logger.info(f"Search path set to : {schema_name}")
     except Exception as e:
-        print(f"Failed to set search path: {e}")
+        logger.error(f"Failed to set search path: {e}")
         raise
 
 

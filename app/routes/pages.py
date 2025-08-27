@@ -81,7 +81,6 @@ def admin_dashboard(conn, identifier):
     if not identifier:
         identifier = current_user.id
 
-    print(f"CURRENT_USER_ACCESS: {current_user.access_type}")
     admin_template = render_template(
         "pages/admin_dashboard.html", page_wrap="admin", identifier=identifier
     )

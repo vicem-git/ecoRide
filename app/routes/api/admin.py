@@ -151,9 +151,6 @@ def get_moderators(conn):
             render_template("admin/moderators_view.html", moderators=moderators), 200
         )
 
-        if "success" in request.args:
-            response.headers["HX-Trigger"] = {"serverMsg": request.args["success"]}
-
         return response
 
     except Exception as e:
@@ -255,20 +252,16 @@ def get_user(conn, email):
 @htmx_login_required
 def suspend_account(conn, account_id):
     try:
+        target = request.headers.get("HX-Target")
+        header = "refresh-mods" if target == "moderators-view" else "refresh-users"
+
         suspended = admin_crud.suspend_account_by_id(conn, account_id)
         if not suspended:
             raise ValueError("Failed to suspend account")
 
         response = make_response("", 204)
-        response.headers["HX-Location"] = json.dumps(
-            {
-                "path": url_for(
-                    "admin.get_moderators", success="Compte suspendu avec succès."
-                ),
-                "target": "#moderators-view",
-                "swap": "innerHTML",
-            }
-        )
+        response.headers["HX-Trigger"] = header
+
         return response
 
     except Exception as e:
@@ -289,21 +282,15 @@ def suspend_account(conn, account_id):
 @htmx_login_required
 def activate_account(conn, account_id):
     try:
+        target = request.headers.get("HX-Target")
+        header = "refresh-mods" if target == "moderators-view" else "refresh-users"
+
         activated = admin_crud.activate_account_by_id(conn, account_id)
         if not activated:
             raise ValueError("Failed to activate account")
 
         response = make_response("", 204)
-        response.headers["HX-Location"] = json.dumps(
-            {
-                "path": url_for(
-                    "admin.get_moderators", success="Compte réactivé avec succès."
-                ),
-                "target": "#moderators-view",
-                "swap": "innerHTML",
-            }
-        )
-        print(response)
+        response.headers["HX-Trigger"] = header
         return response
 
     except Exception as e:
@@ -324,7 +311,6 @@ def activate_account(conn, account_id):
 @htmx_login_required
 def query_users(conn):
     try:
-        print(request.form)
         search_term = request.form.get("search-term", "").strip()
         if not search_term.strip():
             users = []
