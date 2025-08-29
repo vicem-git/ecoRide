@@ -5,7 +5,7 @@
       <div
         x-data="{ expand: false }"
         hx-get="{{ url_for('trips.passenger_trips', for_user=current_user.user_id) }}"
-        hx-trigger="load"
+        hx-trigger="load, user-trips-updated from:body"
         hx-target="#passenger-trips"
         hx-swap="innerHTML"
         class="flex justify-start"
@@ -24,7 +24,7 @@
       <div 
         x-data="{ expand: false }"
         hx-get="{{ url_for('trips.driver_trips', for_user=current_user.user_id) }}"
-        hx-trigger="load"
+        hx-trigger="load, driver-trips-updated from:body"
         hx-target="#driver-trips"
         hx-swap="innerHTML"
         class="flex justify-start"

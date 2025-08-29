@@ -63,10 +63,12 @@ def create_account(conn, email, hashed_password):
 
 
 def get_user_by_account_id(conn, account_id):
-    with conn.cursor() as cur:
-        cur.execute("SELECT id FROM users WHERE account_id = %s", (account_id,))
-        user_id = cur.fetchone()
-        return user_id if user_id else None
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT id, username FROM users WHERE account_id = %s", (account_id,)
+        )
+        user_data = cur.fetchone()
+        return user_data if user_data else None
 
 
 def get_user_public_data(conn, identifier):
@@ -140,6 +142,21 @@ def set_username(conn, user_id, username):
 def get_user_by_email(conn, email):
     with conn.cursor() as cur:
         cur.execute("SELECT id FROM accounts WHERE email = %s", (email,))
+        found = cur.fetchone()
+        return found[0] if found else None
+
+
+def get_user_email(conn, user_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            """SELECT a.email 
+            FROM accounts a 
+            JOIN users u 
+            ON u.account_id = a.id 
+            WHERE u.id = %s
+            """,
+            (user_id,),
+        )
         found = cur.fetchone()
         return found[0] if found else None
 

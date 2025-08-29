@@ -45,7 +45,7 @@ def login():
 @pages_bp.route("/profile", defaults={"identifier": None})
 @pages_bp.route("/profile/<identifier>")
 @login_required
-@transactional()
+@transactional(commit=False)
 def profile(conn, identifier):
     if not identifier:
         identifier = current_user.user_id
@@ -88,13 +88,14 @@ def admin_dashboard(conn, identifier):
     return response
 
 
-@pages_bp.route("/moderator")
+@pages_bp.route("/moderator", defaults={"identifier": None})
+@pages_bp.route("/moderator/<identifier>")
 @login_required
 @internal_access
-@transactional()
+@transactional(commit=False)
 def mod_dashboard(conn, identifier):
-    # query all pending ok reviews, approve/ reject
-    # query all pending bad reviews w/trip summary, approve/ reject
+    if not identifier:
+        identifier = current_user.id
     mod_dashboard = render_template(
         "pages/mod_dashboard.html", page_wrap="mod", identifier=identifier
     )

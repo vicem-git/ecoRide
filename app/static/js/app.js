@@ -95,6 +95,12 @@ document.body.addEventListener("htmx:afterOnLoad", (evt) => {
   }
 });
 
+
+// instead of serverMsg, object with all custom events.
+// or format events to include type
+// evt = {"user-trips-updated":{"type":"serverMsg", "message": "Trips updated"}}
+
+
 document.body.addEventListener("serverMsg", function (evt) {
   Alpine.store('modal').replaceContent(evt.detail.value);
 });

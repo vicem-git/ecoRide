@@ -71,6 +71,8 @@ html {
   font-family: var(--font-sans);
 }
 
+/* TABLE STYLES */
+
 [x-cloak] { display: none !important; }
 
 input[type="range"].range-slider::-webkit-slider-runnable-track {
