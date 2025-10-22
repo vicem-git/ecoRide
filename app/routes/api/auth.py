@@ -193,7 +193,6 @@ def login(conn):
         else:
             account_id = login_response.get("id")
             user_data = user_crud.get_user_by_account_id(conn, account_id)
-            print(user_data)
             if not user_data:
                 raise Exception("Could not retrieve user data after login.")
 

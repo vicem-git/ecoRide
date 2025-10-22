@@ -343,6 +343,9 @@
   .h-\[24px\] {
     height: 24px;
   }
+  .h-\[32px\] {
+    height: 32px;
+  }
   .h-\[48px\] {
     height: 48px;
   }
@@ -384,6 +387,9 @@
   }
   .w-\[24px\] {
     width: 24px;
+  }
+  .w-\[32px\] {
+    width: 32px;
   }
   .w-\[35\%\] {
     width: 35%;
@@ -525,6 +531,9 @@
   }
   .border-apart2 {
     border-color: var(--color-apart2);
+  }
+  .border-contrast4 {
+    border-color: var(--color-contrast4);
   }
   .border-ground3 {
     border-color: var(--color-ground3);
@@ -937,6 +946,9 @@
 html {
   font-family: var(--font-sans);
 }
+body {
+  font-size: 1.2em;
+}
 [x-cloak] {
   display: none !important;
 }
@@ -970,6 +982,7 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 }
 input[type="number"] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 @property --tw-translate-x {
   syntax: "*";

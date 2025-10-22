@@ -15,7 +15,7 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
+:root {
   --color-eco: oklch(0.8383 0.2037 131.93);
   --color-eco-ground: oklch(0.9282 0.0679 131.93);
   --color-eco-ground2: oklch(0.8882 0.0679 131.93);
@@ -71,9 +71,15 @@ html {
   font-family: var(--font-sans);
 }
 
+body {
+  font-size: 1.2em;
+}
+
 /* TABLE STYLES */
 
-[x-cloak] { display: none !important; }
+[x-cloak] {
+  display: none !important;
+}
 
 input[type="range"].range-slider::-webkit-slider-runnable-track {
   @apply h-2 bg-apart rounded;
@@ -86,7 +92,8 @@ input[type="range"].range-slider::-moz-range-track {
 input[type="range"].range-slider::-webkit-slider-thumb {
   @apply w-4 h-4 bg-apart2 rounded-full;
   -webkit-appearance: none;
-  margin-top: -6px; /* centers thumb vertically */
+  margin-top: -6px;
+  /* centers thumb vertically */
 }
 
 input[type="range"].range-slider::-moz-range-thumb {
@@ -98,7 +105,9 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-input[type="number"] {
-  -moz-appearance: textfield; /* Firefox */
-}
 
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  /* Firefox */
+}

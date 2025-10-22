@@ -7,7 +7,7 @@
     @click="dropdownOpen = !dropdownOpen"
     class="p-2 flex rounded-sm hover:bg-ground4 transition-colors duration-200 z-99"
   >
-    <svg viewbox="0 0 24 24" class="w-[24px] h-[24px]">
+    <svg viewbox="0 0 24 24" class="w-[32px] h-[32px]">
       {% include "graphics/trips-icon.html" %}    
     </svg>
   </button>
@@ -17,27 +17,24 @@
     x-show="dropdownOpen"
     @click.outside="dropdownOpen = false"
     x-transition
-    class="p-2 absolute flex flex-col rounded-sm gap-2 bg-ground2">
-    <button
-      type="button"
-      hx-get="{{ url_for('trips.create_trip') }}"
-      hx-target="#global-modal"
-      hx-swap="innerHTML"
-      hx-on::after-request="window.Alpine.store('modal').open()"
-      hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-      class="flex flex-row rounded-xs gap-2 hover:bg-ground3 transition-colors duration-200 whitespace-nowrap">
-      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
-        {% include "graphics/add-icon.html" %}    
-      </svg>
-      <span>Création voyage</span>
-    </button>
-    <a
-      href="{{ url_for('pages.search_trips') }}"
-      class="flex flex-row rounded-xs gap-2 hover:bg-ground3 transition-colors duration-200 whitespace-nowrap">
-      <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
-        {% include "graphics/search-icon.html" %}    
-      </svg>
-      <span>Recherche voyage</span>
-    </a>
+    class="p-2 absolute flex flex-col rounded-sm bg-ground2">
+    <div class="p-2 flex flex-col border border-contrast4 rounded-sm gap-2">
+      <button
+        type="button"
+        hx-get="{{ url_for('trips.create_trip') }}"
+        hx-target="#global-modal"
+        hx-swap="innerHTML"
+        hx-on::after-request="window.Alpine.store('modal').open()"
+        hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+        class="flex flex-row rounded-xs gap-2 hover:bg-ground3 transition-colors duration-200 whitespace-nowrap">
+        <span>Création voyage</span>
+      </button>
+      <hr class="w-full text-contrast4"/>
+      <a
+        href="{{ url_for('pages.search_trips') }}"
+        class="flex flex-row rounded-xs gap-2 hover:bg-ground3 transition-colors duration-200 whitespace-nowrap">
+        <span>Recherche voyage</span>
+      </a>
+    </div>
   </div>
 </div>
