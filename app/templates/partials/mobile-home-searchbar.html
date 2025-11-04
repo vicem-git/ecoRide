@@ -1,0 +1,51 @@
+<form method="GET" action="{{ url_for('pages.search_trips') }}"
+  class="py-2 text-sm flex flex-col w-full bg-ground2 items-center z-90">
+  <div class="p-2 flex w-full flex-row rounded-sm items-center">
+    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+      {% include "graphics/loc-point.html" %}
+    </svg>
+    <select id="home_start_city_param" x-model="$store.tripSearch.start_city" name="start_city" placeholder="Départ..."
+      class="w-full font-normal rounded-sm h-10 bg-ground3" required>
+      <option value="">Départ...</option>
+      {% for city in cities %}
+      <option value="{{ city }}">{{ city }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="p-2 flex w-full flex-row rounded-sm items-center">
+    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+      {% include "graphics/loc-point.html" %}
+    </svg>
+    <select id="home_end_city_param" name="end_city" x-model="$store.tripSearch.end_city" placeholder="Arrivée..."
+      class="w-full font-normal rounded-sm h-10 bg-ground3" required>
+      <option value="">Arrivée...</option>
+      {% for city in cities %}
+      <option value="{{ city }}">{{ city }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <section class="py-2 flex flex-col w-full gap-2 items-center justify-center">
+    <section class="flex gap-6 items-center space-between">
+      {% include "trips/trip_filters.html" %}
+      <input id="eco_filter" type="hidden" name="eco_filter" :value="$store.tripSearch.tripEco ? 'true' : 'false'">
+      <input type="hidden" name="max_price" :value="$store.tripSearch.price">
+      <input type="hidden" name="driver_rating_filter" :value="$store.tripSearch.rating">
+      <input type="date" id="home_start_date" name="start_date"
+        class="h-[48px] w-[106px] py-0 px-1 bg-ground3 font-normal rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" />
+      <div class="flex items-center justify-center gap-2">
+        <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+          {% include "graphics/users-icon.html" %}
+        </svg>
+        <input type="number" id="home_passenger_nr" name="passenger_nr" min="1" max="6" placeholder="1"
+          class="p-1 bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" />
+      </div>
+    </section>
+    <button type="submit"
+      class="flex items-center gap-2 px-4 rounded-sm bg-ground4 focus:ring-2 focus:ring-contrast2 focus:outline-none">
+      <svg viewBox="0 0 24 24" class="w-[24px] h-[48px]">
+        {% include "graphics/search-icon.html" %}
+      </svg>
+      <span class="text-base">Rechercher</span>
+    </button>
+  </section>
+</form>

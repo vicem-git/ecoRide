@@ -15,17 +15,22 @@
       {% include "partials/banner.html" %}
       {% endblock %}
     </div>
-    <div id="header" class="fixed top-2 flex flex-col justify-center items-center w-full h-[72px] z-99">
+    <div id="header" class="md:fixed md:top-2 flex flex-col md:justify-center items-center w-full h-[72px] z-99">
       {% block header %}
-      {% include "partials/header.html" %}
+      <div class="hidden md:flex">
+        {% include "partials/header.html" %}
+      </div>
+      <div class="w-full flex md:hidden">
+        {% include "partials/mobile-header.html" %}
+      </div>
       {% endblock %}
     </div>
-    <div id="main-content" class="w-[70%] transition duration-200">
+    <div id="main-content" class="w-full md:w-[70%] transition duration-200">
       {% block main %}
       MAIN CONTENT
       {% endblock %}
     </div>
-    <footer id="footer" class="flex w-full p-4 bg-ground3 justify-center items-center">
+    <footer id="footer" class="flex w-full md:p-4 bg-ground3 justify-center items-center">
       {% block foot %}
       {% include "partials/footer.html" %}
       {% endblock %}
