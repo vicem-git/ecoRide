@@ -1,4 +1,4 @@
-<section class="flex flex-col bg-ground2 rounded-sm gap-4 justify-center">
+<section class="flex flex-col bg-(--color-ground2) rounded-sm gap-4 justify-center">
   <div class="flex flex-row gap-4 justify-between items-center">
     <div class="p-4 w-48 h-48">
       <img src="{{ url_for('static', filename=profile_user.photo_url) }}" alt="profile-pic" class="object-cover rounded-full">
@@ -14,7 +14,7 @@
         {% endif %}
       </div>
       <div id="roles-container" class="flex p-4 gap-6">
-        <p>Rôles :{% for role in roles %}<span class="text-apart"><br>{{ role }}</span>{% endfor %}</p>
+        <p>Rôles :{% for role in roles %}<span class="text-(--color-apart)"><br>{{ role }}</span>{% endfor %}</p>
         {% if owner %}
         {% endif %}
       </div>

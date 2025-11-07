@@ -3,9 +3,9 @@
     type="button"
     @click="$store.darkMode.toggle()"
     :class="$store.darkMode.on ? 'bg-eco text-ground2' : 'bg-ground4 text-ground4'"
-    class="items-center w-4 h-4 transition-colors rounded-full duration-200 shadow-lg shadow-contrast"
+    class="flex items-center w-4 h-4 md:w-6 md:h-6 rounded-full"
   >
-    <svg viewBox="0 0 24 24" class="w-4 h-4">
+    <svg viewBox="0 0 24 24" class="w-4 h-4 md:w-6 md:h-6">
       {% include "graphics/sun_icon.html" %}
     </svg>
   </button> 

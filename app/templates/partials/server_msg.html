@@ -1,6 +1,6 @@
 {% if messages %}
 <div>
-  <ul class="mb-8 text-lg {{ 'text-error' if msg_case == 'error' else 'text-eco' if msg_case == 'success' else 'text-apart' if msg_case == 'info' }}">
+  <ul class="mb-8 text-lg {{ 'text-(--color-error)' if msg_case == 'error' else 'text-(--color-eco)' if msg_case == 'success' else 'text-(--color-apart)' if msg_case == 'info' }}">
     {% for message in messages %}
       <li>{{ message }}</li>
     {% endfor %}

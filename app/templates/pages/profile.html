@@ -6,8 +6,9 @@ Tableau de bord
 
 {% block main %}
 <section class="p-8 flex w-full min-h-screen">
-  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center justify-center w-full">
+  <div class="p-8 flex bg-(--color-ground2) flex-col gap-8 items-center justify-center w-full">
     {% include "users/profile_summary.html" %}
+    <hr class="w-full border-(--color-ground5)"/>
     {% if "driver" in roles %}
       <div 
         hx-get="{{ url_for('drivers.get_driver_data', user_id=profile_user.id) }}" 

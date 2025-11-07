@@ -5,18 +5,18 @@ Acceuil
 {% endblock %}
 
 {% block main %}
-<main id="index-main" class="pb-8 pt-2 min-h-screen">
-  <div class="hidden md:flex">
+<main id="index-main" class="pb-8 pt-2 min-h-screen z-0">
+  <div class="hidden md:flex sticky top-22">
     {% include "partials/home-searchbar.html" %}
   </div>
   <div class="flex w-full md:hidden">
     {% include "partials/mobile-home-searchbar.html" %}
-  </div>
-  <div class="flex w-full md:hidden">
-    {% include "partials/mobile-index-sections.html" %}
-  </div>
-  <div class="hidden w-full md:flex">
+  </div> 
+  <div class="hidden md:flex flex-col z-0">
     {% include "partials/index-sections.html" %}
+  </div>
+  <div class="flex md:hidden">
+    {% include "partials/mobile-index-sections.html" %}
   </div>
 </main>
 {% endblock %}

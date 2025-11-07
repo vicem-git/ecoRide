@@ -1,4 +1,4 @@
-import '@/css/tw-output.css'
+import '@/css/styles.css'
 import htmx from 'htmx.org';
 import { toggleHidden } from '@/js/modules/domUtils.js';
 import Alpine from 'alpinejs'

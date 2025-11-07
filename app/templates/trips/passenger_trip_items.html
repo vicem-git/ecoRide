@@ -1,4 +1,4 @@
-<div class="py-2 px-4 flex flex-col bg-ground4 gap-2 w-full rounded-sm">
+<div class="py-2 px-4 flex flex-col bg-(--color-ground4) gap-2 w-full rounded-sm">
   {% if trips %}
     {% for trip in trips %}
       {% if trip.status == "upcoming" %}
@@ -7,13 +7,13 @@
           class="p-2 flex items-center justify-between rounded-sm w-full"
         >
           <button @click="expanded = !expanded"
-            class="py-2 px-4 font-normal rounded-sm flex bg-eco-ground hover:bg-eco-ground2 text-apart3 items-center">
+            class="py-2 px-4 font-normal rounded-sm flex bg-(--color-eco-ground) hover:bg-(--color-eco-ground2) text-(--color-apart3) items-center">
             Voyage à venir
           </button>
           <div 
             x-show="expanded" 
             x-collapse
-            class="ml-2 px-24 py-2 flex items-center justify-between bg-ground2 rounded-sm w-full">
+            class="ml-2 px-24 py-2 flex items-center justify-between bg-(--color-ground2) rounded-sm w-full">
             <section class="flex flex-col gap-2 w-full">
               <div class="flex items-center w-full">
                 <p>{{ trip.summary.start_city }}</p>
@@ -22,7 +22,7 @@
                 </svg>
                 <p>{{ trip.summary.end_city }}</p>
               </div>
-              <div class="flex text-base font-normal text-apart3 items-end">
+              <div class="flex text-base font-normal text-(--color-apart3) items-end">
                 <p>{{ trip.summary.start_time|fr_date }}</p>
               </div>
             </section>
@@ -33,7 +33,7 @@
               hx-swap="innerHTML"
               hx-confirm="Êtes-vous sûr.e de vouloir quitter ce voyage ?"
               hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-              class="py-2 px-4 bg-error text-ground1 hover:bg-error2 transition-colors duration-200 rounded-sm"
+              class="py-2 px-4 bg-(--color-error) text-(--color-ground1) hover:bg-(--color-error2) rounded-sm"
             >
               quitter<strong>X</strong>
             </button>
@@ -45,13 +45,13 @@
           class="p-2 flex items-center justify-between rounded-sm w-full"
         >
           <button @click="expanded = !expanded"
-            class="py-2 px-4 flex rounded-sm font-normal bg-ground2 hover:ground4 text-apart3 items-center">
+            class="py-2 px-4 flex rounded-sm font-normal bg-(--color-ground2) hover:bg-(--color-ground4) text-(--color-apart3) items-center">
             Voyage terminés
           </button>
           <div 
             x-show="expanded" 
             x-collapse
-            class="ml-2 px-24 py-2 flex items-center justify-between bg-ground2 rounded-sm w-full">
+            class="ml-2 px-24 py-2 flex items-center justify-between bg-(--color-ground2) rounded-sm w-full">
             <section class="flex flex-col gap-2 w-full">
               <div class="flex items-center w-full">
                 <p>{{ trip.summary.start_city }}</p>
@@ -60,7 +60,7 @@
                 </svg>
                 <p>{{ trip.summary.end_city }}</p>
               </div>
-              <div class="flex text-base font-normal text-apart3 items-end">
+              <div class="flex text-base font-normal text-(--color-apart3) items-end">
                 <p>{{ trip.summary.start_time|fr_date }}</p>
               </div>
             </section>
@@ -69,7 +69,7 @@
       {% endif %}
     {% endfor %}
   {% else %}
-    <p class="p-2 bg-ground4 font-normal rounded-sm text-contrast3">Aucun voyage.</p>
+    <p class="p-2 bg-(--color-ground4) font-normal rounded-sm text-(--color-contrast3)">Aucun voyage.</p>
   {% endif %}
 </div>
 

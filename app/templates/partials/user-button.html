@@ -1,7 +1,7 @@
 <div class="relative inline-block" x-data="{ dropdownOpen: false }">
   <button 
     @click="dropdownOpen = !dropdownOpen"
-    class="p-2 flex rounded-sm hover:bg-ground4 transition-colors duration-200">
+    class="p-2 flex rounded-sm hover:bg-(--color-ground4)">
     <svg viewBox="0 0 24 24" class="w-[32px] h-[32px]">
       {% include "graphics/user-icon.html" %}
     </svg>
@@ -12,7 +12,7 @@
     x-show="dropdownOpen"
     x-transition
     @click.outside="dropdownOpen = false"
-    class="p-2 absolute flex flex-col bg-ground2 gap-1 rounded-sm z-99"
+    class="p-2 absolute flex flex-col bg-(--color-ground2) gap-1 rounded-sm z-50"
   >
     <div class="p-2 flex flex-col gap-2 border border-contrast4 rounded-sm">
       {% if not current_user.is_authenticated %}

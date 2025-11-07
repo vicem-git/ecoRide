@@ -12,9 +12,9 @@ Recherche de voyages
   <div id="trip-search-main" class="flex w-full pt-4 gap-4">
     <div id="trips-container" class="w-full">
       <div id="search_error_msg" class="hidden"></div>
+      {% include "trips/trip_results.html" %}
       {% if not trips %}
-        <div class="p-4 flex flex-col bg-ground1 text-contrast items-center gap-4">
-          <p class="text-lg">veuillez choisir une ville de départ/ arrivée.</p>
+        <div class="p-4 text-base flex flex-col bg-ground1 text-contrast items-center gap-2">
           <p>Voici quelques exemples de trajets populaires :</p>
           <ul class="flex-col p-6 bg-ground2 rounded-sm space-y-4">
             <li>
@@ -37,8 +37,7 @@ Recherche de voyages
             </li>
           </ul>
         </div>
-      {% endif %}
-      {% include "trips/trip_results.html" %} 
+      {% endif %} 
     </div>
   </div>
 </main>

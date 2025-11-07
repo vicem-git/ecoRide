@@ -1,5 +1,5 @@
 {% if current_user is anonymous or current_user is access("user") %}
-  <nav class="flex flex-row items-center justify-center gap-4"> 
+  <nav class="flex flex-row items-center bg-(--color-ground2) justify-center gap-4"> 
     {% if page_wrap in ["home"] %}
       {% include "partials/trips-button.html" %}
       {% include "partials/user-button.html" %}

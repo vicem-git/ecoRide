@@ -1,10 +1,10 @@
-<section class="p-4 flex flex-col rounded-sm w-full bg-ground3 gap-6 justify-center items-start">
+<section class="p-4 flex flex-col rounded-sm w-full bg-(--color-ground3) gap-6 justify-center items-start">
   <div class="flex gap-4 justify-between items-center w-full">
     <h2 class="text-lg font-bold">Votre tableau conducteur.ice</h2>
     <div class="flex gap-2 items-center">
       Note :
       {% if driver_data.data.rating == 0 %}
-        <p class="text-apart2"> pas encore d'évaluation</p>
+        <p class="text-(--color-apart2)"> pas encore d'évaluation</p>
       {% else %}
         <p>
           {% for r in range(trip.summary.driver_rating) %}
@@ -28,7 +28,7 @@
     hx-swap="innerHTML"
     hx-on::after-request="window.Alpine.store('modal').open()"
     hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-    class="p-6 flex gap-2 rounded-sm items-center justify-center w-full bg-apart hover:bg-apart2 transition-colors duration-200">
+    class="p-6 flex gap-2 rounded-sm items-center justify-center w-full bg-(--color-apart) hover:bg-(--color-apart2)">
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/add-icon.html" %}    
     </svg>
