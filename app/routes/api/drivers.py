@@ -117,7 +117,6 @@ def remove_vehicle(conn, vehicle_id):
     driver_data = driver_crud.get_driver_data(conn, current_user.user_id)
     driver_id = driver_data["id"] if driver_data else None
 
-    print(f"DRIVER : {driver_id}")
     vehicle = driver_crud.get_vehicle_by_id(conn, vehicle_id)
     if not vehicle or str(vehicle["driver_id"]) != str(driver_id):
         abort(403)

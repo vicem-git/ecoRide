@@ -6,6 +6,7 @@
   <td>
     {% if user.status|lower == 'active' %}
       <button hx-post="{{ url_for('admin.suspend_account', account_id=user.account_id) }}"
+              hx-confirm="Etes-vous sûr de vouloir suspendre cet utilisateur ?"
               hx-target="#users-search-view"
               hx-swap="innerHTML"
               class="px-2 py-1 bg-error hover:bg-error2 text-white rounded">
@@ -13,6 +14,7 @@
       </button>
     {% elif user.status|lower == 'suspended' %}
       <button hx-post="{{ url_for('admin.activate_account', account_id=user.account_id) }}"
+              hx-confirm="Etes-vous sûr de vouloir activer cet utilisateur ?"
               hx-target="#users-search-view"
               hx-swap="innerHTML"
               class="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded">

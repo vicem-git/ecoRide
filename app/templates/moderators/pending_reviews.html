@@ -1,0 +1,24 @@
+{% for review in reviews %}
+  <tr class="text-apart">
+    <td class="border border-ground3 p-2">{{review.username}}</td>
+    <td class="border border-ground3 p-2">{{review.rating}}</td>
+    <td class="border border-ground3 p-2">{{review.comments}}</td>
+    <td class="flex gap-2 items-center justify-center border border-ground3 p-2">
+      <button
+        hx-post="{{ url_for('mods.approve_review', review_id=review.id) }}"
+        hx-confirm="Etes-vous sûr de vouloir approuver cet avis ?"
+        class="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded"
+      >accepter</button>
+      <button
+        hx-post="{{ url_for('mods.reject_review', review_id=review.id) }}"
+        hx-confirm="Etes-vous sûr de vouloir rejeter cet avis ?"
+        class="px-2 py-1 bg-error hover:bg-error2 text-white rounded"
+      >rejeter</button>
+    </td>
+  </tr>
+{% else %}
+  <tr class="text-apart">
+    <td>Aucun avis à réviser</td>
+  </tr>
+{% endfor %}
+

@@ -3,13 +3,13 @@
   hx-target="#trips-container"
   hx-swap="innerHTML"
   hx-include="#start_city_param, #end_city_param, #passenger_nr_filter, #start_date_filter, #eco_filter, #price_filter, #driver_rating_filter"
-  class="sticky top-24 px-4 py-2 w-full flex flex-row rounded-xs bg-ground2 h-[70px] gap-3 items-center z-90"
+  class="sticky top-24 px-4 py-2 w-full flex flex-col md:flex-row rounded-xs bg-(--color-ground4) h-[70px] gap-3 items-center z-40"
   >
   <div class="p-2 flex flex-row rounded-sm gap-2 w-[35%] items-center">
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/loc-point.html" %}    
     </svg>
-    <select id="start_city_param" x-model="$store.tripSearch.start_city" name="start_city" placeholder="Départ..." class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
+    <select id="start_city_param" x-model="$store.tripSearch.start_city" name="start_city" placeholder="Départ..." class="p-2 w-full font-normal rounded-sm h-10 bg-(--color-ground3)" required>
       {% for city in cities %}
         <option value="{{ city }}">{{ city }}</option>
       {% endfor %}
@@ -19,7 +19,7 @@
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/loc-point.html" %}    
     </svg>
-    <select id="end_city_param" name="end_city" x-model="$store.tripSearch.end_city" placeholder="Arrivée..." class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
+    <select id="end_city_param" name="end_city" x-model="$store.tripSearch.end_city" placeholder="Arrivée..." class="p-2 w-full font-normal rounded-sm h-10 bg-(--color-ground3)" required>
       {% for city in cities %}
         <option value="{{ city }}">{{ city }}</option>
       {% endfor %}
@@ -29,16 +29,16 @@
     <svg viewBox="0 0 24 24" class="mx-4 w-[24px] h-[24px]">
       {% include "graphics/users-icon.html" %}
     </svg>
-    <input type="number" id="passenger_nr_filter" x-model="$store.tripSearch.passenger_nr" name="passenger_nr" min="1" max="6" placeholder="1" class="p-4 h-[48px] bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none"/>
+    <input type="number" id="passenger_nr_filter" x-model="$store.tripSearch.passenger_nr" name="passenger_nr" min="1" max="6" placeholder="1" class="p-4 h-[48px] bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none"/>
   </div> 
-  <input type="date" id="start_date_filter" x-model="$store.tripSearch.start_date" name="start_date" class="h-[48px] w-[106px] font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" />
+  <input type="date" id="start_date_filter" x-model="$store.tripSearch.start_date" name="start_date" class="h-[48px] w-[106px] font-normal p-2 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" />
   {% include "trips/trip_filters.html" %}
   <input id="eco_filter" type="hidden" name="eco_filter" :value="$store.tripSearch.tripEco ? 'true' : 'false'">
   <input type="hidden" name="max_price" :value="$store.tripSearch.price">
   <input type="hidden" name="driver_rating_filter" :value="$store.tripSearch.rating">
   <button
     type="submit"
-    class="h-[48px] px-4 rounded-sm bg-ground2 hover:bg-ground3 focus:ring-2 focus:ring-contrast2 focus:outline-none">
+    class="h-[48px] px-4 rounded-sm bg-(--color-ground5) hover:bg-(--color-apart) focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none">
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/search-icon.html" %}
     </svg>

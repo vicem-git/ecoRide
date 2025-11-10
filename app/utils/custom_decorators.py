@@ -120,6 +120,9 @@ def internal_access(f):
     @wraps(f)
     def internal_access_wrapper(*args, **kwargs):
         try:
+            if current_user.is_anonymous:
+                return redirect(url_for("pages.login"))
+
             access_type = current_user.access_type
             internal_access_ids = []
             internal_access_ids.append(

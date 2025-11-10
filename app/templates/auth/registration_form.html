@@ -1,40 +1,39 @@
 <div id="server-messages">
 </div>
-<form
-  id="register-form"
-  hx-post="{{ url_for('auth.register_user') }}"
-  hx-trigger="submit"
-  hx-target="#global-modal"
-  hx-swap="innerHTML"
-  hx-on::after-response="window.Alpine.store('modal').open()"
+<form id="register-form" hx-post="{{ url_for('auth.register_user') }}" hx-trigger="submit" hx-target="#global-modal"
+  hx-swap="innerHTML" hx-on::after-response="window.Alpine.store('modal').open()"
   hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-  class="flex flex-col items-center gap-4 mt-6"
->
-  <div class="text-xl flex flex-col items-center justify-center mb-12 gap-3">
-    <h2 class="mb-8 tracking-wide font-bold">veuillez fournir les détails d'inscription</h2>
-    <input type="email" name="email" placeholder="Email" class="mb-4 p-2 border border-ground4 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required/>
-    <input type="password" name="password" placeholder="Password" class="mb-4 p-2 border border-ground4 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required/>
-    <input  type="password" name="confirm_password" placeholder="Confirm Password" class="mb-4 p-2 border border-ground4 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required/>
-    <input
-      type="text"
-      name="username"
-      placeholder="choisir un nom d'utilisateur"
-      class="p-2 border border-ground4 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none"
-      required
-    /></div>
-  <div class="flex flex-col text-xl gap-2 mb-8">
-      <p class="font-medium">Comment allez-vous utiliser la plateforme ?</p>
+  class="flex flex-col items-center gap-4 mt-6">
+  <div class="text-base md:text-xl flex flex-col items-center justify-center mb-12 gap-3">
+    <h2 class="md:mb-8 tracking-wide font-bold">veuillez fournir les détails d'inscription</h2>
+    <input type="email" name="email" placeholder="Email"
+      class="mb-4 p-2 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none"
+      required />
+    <input type="password" name="password" placeholder="Password"
+      class="mb-4 p-2 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none"
+      required />
+    <input type="password" name="confirm_password" placeholder="Confirm Password"
+      class="mb-4 p-2 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none"
+      required />
+    <input type="text" name="username" placeholder="choisir un nom d'utilisateur"
+      class="p-2 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none" required />
+  </div>
+  <div class="flex flex-col text-base md:text-xl gap-2 mb-8">
+    <p class="font-medium">Comment allez-vous utiliser la plateforme ?</p>
 
-      <label class="flex items-center gap-2">
-        <input type="checkbox" name="roles" value="driver" class="mb-4 p-2 border border-ground4 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" />
-        Conducteur.ice
-      </label>
-
-      <label class="flex items-center gap-2">
-        <input type="checkbox" name="roles" value="passenger" class="mb-4 p-2 border border-ground4 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" />
-        Passager
-      </label>
+    <div class="flex items-center gap-2">
+      <input type="checkbox" name="roles" value="driver"
+        class="focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none" />
+      <span>Conducteur.ice</span>
     </div>
-  <button type="submit" class="px-4 py-2 rounded-sm bg-ground2 hover:bg-ground3 font-semibold transition-colors duration-300" type="submit">Inscription !</button>
-</form>
 
+    <div class="flex items-center gap-2">
+      <input type="checkbox" name="roles" value="passenger"
+        class="focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none" />
+      <span>Passager</span>
+    </div>
+  </div>
+  <button type="submit"
+    class="px-4 py-2 rounded-sm bg-(--color-ground4) hover:bg-(--color-ground5) font-semibold"
+    type="submit">Inscription !</button>
+</form>

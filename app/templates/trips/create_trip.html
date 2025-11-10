@@ -1,30 +1,30 @@
 <form id="create_trip-main" class="p-8 flex flex-col w-full gap-6">
 
-  <select id="start_city_param"  name="start_city" placeholder="Départ..." class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
+  <select id="start_city_param"  name="start_city" placeholder="Départ..." class="p-2 w-full font-normal rounded-sm h-10 bg-(--color-ground4)" required>
     <option value="">Départ...</option>
     {% for city in cities %}
       <option value="{{ city }}">{{ city }}</option>
     {% endfor %}
   </select>
-  <select id="end_city_param" name="end_city"  placeholder="Arrivée..." class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
+  <select id="end_city_param" name="end_city"  placeholder="Arrivée..." class="p-2 w-full font-normal rounded-sm h-10 bg-(--color-ground4)" required>
     <option value="">Arrivée...</option>
     {% for city in cities %}
       <option value="{{ city }}">{{ city }}</option>
     {% endfor %}
   </select> 
   
-  <label for="start_time_filter" class="text-apart3">Date et heure de départ :</label>
+  <label for="start_time_filter" class="text-(--color-apart3)">Date et heure de départ :</label>
   <div class="flex items-center gap-2"> 
-    <input type="date" id="start_date_filter" name="start_date" class="h-[48px] w-[106px] font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" required/>
-    <input type="time" id="start_time_filter" name="start_time" class="h-[48px] w-[106px] font-normal p-2 bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" required />
+    <input type="date" id="start_date_filter" name="start_date" class="h-[48px] w-[106px] font-normal p-2 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" required/>
+    <input type="time" id="start_time_filter" name="start_time" class="h-[48px] w-[106px] font-normal p-2 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" required />
   </div>
   
   <section id="create-trip-vehicle-section" x-data="{ dropdownOpen: false }" class="flex flex-col gap-4">
-    <p class="text-apart3">Sélectionnez un véhicule pour ce voyage :</p>
-    <p class="text-apart2">Si vous n'avez pas de véhicule,<br>vous pouvez en ajouter un depuis votre profil.</p>
-    <select id="vehicle-select" name="vehicle_id" placeholder="sélectionner un véhicule" class="p-2 w-full font-normal rounded-sm h-10 bg-ground4" required>
+    <p class="text-(--color-apart3)">Sélectionnez un véhicule pour ce voyage :</p>
+    <p class="text-(--color-apart2)">Si vous n'avez pas de véhicule,<br>vous pouvez en ajouter un depuis votre profil.</p>
+    <select id="vehicle-select" name="vehicle_id" placeholder="sélectionner un véhicule" class="p-2 w-full font-normal rounded-sm h-10 bg-(--color-ground4)" required>
       {% if not driver_info.vehicles %}
-        <p class="text-apart2">Vous n'avez pas de véhicule enregistré.</p>
+        <p class="text-(--color-apart2)">Vous n'avez pas de véhicule enregistré.</p>
       {% else %}
         {% for vehicle in driver_info.vehicles %}
           <option value="{{ vehicle.id }}" >{{ vehicle.brand }} - {{ vehicle.model }}, {{ vehicle.plate_number }}</option>
@@ -35,7 +35,7 @@
   
   <div class="flex items-center justify-center gap-2 ">
     <p> Prix du voyage :<br>veuillez prendre en compte dans votre prix<br>un montant de 2 crédits comme frais de plateforme</p>
-    <input type="number" id="create-trip-price" name="price" min="2" max="30" placeholder="2" class="p-2 h-6 bg-ground3 rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" required/>
+    <input type="number" id="create-trip-price" name="price" min="2" max="30" placeholder="2" class="p-2 h-6 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" required/>
   </div> 
 
   <button 
@@ -45,7 +45,7 @@
     hx-swap="innerHTML"
     hx-on::after-request="window.Alpine.store('modal').open()"
     hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-    class="p-2 rounded bg-eco-ground2 text-apart3 hover:bg-eco-ground3 hover:text-apart2 transition-colors">
+    class="p-2 rounded bg-(--color-eco-ground2) text-(--color-apart3) hover:bg-(--color-eco-ground3) hover:text-(--color-apart2)">
     create trip
   </button>
 </form>

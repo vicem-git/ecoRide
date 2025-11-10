@@ -1,9 +1,9 @@
 <section id="join-trip-container" class="flex flex-col items-center justify-center gap-4 p-4 w-full">
   <div> summary </div>
-  <div class="text-contrast2 font-semibold text-2xl">
+  <div class="text-(--color-contrast2) font-semibold text-2xl">
     your balance  : {{ user_balance }}
   </div>
-  <div class="text-contrast2 font-semibold text-2xl">
+  <div class="text-(--color-contrast2) font-semibold text-2xl">
     total price : {{ trip_price }}
   </div>
   <button
@@ -11,7 +11,7 @@
     hx-target="#join-trip-container"
     hx-swap="innerHTML"
     hx-ox::after-request="window.Alpine.store('modal').replaceContent(event.detail.xhr.response)"
-    class="bg-ground3 hover:bg-ground2 text-contrast2 font-semibold py-2 px-4 rounded-sm transition-colors duration-300"
+    class="bg-(--color-ground3) hover:bg-(--color-ground2) text-(--color-contrast2) font-semibold py-2 px-4 rounded-sm"
   >
     participer
   </button>

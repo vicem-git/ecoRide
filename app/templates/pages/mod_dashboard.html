@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Tableau Moderateur
+{% endblock %}
+
+{% block main %}
+<main class="p-8 flex w-full min-h-screen">
+  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center w-full">
+    <h2 class="text-3xl font-bold">Tableau de bord Moderateur</h2>
+    <hr/>
+    <section
+      hx-get="{{ url_for('mods.get_pending_reviews') }}"
+      hx-trigger="load, mod-review-updated from:body"
+      hx-target="#pending-reviews"
+      hx-swap="innerHTML"
+      hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+    >
+      <!-- PENDING REVIEWS -->
+      <table class="w-full mt-4">
+        <thead class="bg-ground4 rounded-xs">
+          <tr> 
+            <th class="p-2 text-left">Nom d'utilisateur</th>
+            <th class="p-2 text-left">Note</th>
+            <th class="p-2 text-left">Commentaires</th>
+            <th class="p-2 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pending-reviews" class="bg-ground1">
+          <tr>
+            <td colspan="4" rowspan="4" class="text-center text-apart py-8">
+              pending-reviews
+            </td>
+          </tr>
+        </tbody>
+      </table> 
+    </section>
+
+    <section
+      hx-get="{{ url_for('mods.get_pending_negative') }}"
+      hx-trigger="load"
+      hx-target="#pending-negative"
+      hx-swap="innerHTML"
+      hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+    >
+      <!-- PENDING NEGATIVE REVIEWS -->
+      <div id="pending-negative">pending-negative-reviews</div>
+    </section>
+  </div>
+</main>
+{% endblock %}

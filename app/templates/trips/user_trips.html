@@ -1,18 +1,19 @@
-<section id="user-trips" class="p-4 flex flex-col gap-6 text-contrast3 rounded-sm w-full">
-  <h2 class="text-xl text-contrast">Voyages</h2>
+<section id="user-trips" class="p-4 flex flex-col gap-6 text-(--color-contrast3) rounded-sm w-full">
+  <hr class="w-full border-(--color-ground5)"/>
+  <h2 class="text-xl text-(--color-contrast)">Voyages</h2>
   <div class="flex flex-col gap-6 w-full">
     {% if "passenger" in roles %}
       <div
         x-data="{ expand: false }"
         hx-get="{{ url_for('trips.passenger_trips', for_user=current_user.user_id) }}"
-        hx-trigger="load"
+        hx-trigger="load, user-trips-updated from:body"
         hx-target="#passenger-trips"
         hx-swap="innerHTML"
         class="flex justify-start"
       >
         <button
           @click="expand = !expand"
-          class="py-2 px-4 flex bg-apart hover:bg-apart2 text-contrast2 items-center rounded-sm"
+          class="py-2 px-4 flex bg-(--color-apart) hover:bg-(--color-apart2) text-(--color-contrast2) items-center rounded-sm"
         >
           voyages passager
         </button>
@@ -24,14 +25,14 @@
       <div 
         x-data="{ expand: false }"
         hx-get="{{ url_for('trips.driver_trips', for_user=current_user.user_id) }}"
-        hx-trigger="load"
+        hx-trigger="load, driver-trips-updated from:body"
         hx-target="#driver-trips"
         hx-swap="innerHTML"
         class="flex justify-start"
       >
         <button
           @click="expand = !expand"
-          class="py-2 px-4 flex bg-apart hover:bg-apart2 text-contrast2 items-center rounded-sm"
+          class="py-2 px-4 flex bg-(--color-apart) hover:bg-(--color-apart2) text-(--color-contrast2) items-center rounded-sm"
         >
           voyages conducteur.ice
         </button>

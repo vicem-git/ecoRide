@@ -181,8 +181,6 @@ def login(conn):
 
         access_level = auth_crud.email_access_level(conn, login_data.email)
 
-        print(f"Access level for {login_data.email}: {access_level}")
-
         access_name = static_id_resolver("account_access_type", access_level)
 
         if access_name in ("admin", "moderator"):
@@ -193,16 +191,19 @@ def login(conn):
                 access_type=login_response["access_type"],
             )
         else:
+            account_id = login_response.get("id")
+            user_data = user_crud.get_user_by_account_id(conn, account_id)
+            if not user_data:
+                raise Exception("Could not retrieve user data after login.")
+
             session_obj = SessionUser(
                 account_id=login_response["id"],
                 email=login_data.email,
                 status=login_response["status"],
                 access_type=login_response["access_type"],
-                user_id=login_response["user_id"],
-                username=login_response["username"],
+                user_id=user_data["id"],
+                username=user_data["username"],
             )
-
-        print(f"Session object created: {session_obj}")
 
         if not session_obj:
             raise Exception("Could not retrieve user object after login.")
@@ -212,7 +213,7 @@ def login(conn):
         if access_name == "admin":
             url = url_for("pages.admin_dashboard", identifier=session_obj.id)
         elif access_name == "moderator":
-            url = url_for("pages.moderator_dashboard", identifier=session_obj.id)
+            url = url_for("pages.mod_dashboard", identifier=session_obj.id)
         elif access_name == "user" and session_obj.user_id is not None:
             url = url_for("pages.profile", identifier=session_obj.user_id)
         elif access_name == "user" and session_obj.user_id is None:

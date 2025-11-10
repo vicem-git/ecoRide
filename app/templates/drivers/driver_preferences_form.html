@@ -4,7 +4,7 @@
     hx-target="#driver-preferences"
     hx-swap="innerHTML"
     hx-on::after-request="window.Alpine.store('modal').close()"
-    class="flex flex-col gap-4 bg-ground2 p-4 rounded w-full items-center"
+    class="flex flex-col gap-4 bg-(--color-ground2) p-4 rounded w-full items-center"
   >
     <p class="font-semibold">Modifier vos préférences</p>
 
@@ -22,7 +22,7 @@
       {% endfor %}
     </div>
 
-    <button type="submit" class="p-2 bg-ground3">Enregistrer</button>
+    <button type="submit" class="p-2 bg-(--color-ground3)">Enregistrer</button>
   </form>
 </div>
 

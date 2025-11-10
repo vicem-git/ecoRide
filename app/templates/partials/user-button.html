@@ -1,8 +1,8 @@
 <div class="relative inline-block" x-data="{ dropdownOpen: false }">
   <button 
     @click="dropdownOpen = !dropdownOpen"
-    class="p-2 flex rounded-sm hover:bg-ground4 transition-colors duration-200">
-    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+    class="p-2 flex rounded-sm hover:bg-(--color-ground4)">
+    <svg viewBox="0 0 24 24" class="w-[32px] h-[32px]">
       {% include "graphics/user-icon.html" %}
     </svg>
   </button>
@@ -12,27 +12,30 @@
     x-show="dropdownOpen"
     x-transition
     @click.outside="dropdownOpen = false"
-    class="p-2 absolute flex flex-col bg-ground2 gap-1 rounded-sm z-99"
+    class="p-2 absolute flex flex-col bg-(--color-ground2) gap-1 rounded-sm z-50"
   >
-    {% if not current_user.is_authenticated %}
-      <a href="{{ url_for('pages.login') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
-        <p> Connexion </p>
+    <div class="p-2 flex flex-col gap-2 border border-contrast4 rounded-sm">
+      {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('pages.login') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+          <p> Connexion </p>
+        </a>
+        <hr class="w-full text-contrast4"/>
+        <a href="{{ url_for('pages.registration') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+          <p> Inscription </p>
+        </a>
+      {% elif current_user.is_authenticated and current_user.user_id %}
+        <a href="{{ url_for('pages.profile', identifier=current_user.user_id) }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+          <p> Tableau de bord </p>
+        </a>
+        <hr class="w-full text-contrast4"/>
+        <a href="{{ url_for('auth.logout') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
+          <p> Deconnexion </p>
+        </a>
+      {% endif %}
+      <hr class="w-full text-contrast4"/>
+      <a href="{{ url_for('pages.contact') }}" class="p-1 hover:bg-ground4 rounded-sm transition-colors duration-200 whitespace-nowrap">
+        <p> Contact </p>
       </a>
-      <a href="{{ url_for('pages.registration') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
-
-        <p> Inscription </p>
-      </a>
-    {% elif current_user.is_authenticated and current_user.user_id %}
-      <a href="{{ url_for('pages.profile', identifier=current_user.user_id) }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
-        <p> Tableau de bord </p>
-      </a>
-
-      <a href="{{ url_for('auth.logout') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
-        <p> Deconnexion </p>
-      </a>
-    {% endif %}
-    <a href="{{ url_for('pages.contact') }}" class="p-1 hover:bg-ground4 rounded-sm transition-colors duration-200 whitespace-nowrap">
-      <p> Contact </p>
-    </a>
+    </div>
   </div>
 </div>

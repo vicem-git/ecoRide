@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 
 def allow_tx(conn, user_id, trip_id):
-    print(f"Checking if {user_id} balance is sufficient for {trip_id} price")
     with conn.cursor() as cur:
         cur.execute("SELECT credits FROM users WHERE id = %s", (user_id,))
         user_balance = cur.fetchone()[0]

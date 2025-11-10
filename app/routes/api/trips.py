@@ -37,7 +37,6 @@ def create_trip(conn, driver_id=None):
         try:
             driver_data = driver_crud.get_driver_data(conn, user_id)
             driver_id = driver_data.get("id") if driver_data else None
-            print(driver_id)
 
             if not driver_id:
                 response = make_response(
@@ -54,8 +53,6 @@ def create_trip(conn, driver_id=None):
 
             driver_preferences = driver_crud.get_driver_preferences(conn, driver_id)
             driver_vehicles = driver_crud.get_driver_vehicles(conn, driver_id)
-
-            print(f"VEHICULES :{driver_vehicles}, PREFS : {driver_preferences}")
 
             if not driver_vehicles:
                 messages = [
@@ -102,8 +99,6 @@ def create_trip(conn, driver_id=None):
             return response
 
     if request.method == "POST":
-        print(f"driver id :{driver_id}")
-
         start_date = request.form.get("start_date")
         start_time = request.form.get("start_time")
         start_datetime = datetime.strptime(
@@ -154,7 +149,6 @@ def create_trip(conn, driver_id=None):
         except ValidationError as ve:
             logger.error("Validation error during trip creation: %s", ve.errors())
             errors = render_pydantic_errors(ve)
-            print(errors)
             response = make_response(
                 render_template(
                     "partials/server_msg.html", messages=errors, msg_case="error"
@@ -243,7 +237,9 @@ def cancel_trip(conn, trip_id):
             200,
         )
         response.headers["HX-Trigger"] = {
-            "serverMsg": "Trajet annulé avec succès. Un email de confirmation a été envoyé aux passagers."
+            "driver-trips-updated": {
+                "messsage": "Trajet annulé avec succès. Un email de confirmation a été envoyé aux passagers."
+            }
         }
         return response
 
@@ -465,7 +461,9 @@ def leave_trip(conn, trip_id):
             render_template("trips/user_trips.html", roles=roles),
             200,
         )
-        response.headers["HX-Trigger"] = {"serverMsg": "Vous avez quitté le voyage."}
+        response.headers["HX-Trigger"] = {
+            "user-trips-updated": {"message": "Vous avez quitté le voyage."}
+        }
         return response
 
     except Exception as e:

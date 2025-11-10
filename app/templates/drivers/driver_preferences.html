@@ -1,4 +1,4 @@
-<div class="flex gap-4 p-4 items-center bg-ground2 w-full justify-center">
+<div class="flex gap-4 p-4 items-center bg-(--color-ground2) w-full justify-center">
   <div id="driver-preferences" class="flex flex-col rounded-sm gap-4 w-full">
     <section class="flex items-center w-full justify-between">
       <p>Préférences</p>
@@ -9,7 +9,7 @@
           hx-swap="innerHTML"
           hx-on::after-request="window.Alpine.store('modal').open()"
           hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-          class="p-2 rounded-sm bg-ground3 hover:bg-ground4"
+          class="p-2 rounded-sm bg-(--color-ground3) hover:bg-(--color-ground4)"
         >Modifier</button>
       {% endif %}
     </section>
@@ -17,16 +17,16 @@
       {% set preferences = driver_data.preferences %}
     {% elif preferences is not defined %}
       {% set preferences = [] %}
-      <p class="text-ground3">Aucune préférence définie.</p>
+      <p class="text-(--color-ground3)">Aucune préférence définie.</p>
     {% endif %}
     {% if preferences %}
       <p class="flex flex-col">
         {% for preference in preferences %}
-          <span class="text-sm text-apart2">{{ preference.name }}</span>
+          <span class="text-sm text-(--color-apart2)">{{ preference.name }}</span>
         {% endfor %}
       </p>
     {% else %}
-      <p class="text-ground3">Aucune préférence définie.</p>
+      <p class="text-(--color-ground3)">Aucune préférence définie.</p>
     {% endif %}
   </div> 
 </div>

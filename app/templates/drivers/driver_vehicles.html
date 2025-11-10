@@ -1,4 +1,4 @@
-<div id="driver-vehicles" class="p-4 flex flex-col rounded-sm gap-6 bg-ground2 items-center justify-center w-full">
+<div id="driver-vehicles" class="p-4 flex flex-col rounded-sm gap-6 bg-(--color-ground2) items-center justify-center w-full">
   <div class="flex justify-between items-center w-full">
     <p>Véhicules</p>
     {% if owner %}
@@ -7,7 +7,7 @@
         hx-target="#global-modal"
         hx-swap="innerHTML"
         hx-on::after-request="window.Alpine.store('modal').open()"
-        class="p-2 rounded-sm bg-ground3 hover:bg-ground4 text-contrast2"
+        class="p-2 rounded-sm bg-(--color-ground3) hover:bg-(--color-ground4) text-(--color-contrast2)"
       >+ Ajouter un véhicule</button>
     {% endif %}
   </div>
@@ -19,7 +19,7 @@
   {% endif %}
 
   {% for v in vehicles %}
-    <div class="border border-apart2 text-apart3 p-4 rounded flex justify-between items-center w-full">
+    <div class="border border-(--color-apart2) text-(--color-apart3) p-4 rounded flex justify-between items-center w-full">
       <div>
         <strong>{{ v.brand }} {{ v.model }}</strong> — {{ v.plate_number }}
       </div>
@@ -29,7 +29,7 @@
           hx-target="#driver-vehicles"
           hx-swap="outerHTML"
           hx-confirm="Are you sure you want to delete this vehicle?"
-          class="text-error text-sm"
+          class="text-(--color-error) text-sm"
         >✕ Supprimer</button>
       {% endif %}
     </div>

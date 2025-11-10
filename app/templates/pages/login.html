@@ -7,7 +7,7 @@ Connexion
 {% block main %}
 
 <main id="login-main" class="flex flex-col min-h-screen items-center">
-  <h1 class="text-3xl p-8 mb-24"> Ravi de vous revoir :) </h1>
+  <h1 class="text-lg md:text-3xl p-4 md:p-8 md:mb-24"> Ravi de vous revoir :) </h1>
   <div id="login-server-messages">
   </div>
   <div class="flex flex-col items-center justify-center">
@@ -20,14 +20,14 @@ Connexion
       hx-trigger="submit"
       hx-on::after-request="window.Alpine.store('modal').open()"
       hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-      class="flex flex-col items-center"
+      class="flex text-base md:text-xl flex-col items-center"
     >
-      <div class="text-xl flex flex-col items-center justify-center mb-12 gap-3">
-        <h2 class="mb-8 tracking-wide font-bold">veuillez fournir les détails d'inscription</h2>
-        <input type="email" name="email" placeholder="Email" class="mb-4 p-2 border border-ground4 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required/>
-        <input type="password" name="password" placeholder="Password" class="mb-4 p-2 border border-ground4 rounded-sm focus:ring-2 focus:ring-eco-ground3 focus:outline-none" required/>
+      <div class="flex flex-col items-center justify-center mb-4 md:mb-12 gap-3">
+        <h2 class="md:mb-8 tracking-wide italic">veuillez fournir les détails d'inscription</h2>
+        <input type="email" name="email" placeholder="Email" class="  mb-4 p-2 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none" required/>
+        <input type="password" name="password" placeholder="Password" class="mb-4 p-2 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none" required/>
       </div> 
-      <button type="submit" class="px-4 py-2 rounded-sm bg-ground2 hover:bg-ground3 font-semibold transition-colors duration-300" type="submit">Connexion !</button>
+      <button type="submit" class="px-4 py-2 rounded-sm bg-(--color-ground2) hover:bg-(--color-ground3) font-semibold" type="submit">Connexion !</button>
     </form>
   </div>
 </main>

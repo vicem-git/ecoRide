@@ -1,0 +1,13 @@
+<div class='flex w-full h-fit'>
+  <header class="flex p-2 w-full rounded-xs bg-ground2 opacity-95 justify-between items-center z-99">
+    <div class="flex items-center md:hidden">
+      {% include "partials/mobile-navbar.html" %}
+    </div>
+    <a href="{{ url_for('pages.index') }}" class="flex items-center">
+      <svg viewBox="0 0 222 52" class="w-auto h-[32px]">
+        {% include "graphics/eco-bolt.html" %}
+      </svg>
+    </a>
+    {% include "partials/theme-button.html" %}
+  </header>
+</div>

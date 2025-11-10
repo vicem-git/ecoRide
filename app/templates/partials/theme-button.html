@@ -1,20 +1,13 @@
-<div class="p-2 flex items-center gap-1">
-  <svg viewBox="0 0 24 24" class="w-4 h-4">
-    {% include "graphics/sun_icon.html" %}
-  </svg>
+<div class="p-2 flex items-center gap-1"> 
   <button
     type="button"
     @click="$store.darkMode.toggle()"
     :class="$store.darkMode.on ? 'bg-eco text-ground2' : 'bg-ground4 text-ground4'"
-    class="relative w-12 h-6 transition-colors rounded-full duration-200"
+    class="flex items-center w-4 h-4 md:w-6 md:h-6 rounded-full"
   >
-    <span
-      :class="$store.darkMode.on ? 'translate-x-6' : 'translate-x-1'"
-      class="absolute top-1 left-1 w-4 h-4 bg-contrast2 rounded-full transition-transform duration-200"
-    ></span>
-  </button>
-  <svg viewBox="0 0 24 24" class="w-4 h-4">
-    {% include "graphics/moon_icon.html" %}
-  </svg>
+    <svg viewBox="0 0 24 24" class="w-4 h-4 md:w-6 md:h-6">
+      {% include "graphics/sun_icon.html" %}
+    </svg>
+  </button> 
 </div>
 

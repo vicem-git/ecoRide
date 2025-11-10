@@ -6,26 +6,31 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='graphics/fav-ecoride.svg') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %} - ecoRide</title>
-    <script type="module" src="http://localhost:5173/js/app.js"></script>
+    <script type="module" src="http://localhost:5173/app/static/js/app.js"></script>
     {% endblock %}
   </head>
-  <body x-data :class="{ 'dark': $store.darkMode.on }" class="flex flex-col bg-ground1 text-contrast2 font-sans font-semibold items-center transition duration-200">
+  <body x-data :class="{ 'dark': $store.darkMode.on }" class="flex flex-col bg-(--color-ground) items-center transition duration-200 z-0">
     <div id="banner">
       {% block banner %}
-      {% include "partials/banner.html" %}
+        {% include "partials/banner.html" %}
       {% endblock %}
     </div>
-    <div id="header" class="fixed top-2 flex flex-col justify-center items-center w-full h-[72px] z-99">
+    <div id="header" class="fixed top-0 md:top-4 flex flex-col md:justify-center items-center w-full h-[72px] z-50">
       {% block header %}
-      {% include "partials/header.html" %}
+      <div class="hidden md:flex w-full items-center justify-center">
+        {% include "partials/header.html" %}
+      </div>
+      <div class="w-full flex md:hidden">
+        {% include "partials/mobile-header.html" %}
+      </div>
       {% endblock %}
     </div>
-    <div id="main-content" class="w-[70%] transition duration-200">
+    <div id="main-content" class="w-full md:w-[70%]">
       {% block main %}
       MAIN CONTENT
       {% endblock %}
     </div>
-    <footer id="footer" class="flex w-full p-4 bg-ground3 justify-center items-center">
+    <footer id="footer" class="flex w-full md:p-4 bg-(--color-apart) justify-center items-center">
       {% block foot %}
       {% include "partials/footer.html" %}
       {% endblock %}
@@ -33,20 +38,20 @@
     <div  
       x-show="$store.modal.show" 
       x-cloak 
-      class="fixed inset-0 bg-ground2/50 backdrop-blur-sm z-100 flex items-center justify-center"
+      class="fixed inset-0 bg-(--color-ground2)/50 backdrop-blur-sm z-50 flex items-center justify-center"
       x-transition
       id="modal-backdrop">
       <div
-        class="flex flex-col bg-ground rounded-sm shadow-lg p-6 w-auto relative"
+        class="flex flex-col bg-(--color-ground) rounded-sm shadow-lg p-6 w-auto relative"
         @click.outside="$store.modal.close()"
         x-transition>
         <button 
           @click="$store.modal.close()"
-          class="absolute p-2 top-2 right-2 text-gray-500 hover:text-gray-700">
+          class="absolute p-2 top-2 right-2 text-(--color-contrast2) hover:text-(--color-contrast)">
           ✕
         </button>
         <template x-if="$store.modal.errorMessage" class="w-[80%]">
-          <div class="text-error p-4" x-html="$store.modal.errorMessage"></div>
+          <div class="text-(--color-error) p-4" x-html="$store.modal.errorMessage"></div>
         </template>
         <div id="global-modal" class="w-full"></div>
       </div>

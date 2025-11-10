@@ -2,7 +2,7 @@
   <button
     type="button"
     @click="dropdownOpen = !dropdownOpen"
-    class="p-2 flex rounded-sm hover:bg-ground4 transition-colors duration-200"
+    class="p-2 flex rounded-sm hover:bg-(--color-ground4)"
   >
     <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/filters_icon.html" %}
@@ -14,7 +14,7 @@
     x-show="dropdownOpen"
     @click.outside="dropdownOpen = false"
     x-transition
-    class="p-4 absolute flex flex-col bg-ground2 gap-1 rounded-sm z-99"
+    class="p-4 top-12 right-0 absolute flex flex-col bg-(--color-ground2) gap-1 rounded-sm z-50"
   >
     <div class="flex items-center gap-3">
       <label for="eco-filter">eco voyages</label>
@@ -22,7 +22,7 @@
         type="button"
         @click="$store.tripSearch.tripEco = !$store.tripSearch.tripEco"
         :class="$store.tripSearch.tripEco ? 'bg-eco' : 'bg-ground4'"
-        class="w-12 h-6 transition-colors rounded-full duration-200 relative z-0"
+        class="w-12 h-6 rounded-full"
       >
         <span
           :class="$store.tripSearch.tripEco ? 'translate-x-6' : 'translate-x-1'"
