@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgis/postgis:17-3.5
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ecoride_admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: ecoride_db
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./app/db_store/db_init.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+
+  mongo_db:
+    image: mongo:latest
+    container_name: mongo_db
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=ecoride_nosql
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    volumes:
+      - /app/db_store/mongo-init.py:/docker-entrypoint-initdb.d/mongo-init.py
+  
+  flask_ecoride:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flask_ecoride
+    restart: unless-stopped
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=ecoride_admin
+      - DB_PORT=5432
+      - DB_PASSWORD=secret
+      - DB_NAME=ecoride_db
+      - FLASK_APP=main.py
+      - FLASK_SECRET_KEY=secret
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ./flask_app:/flask_app
+    depends_on:
+      - postgres
+    command: "python main.py"
+
+volumes:
+  db:

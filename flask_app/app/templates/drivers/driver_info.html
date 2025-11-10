@@ -1,8 +1,8 @@
-<section class="p-4 flex flex-col rounded-sm w-full bg-(--color-ground3) gap-6 justify-center items-start">
+<section class="p-4 flex flex-col text-base md:text-lg rounded-sm w-full bg-(--color-ground3) gap-6 justify-center items-start">
   <div class="flex gap-4 justify-between items-center w-full">
-    <h2 class="text-lg font-bold">Votre tableau conducteur.ice</h2>
-    <div class="flex gap-2 items-center">
-      Note :
+    <h2 class="font-bold">Votre tableau conducteur.ice</h2>
+    <div class="flex gap-2 text-sm md:text-base items-center">
+        <p class="whitespace-nowrap">Note :</p>
       {% if driver_data.data.rating == 0 %}
         <p class="text-(--color-apart2)"> pas encore d'évaluation</p>
       {% else %}

@@ -1,12 +1,12 @@
 <div x-data="{show:false}">
-  <button @click="show=!show" class="flex p-2 rounded-sm bg-ground2">
+  <button @click="show=!show" class="flex p-2 rounded-sm bg-(--color-ground2)">
     <svg viewbox="0 0 24 24" class="w-[24px] h-[24px]">
       {% include "graphics/drop-menu-icon.html" %}
     </svg>
   </button>
-  <div x-show="show" @click.outside="show = false" x-transition class="absolute top-0 left-0 flex flex-col max-w-[30%]">
+  <div x-show="show" @click.outside="show = false" x-transition class="absolute flex flex-col bg-(--color-ground2)">
     {% if current_user is anonymous or current_user is access("user") %}
-      <nav class="flex flex-col items-center justify-center gap-4">
+      <nav class="flex flex-col text-base bg-(--color-ground2) items-center justify-center gap-4">
         {% include "partials/mobile-menu.html" %}
       </nav>
     {% elif current_user is access("admin", "moderator") %}
