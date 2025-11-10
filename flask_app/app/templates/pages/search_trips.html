@@ -6,8 +6,11 @@ Recherche de voyages
 
 {% block main %}
 <main id="index-main" class="pt-2 pb-8 flex flex-col min-h-screen w-full">
-  <div id="searchbar">
+  <div id="searchbar" class="hidden md:flex">
     {% include "partials/searchbar.html" %}
+  </div>
+  <div>
+    {% include "partials/mobile-searchbar.html" %}
   </div>
   <div id="trip-search-main" class="flex w-full pt-4 gap-4">
     <div id="trips-container" class="w-full">
