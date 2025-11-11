@@ -7,7 +7,7 @@ from .custom_decorators import (
     require_ownership,
     internal_access,
 )
-from .custom_filters import fr_date
+from .custom_filters import create_datetime_filter
 from .custom_errors import render_pydantic_errors
 from .custom_mailer import send_email
 from .template_helpers import register_template_helpers
