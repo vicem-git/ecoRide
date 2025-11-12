@@ -67,7 +67,7 @@ CREATE TABLE users (
     account_id UUID UNIQUE NOT NULL REFERENCES accounts(id) ON DELETE SET NULL,
     username VARCHAR(30) UNIQUE NOT NULL,
     photo_url VARCHAR(255) NULL,
-    credits INTEGER DEFAULT 20 CHECK (credits >= 0)
+    credits INTEGER DEFAULT 50 CHECK (credits >= 0)
 );
 
 CREATE TABLE user_roles (

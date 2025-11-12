@@ -1,75 +1,71 @@
-<div class="py-2 px-4 flex flex-col text-base md:text-lg bg-(--color-ground4) gap-2 w-full rounded-sm">
-  {% if trips %}
-    {% for trip in trips %}
-      {% if trip.status == "upcoming" %}
-        <div 
-          x-data="{ expanded: false }"
-          class="p-2 flex items-center justify-between rounded-sm w-full"
-        >
-          <button @click="expanded = !expanded"
-            class="py-2 px-4 font-normal rounded-sm flex bg-(--color-eco-ground) hover:bg-(--color-eco-ground2) text-(--color-apart3) items-center">
-            Voyage à venir
-          </button>
-          <div 
-            x-show="expanded" 
-            x-collapse
-            class="ml-2 px-24 py-2 flex items-center justify-between bg-(--color-ground2) rounded-sm w-full">
-            <section class="flex flex-col gap-2 w-full">
-              <div class="flex items-center w-full">
+<div class="flex flex-col text-base md:text-lg gap-2 w-full rounded-xs">
+  <div class="p-2 flex flex-col w-full">
+    <span class="text-(--color-apart3) font-semibold mb-2">
+      à venir
+    </span>
+    {% if trips %}
+      {% for trip in trips %}
+        {% if trip.status == "upcoming" %}
+          <div class="p-1 flex items-center bg-(--color-ground2) rounded-xs w-full">
+            <section class="flex flex-col md:flex-row md:gap-6 w-full">
+              <div class="flex items-center gap-2">
                 <p>{{ trip.summary.start_city }}</p>
-                <svg viewbox="0 0 110 30" class="p2 w-32 h-5">
+                <svg viewbox="0 0 110 30" class="w-12">
                   {% include "graphics/travel_right.html" %}
                 </svg>
                 <p>{{ trip.summary.end_city }}</p>
               </div>
-              <div class="flex text-base font-normal text-(--color-apart3) items-end">
+              <div class="flex items-center text-base font-normal text-(--color-apart) whitespace-nowrap">
                 <p>{{ trip.summary.start_time|fr_date }}</p>
               </div>
             </section>
             <button
               type="button"
               hx-post="{{ url_for('trips.leave_trip', trip_id=trip.trip_id, for_participant=current_user.user_id) }}"
-              hx-target="#user-trips"
-              hx-swap="innerHTML"
+              hx-swap="none"
               hx-confirm="Êtes-vous sûr.e de vouloir quitter ce voyage ?"
               hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-              class="py-2 px-4 bg-(--color-error) text-(--color-ground1) hover:bg-(--color-error2) rounded-sm"
+              class="py-1 px-2 bg-(--color-error) text-(--color-ground1) hover:bg-(--color-error2) rounded-xs"
             >
-              quitter<strong>X</strong>
+              quitter
             </button>
           </div>
-        </div>
-      {% elif trip.status == "completed" %}
-        <div 
-          x-data="{ expanded: false }"
-          class="p-2 flex items-center justify-between rounded-sm w-full"
-        >
-          <button @click="expanded = !expanded"
-            class="py-2 px-4 flex rounded-sm font-normal bg-(--color-ground2) hover:bg-(--color-ground4) text-(--color-apart3) items-center">
-            Voyage terminés
-          </button>
-          <div 
-            x-show="expanded" 
-            x-collapse
-            class="ml-2 px-24 py-2 flex items-center justify-between bg-(--color-ground2) rounded-sm w-full">
-            <section class="flex flex-col gap-2 w-full">
-              <div class="flex items-center w-full">
+        {% else %}
+          <p class="text-sm text-(--color-contrast3)">
+            Aucun voyage.
+          </p>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+  <div class="p-2 flex flex-col w-full">
+    <span class="text-(--color-apart3) font-semibold mb-2">
+      terminés
+    </span>
+    {% if trips %}
+      {% for trip in trips %}
+        {% if trip.status == "completed" %}
+          <div class="p-1 flex items-center bg-(--color-ground2) rounded-xs w-full">
+            <section class="flex flex-col md:flex-row md:gap-6 w-full">
+              <div class="flex items-center gap-2">
                 <p>{{ trip.summary.start_city }}</p>
-                <svg viewbox="0 0 110 30" class="p2 w-32 h-5">
+                <svg viewbox="0 0 110 30" class="w-12">
                   {% include "graphics/travel_right.html" %}
                 </svg>
                 <p>{{ trip.summary.end_city }}</p>
               </div>
-              <div class="flex text-base font-normal text-(--color-apart3) items-end">
+              <div class="flex items-center text-base font-normal text-(--color-apart) whitespace-nowrap">
                 <p>{{ trip.summary.start_time|fr_date }}</p>
               </div>
             </section>
           </div>
-        </div>
-      {% endif %}
-    {% endfor %}
-  {% else %}
-    <p class="p-2 bg-(--color-ground4) font-normal rounded-sm text-(--color-contrast3)">Aucun voyage.</p>
-  {% endif %}
+        {% else %}
+          <p class="text-sm text-(--color-contrast3)">
+            Aucun voyage.
+          </p>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
 </div>
 

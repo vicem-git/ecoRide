@@ -33,8 +33,8 @@
         <div class="w-16 h-16 rounded-full overflow-hidden">
           <img src="{{ url_for('static', filename=trip.summary.driver_photo) }}"/>
         </div>
-          <div class="flex flex-col font-normal text-(--color-apart3) items-end justify-between">
-        <a action="GET" href="{{ url_for('pages.profile', identifier=trip.summary.driver_name) }}" class="text-xl font-semibold">{{ trip.summary.driver_name }}</p>
+        <div class="flex flex-col font-normal text-(--color-apart3) items-end justify-between">
+          <a action="GET" href="{{ url_for('pages.profile', identifier=trip.summary.driver_name) }}" class="text-xl font-semibold">{{ trip.summary.driver_name }}</a>
           <p>
             {% for r in range(trip.summary.driver_rating) %}
               ★
@@ -96,8 +96,8 @@
           <div class="w-16 h-16 rounded-full overflow-hidden">
             <img src="{{ url_for('static', filename=trip.summary.driver_photo) }}"/>
           </div>
-            <div class="flex flex-col font-normal text-(--color-apart3) items-end justify-between">
-          <a action="GET" href="{{ url_for('pages.profile', identifier=trip.summary.driver_name) }}" class="text-xl font-semibold">{{ trip.summary.driver_name }}</p>
+          <div class="flex flex-col font-normal text-(--color-apart3) items-end justify-between">
+            <a action="GET" href="{{ url_for('pages.profile', identifier=trip.summary.driver_name) }}" class="text-xl font-semibold">{{ trip.summary.driver_name }}</a>
             <p>
               {% for r in range(trip.summary.driver_rating) %}
                 ★

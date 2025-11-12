@@ -136,14 +136,8 @@ def create_trip(conn, driver_id=None):
             if not summary:
                 raise Exception("Trip summary generation failed")
 
-            response = make_response(
-                render_template(
-                    "partials/server_msg.html",
-                    messages=["Trajet créé avec succès."],
-                    msg_case="success",
-                ),
-                200,
-            )
+            response = make_response("", 200)
+            response.headers["HX-Trigger"] = {"serverMsg": "Trajet créé avec succès."}
             return response
 
         except ValidationError as ve:
@@ -256,6 +250,32 @@ def cancel_trip(conn, trip_id):
         return response
 
 
+@trips_bp.route("/start_trip/<trip_id>", methods=["POST"])
+@transactional()
+@htmx_login_required
+@require_ownership("for_trip")
+def start_trip(conn, trip_id):
+    try:
+        started_status = current_app.static_ids["trip_status"]["in_progress"]
+        started = trips_crud.update_trip_status(conn, trip_id, started_status)
+        if not started:
+            raise Exception("Trip startup failed")
+
+        response = make_response("", 200)
+        response.headers["HX-Trigger"] = {"serverMsg": "Trajet demarré."}
+
+        return response
+    except Exception as e:
+        logger.error("Error starting trip: %s", e)
+        messages = ["Une erreur s'est produite, reessayez plus tard."]
+        response = make_response(
+            render_template(
+                "trips/server_msg.html", messages=messages, msg_case="error"
+            ),
+            500,
+        )
+        return response
+
 @trips_bp.route("/complete_trip/<trip_id>", methods=["POST"])
 @transactional()
 @htmx_login_required
@@ -267,18 +287,26 @@ def complete_trip(conn, trip_id):
         if not completed:
             raise Exception("Trip completion failed")
 
-        # send review request email to passengers
-        # release TXS ??
+        passengers = trips_crud.get_trip_passengers_userdata(conn, trip_id)
 
-        response = make_response(
-            render_template(
-                "trips/user_trips.html",
-            ),
-            200,
-        )
-        response.headers["HX-Trigger"] = {"serverMsg": "Trajet complété avec succès."}
+        response = make_response("", 200)
+        response.headers["HX-Trigger"] = {"serverMsg": "Trajet finalsé avec succès."}
+
+        @response.call_on_close
+        def trip_completion_email():
+            for passenger in passengers:
+                try:
+                    username = passenger["username"]
+                    address = passenger["email"]
+                    message_body = render_template(
+                        "emails/trip_completed.txt",
+                        username=username,
+                    )
+                    result = send_email(username, address, "Trip completed!", message_body)
+                    logger.debug(f"sending notification to {address}: {result}")
+                except Exception as e:
+                    logger.warning(f"email for {passenger["email"]} failed: {e}")
         return response
-
     except Exception as e:
         logger.error("Error completing trip: %s", e)
         messages = ["Une erreur s'est produite, veuillez réessayer plus tard."]
@@ -455,12 +483,12 @@ def leave_trip(conn, trip_id):
         if not left_trip:
             raise Exception("Failed to leave trip")
 
-        roles = user_crud.get_user_roles(conn, current_user.user_id)
+        # RESTORE CREDITS !
+        restore_tx = tx_crud.restore_tx(conn, user_id=current_user.user_id, trip_id=trip_id)
+        if not restore_tx:
+            raise Exception(f"failed to revert user's transaction: user - {current_user.user_id}, trip - {trip_id}") 
 
-        response = make_response(
-            render_template("trips/user_trips.html", roles=roles),
-            200,
-        )
+        response = make_response("",200,)
         response.headers["HX-Trigger"] = {
             "user-trips-updated": {"message": "Vous avez quitté le voyage."}
         }

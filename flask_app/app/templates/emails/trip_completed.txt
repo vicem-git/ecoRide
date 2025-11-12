@@ -1,0 +1,8 @@
+Bonjour {{ username }},
+Vous venez de terminer un voyage !
+Veuillez vous rendre sur votre tableau de bord pour valider votre trajet.
+
+Si vous ne la validez pas dans les 24 heures, une évaluation « OK » sera automatiquement générée et les crédits seront transférés au conducteur.ice.
+
+
+— L'equipe Ecoride 

@@ -1,43 +1,32 @@
-<section id="user-trips" class="p-4 flex flex-col gap-6 text-(--color-contrast3) rounded-sm w-full">
-  <hr class="w-full border-(--color-ground5)"/>
-  <h2 class="text-xl text-(--color-contrast)">Voyages</h2>
-  <div class="flex flex-col text-base md:text-lg gap-6 w-full">
-    {% if "passenger" in roles %}
-      <div
-        x-data="{ expand: false }"
-        hx-get="{{ url_for('trips.passenger_trips', for_user=current_user.user_id) }}"
-        hx-trigger="load, user-trips-updated from:body"
-        hx-target="#passenger-trips"
-        hx-swap="innerHTML"
-        class="flex justify-start"
-      >
-        <button
-          @click="expand = !expand"
-          class="py-2 px-4 flex bg-(--color-apart) hover:bg-(--color-apart2) text-(--color-contrast2) items-center rounded-sm"
-        >
-          voyages passager
-        </button>
-        <div x-show="expand" x-collapse id="passenger-trips" ></div>
-      </div>
-    {% endif %}
+<section id="user-trips" class="p-4 flex flex-col bg-(--color-ground3) text-(--color-contrast3) rounded-xs w-full">
+  {% if "passenger" in roles %}
+    <div
+      hx-get="{{ url_for('trips.passenger_trips', for_user=current_user.user_id) }}"
+      hx-trigger="load, user-trips-updated from:body"
+      hx-target="#passenger-trips"
+      hx-swap="innerHTML"
+      class="flex flex-col mb-4"
+    >
+      <span class="text-xl md:text-2xl font-semibold mb-2">
+        Voyages passager
+      </span>
+      <div id="passenger-trips" ></div>
+    </div>
+  {% endif %}
 
-    {% if "driver" in roles %}
-      <div 
-        x-data="{ expand: false }"
-        hx-get="{{ url_for('trips.driver_trips', for_user=current_user.user_id) }}"
-        hx-trigger="load, driver-trips-updated from:body"
-        hx-target="#driver-trips"
-        hx-swap="innerHTML"
-        class="flex justify-start"
-      >
-        <button
-          @click="expand = !expand"
-          class="py-2 px-4 flex bg-(--color-apart) hover:bg-(--color-apart2) text-(--color-contrast2) items-center rounded-sm"
-        >
-          voyages conducteur.ice
-        </button>
-        <div x-show="expand" x-collapse id="driver-trips"></div>
-      </div>
-    {% endif %}
-  </div>
+  {% if "driver" in roles %}
+    <hr class="w-full border-(--color-ground5) mb-2"/>
+    <div 
+      hx-get="{{ url_for('trips.driver_trips', for_user=current_user.user_id) }}"
+      hx-trigger="load, driver-trips-updated from:body"
+      hx-target="#driver-trips"
+      hx-swap="innerHTML"
+      class="flex flex-col"
+    >
+      <span class="text-xl md:text-2xl font-semibold mb-2">
+        Voyages conducteur.ice
+      </span>
+      <div id="driver-trips"></div>
+    </div>
+  {% endif %}
 </section>

@@ -1,4 +1,7 @@
+from threading import Thread
+from flask import current_app
 import requests
+import time
 from config import Config
 from urllib.parse import urlparse
 import logging
@@ -31,6 +34,7 @@ def send_email(username, address, subject, text):
             api_url,
             auth=("api", f"{api_key}"),
             data=payload,
+            timeout=5, #secs
         )
         logger.debug(f"Response status: {response.status_code}")
         logger.debug(f"Response body: {response.text}")
@@ -38,8 +42,13 @@ def send_email(username, address, subject, text):
         logger.error(f"Request failed: {e}")
         return {"success": False, "error": str(e)}
 
-    if response.status_code == 200:
-        return {"success": True, "message": response.json().get("message")}
+    try:
+        data = response.json()
+    except ValueError:
+        data = {"message": response.text}
+
+    if response.ok:
+        return {"success": True, "message": data.get("message", "email sent")}
     else:
         return {
             "success": False,

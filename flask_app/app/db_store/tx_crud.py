@@ -50,6 +50,27 @@ def create_tx(conn, tx_from, tx_to, amount, trip_id):
         )
     return tx_id if tx_id else None
 
+def revert_tx(conn, user_id, trip_id):
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT id, amount FROM transactions WHERE tx_from = %s AND trip_id = %s",
+            (user_id, trip_id),
+        )
+        tx_id = cur.fetchone()[0]
+        tx_amount = cur.fetchone()[1]
+
+        cur.execute(
+            "DELETE FROM transactions WHERE id = %s",
+            (tx_id,), 
+        )
+
+        cur.execute(
+            "UPDATE users SET credits = credits + %s WHERE id = %s",
+            (tx_amount, user_id),
+        )
+        return cur.fetchone > 0
+
+
 
 def complete_tx(conn, trip_id):
     platform_fee = 2
@@ -96,9 +117,10 @@ def get_trip_txs(conn, trip_id):
             """
             SELECT * FROM trip_txs
             WHERE trip_id = %s
-        """,
+            """,
             (trip_id,),
         )
         result = cur.fetchall()
         trip_txs = [tx[0] for tx in result]
         return trip_txs
+

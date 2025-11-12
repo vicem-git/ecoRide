@@ -6,7 +6,8 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='graphics/fav-ecoride.svg') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %} - ecoRide</title>
-    <script type="module" src="http://localhost:5173/app/static/js/app.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/assets/app-CRUjErNr.css') }}"/>
+    <script type="module" src="{{ url_for('static', filename='dist/assets/app-B1awWCX1.js') }}"></script>
     {% endblock %}
   </head>
   <body x-data :class="{ 'dark': $store.darkMode.on }" class="flex flex-col bg-(--color-ground) items-center transition duration-200 z-0">
