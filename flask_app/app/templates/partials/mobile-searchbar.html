@@ -1,5 +1,5 @@
 <form method="GET" action="{{ url_for('pages.search_trips') }}"
-  class="text-sm flex flex-col w-full bg-(--color-ground2) items-center z-20">
+  class="text-sm flex md:hidden flex-col w-full bg-(--color-ground2) items-center z-20">
   <section class="flex w-full items-center">
     <div class="p-2 w-[50%] flex flex-row rounded-sm items-center">
         <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
@@ -31,7 +31,7 @@
       {% include "trips/trip_filters.html" %}
       <input id="eco_filter" type="hidden" name="eco_filter" :value="$store.tripSearch.tripEco ? 'true' : 'false'">
       <input type="hidden" name="max_price" :value="$store.tripSearch.price">
-      <input type="hidden" name="driver_rating_filter" :value="$store.tripSearch.rating">
+      <input type="hidden" name="driver_rating" :value="$store.tripSearch.rating">
       <input type="date" id="home_start_date" name="start_date"
         class="h-[48px] w-[106px] py-0 px-1 bg-(--color-ground3) font-normal rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" />
       <div class="flex items-center justify-center gap-2">

@@ -4,45 +4,40 @@ services:
     container_name: postgres_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ecoride_admin
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: ecoride_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASS}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - db:/var/lib/postgresql/data
-      - ./app/db_store/db_init.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+      - ./flask_app/app/db_store/db_init.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
 
-  mongo_db:
-    image: mongo:latest
-    container_name: mongo_db
+  mongo:
+    image: mongo:7.0
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_DATABASE=ecoride_nosql
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=secret
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
     volumes:
-      - /app/db_store/mongo-init.py:/docker-entrypoint-initdb.d/mongo-init.py
+      - mongo_data:/data/db
   
   flask_ecoride:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file: 
+      - .env
     container_name: flask_ecoride
     restart: unless-stopped
-    environment:
-      - DB_HOST=postgres
-      - DB_USER=ecoride_admin
-      - DB_PORT=5432
-      - DB_PASSWORD=secret
-      - DB_NAME=ecoride_db
-      - FLASK_APP=main.py
-      - FLASK_SECRET_KEY=secret
     ports:
       - "127.0.0.1:5000:5000"
     volumes:
       - ./flask_app:/flask_app
     depends_on:
       - postgres
+      - mongo
     command: "python main.py"
 
 volumes:
   db:
+  mongo_data:

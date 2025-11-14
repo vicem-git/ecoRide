@@ -39,20 +39,20 @@ Alpine.store('darkMode', {
 
 Alpine.store('modal', {
   show: Alpine.$persist(false).as('modal_show'),
-  errorMessage: Alpine.$persist('').as('modal_error'),
+  content: Alpine.$persist('').as('modal_content'),
   open() {
     this.show = true
   },
   close() {
     this.show = false;
-    this.errorMessage = '';
+    this.content = '';
   },
-  setError(message) {
-    this.errorMessage = message;
+  setContent(message) {
+    this.content = message;
     this.open();
   },
   replaceContent(html) {
-    this.errorMessage = '';
+    this.content = '';
     this.open();
     document.querySelector('#global-modal').innerHTML = html;
   }
@@ -65,7 +65,7 @@ Alpine.store('tripSearch', {
   start_date: Alpine.$persist('').as('trip_date'),
   eco: Alpine.$persist(false).as('trip_eco'),
   price: Alpine.$persist(25).as('trip_price'),
-  rating: Alpine.$persist(3).as('trip_rating'),
+  rating: Alpine.$persist(0).as('trip_rating'),
 });
 
 Alpine.start();
@@ -96,13 +96,18 @@ document.body.addEventListener("htmx:afterOnLoad", (evt) => {
 });
 
 
-// instead of serverMsg, object with all custom events.
-// or format events to include type
-// evt = {"user-trips-updated":{"type":"serverMsg", "message": "Trips updated"}}
-
-
 document.body.addEventListener("serverMsg", function (evt) {
-  Alpine.store('modal').replaceContent(evt.detail.value);
+  const type = evt.detail?.type;
+  if (!type) return;
+
+  if (type === 'message') {
+    Alpine.store('modal').setContent(evt.detail.message);
+  } else {
+    const event = new Event(evt.detail.type)
+    Alpine.store('modal').setContent(evt.detail.message);
+    document.body.dispatchEvent(event)
+    console.log(event)
+  }
 });
 
 window.renderChart = function (canvasId, labels, values, datasetLabel = 'Income') {

@@ -1,26 +1,25 @@
 from flask import Flask
 from rich.logging import RichHandler
 import logging
-from app.db_store import DatabaseManager, crud_utilities, trips_crud
+from app.db_store import DatabaseManager, MongoStore, crud_utilities, trips_crud
 from app.routes import pages_bp
 from app.routes.api import admin_bp, auth_bp, drivers_bp, mods_bp, trips_bp, users_bp
-from config import db_config, Config
+from config import db_config, mongo_config, Config
 from app.utils import (
     bcrypt,
     login_manager,
     safe_close,
-    fr_date,
+    create_datetime_filter,
     register_template_helpers,
 )
 from app.models import session_user_loader
 import atexit
 from datetime import datetime
-import locale
+from babel import Locale
 from app.faker import seed_data, villes
 
-# Might raise error on some systems, TEST FOR DOCKER
-locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
-
+APP_LOCALE = 'fr_FR'
+locale_obj = Locale.parse(APP_LOCALE)
 
 def create_app():
     app = Flask(
@@ -28,7 +27,7 @@ def create_app():
         static_folder="app/static",
     )
 
-    app.jinja_env.filters["fr_date"] = fr_date
+    app.jinja_env.filters["fr_date"] = create_datetime_filter(APP_LOCALE)
 
     logging.basicConfig(
         level=logging.DEBUG,
@@ -44,6 +43,9 @@ def create_app():
     bcrypt.init_app(app)
     db_manager = DatabaseManager(db_config)
     app.db_manager = db_manager
+
+    mongo_store = MongoStore(mongo_config)
+    app.mongo_store = mongo_store
 
     logging.info(
         f"[bold green]TIME NOW : {datetime.now().strftime('%d %B %Y - %H:%Mhs')}[/bold green]"
@@ -130,4 +132,8 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    logging.getLogger("pymongo").setLevel(logging.WARNING)
+    logging.getLogger("pymongo.mongo_client").setLevel(logging.WARNING)
+    logging.getLogger("pymongo.pool").setLevel(logging.WARNING)
+    logging.getLogger("bson").setLevel(logging.WARNING)
+    app.run(host="0.0.0.0", port=5000, debug=True)

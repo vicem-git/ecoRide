@@ -1,113 +1,118 @@
-<div class="py-2 px-4 text-base md:text-lg rounded-sm flex flex-col bg-(--color-ground4) gap-2 w-full">
-  {% if trips %}
-    {% for trip in trips %}
-      {% if trip.status == "in-progress" %}
-        <div 
-          x-data="{ expanded: false }"
-          class="p-2 flex items-center justify-between rounded-sm w-full"
-          >
-            <button @click="expanded = !expanded"
-              class="py-2 px-4 font-normal flex rounded-sm bg-(--color-eco-ground2) hover:bg-(--color-eco-ground3) text-(--color-apart3) items-center">
-              Voyage en cours
-            </button>
-            <div 
-              x-show="expanded" 
-              x-collapse
-              class="ml-2 px-24 py-2 flex items-center justify-between bg-(--color-ground2) rounded-sm w-full"
-            >
-              <section class="flex flex-col gap-2 w-full">
-                <div class="flex items-center w-full">
-                  <p>{{ trip.summary.start_city }}</p>
-                  <svg viewbox="0 0 110 30" class="p2 w-32 h-5">
-                    {% include "graphics/travel_right.html" %}
-                  </svg>
-                  <p>{{ trip.summary.end_city }}</p>
-                </div>
-                <div class="flex text-base font-normal text-(--color-apart3) items-end">
-                  <p>{{ trip.summary.start_time|fr_date }}</p>
-                </div>
-              </section>
-              <button
-                type="button"
-                hx-post="{{ url_for('trips.complete_trip', trip_id=trip.trip_id, for_trip=trip.trip_id) }}"
-                hx-target="#user-trips"
-                hx-swap="innerHTML"
-                hx-confirm="Êtes-vous sûr.e de vouloir Terminer le voyage ?"
-                hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-                class="p-2 bg-(--color-eco-ground1) text-(--color-ground1) hover:bg-(--color-eco-ground2) rounded-sm"
-              >
-                Terminer<strong>X</strong>
-              </button>
+<div class="flex flex-col text-base md:text-lg gap-2 w-full rounded-xs">
+  <div class="p-2 flex flex-col w-full">
+    <span class="text-(--color-apart3) font-semibold mb-2">
+      en cours
+    </span>
+    {% if active %}
+      {% for trip in active %}
+        <div class="p-1 flex items-center bg-(--color-eco-ground) rounded-xs w-full">
+          <section class="flex flex-col md:flex-row md:gap-6 w-full">
+            <div class="flex items-center gap-2">
+              <p>{{ trip.summary.start_city }}</p>
+              <svg viewbox="0 0 110 30" class="w-12">
+                {% include "graphics/travel_right.html" %}
+              </svg>
+              <p>{{ trip.summary.end_city }}</p>
             </div>
-        </div>
-      {% elif trip.status == "upcoming" %}
-        <div 
-          x-data="{ expanded: false }"
-          class="p-2 flex items-center justify-between rounded-sm w-full"
-        >
-          <button @click="expanded = !expanded"
-            class="py-2 px-4 flex font-normal rounded-sm bg-(--color-eco-ground) hover:bg-(--color-eco-ground2) text-(--color-apart3) items-center">
-            Voyage à venir
+            <div class="flex items-center text-base font-normal text-(--color-apart) whitespace-nowrap">
+              <p>{{ trip.summary.start_time|fr_date }}</p>
+            </div>
+          </section>
+          <button
+            type="button"
+            hx-post="{{ url_for('trips.complete_trip', trip_id=trip.trip_id, for_trip=trip.trip_id) }}"
+            hx-swap="none"
+            hx-confirm="Vous avez arrivé à destination ?"
+            hx-on::after-request="window.Alpine.store('modal').open()"
+            hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+            class="py-1 px-2 bg-(--color-apart) text-(--color-ground1) hover:bg-(--color-apart3) rounded-xs"
+          >
+            finaliser
           </button>
-          <div 
-            x-show="expanded" 
-            x-collapse
-            class="ml-2 px-24 py-2 flex items-center justify-between bg-(--color-ground2) rounded-sm w-full">
-            <section class="flex flex-col gap-2 w-full">
-              <div class="flex items-center w-full">
-                <p>{{ trip.summary.start_city }}</p>
-                <svg viewbox="0 0 110 30" class="p2 w-32 h-5">
-                  {% include "graphics/travel_right.html" %}
-                </svg>
-                <p>{{ trip.summary.end_city }}</p>
-              </div>
-              <div class="flex text-base font-normal text-(--color-apart3) items-end">
-                <p>{{ trip.summary.start_time|fr_date }}</p>
-              </div>
-            </section>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-sm text-(--color-contrast3)">
+        Aucun voyage.
+      </p>
+    {% endif %}
+  </div>
+  <div class="p-2 flex flex-col w-full">
+    <span class="flex font-semibold text-(--color-apart3) mb-2">
+      à venir
+    </span>
+    {% if upcoming %}
+      {% for trip in upcoming %}
+        <div class="p-1 flex items-center bg-(--color-ground2) rounded-xs w-full">
+          <section class="flex flex-col md:flex-row md:gap-6 w-full">
+            <div class="flex items-center gap-2">
+              <p>{{ trip.summary.start_city }}</p>
+              <svg viewbox="0 0 110 30" class="w-12">
+                {% include "graphics/travel_right.html" %}
+              </svg>
+              <p>{{ trip.summary.end_city }}</p>
+            </div>
+            <div class="flex items-center text-base font-normal text-(--color-apart) whitespace-nowrap">
+              <p>{{ trip.summary.start_time|fr_date }}</p>
+            </div>
+          </section>
+          <div class="flex flex-col md:flex-row md:gap-6">
+            <button
+              type="button"
+              hx-post="{{ url_for('trips.start_trip', trip_id=trip.trip_id, for_trip=trip.trip_id) }}"
+              hx-swap="none"
+              hx-confirm="Commencer ce voyage ?"
+              hx-on::after-request="window.Alpine.store('modal').open()"
+              hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+              class="py-1 px-2 bg-(--color-eco-ground2) text-(--color-contrast) hover:bg-(--color-eco-ground3) rounded-xs"
+            >
+              démarrer
+            </button>
             <button
               type="button"
               hx-post="{{ url_for('trips.cancel_trip', trip_id=trip.trip_id, for_trip=trip.trip_id) }}"
-              hx-target="#user-trips"
-              hx-swap="innerHTML"
+              hx-swap="none"
               hx-confirm="Êtes-vous sûr.e de vouloir annuler ce voyage ?"
+              hx-on::after-request="window.Alpine.store('modal').open()"
               hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-              class="p-2 bg-(--color-error) text-(--color-ground1) hover:bg-(--color-error2) rounded-sm"
+              class="py-1 px-2 bg-(--color-error) text-(--color-ground1) hover:bg-(--color-error2) rounded-xs"
             >
-              annuler<strong>X</strong>
+              annuler
             </button>
           </div>
         </div>
-      {% elif trip.status == "completed" %}
-        <div 
-          x-data="{ expanded: false }"
-          class="p-2 flex items-center justify-between rounded-sm w-full"
-        >
-          <button @click="expanded = !expanded"
-            class="py-2 px-4 font-normal flex rounded-sm bg-(--color-ground2) hover:bg-(--color-ground3) text-(--color-apart3) items-center">
-            Voyages terminés
-          </button>
-          <div 
-            x-show="expanded" 
-            x-collapse
-            class="ml-2 px-24 py-2 flex items-center justify-between bg-(--color-ground2) rounded-sm w-full">
-            <section class="flex flex-col gap-2 w-full">
-              <div class="flex w-full items-center">
-                <p>{{ trip.summary.start_city }}</p>
-                <svg viewbox="0 0 110 30" class="p2 w-32 h-5">
-                  {% include "graphics/travel_right.html" %}
-                </svg>
-                <p>{{ trip.summary.end_city }}</p>
-              </div>
-              <div class="flex text-base font-normal text-(--color-apart3) items-end">
-                <p>{{ trip.summary.start_time|fr_date }}</p>
-              </div>
-            </section>
-          </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-sm text-(--color-contrast3)">
+        Aucun voyage.
+      </p>
+    {% endif %}
+  </div>
+  <div class="p-2 flex flex-col w-full">
+    <span class="text-(--color-apart3) font-semibold mb-2">
+      terminés
+    </span>
+    {% if completed %}
+      {% for trip in completed %}
+        <div class="p-1 flex items-center bg-(--color-ground2) rounded-xs w-full">
+          <section class="flex flex-col md:flex-row md:gap-6 w-full">
+            <div class="flex items-center gap-2">
+              <p>{{ trip.summary.start_city }}</p>
+              <svg viewbox="0 0 110 30" class="w-12">
+                {% include "graphics/travel_right.html" %}
+              </svg>
+              <p>{{ trip.summary.end_city }}</p>
+            </div>
+            <div class="flex items-center text-base font-normal text-(--color-apart) whitespace-nowrap">
+              <p>{{ trip.summary.start_time|fr_date }}</p>
+            </div>
+          </section>
         </div>
-      {% endif %}
-    {% endfor %}
-  {% else %}
-    <p class="p-2 bg-(--color-ground4) font-normal rounded-sm text-(--color-contrast3)">Aucun voyage.</p>
-  {% endif %}
+      {% endfor %}
+    {% else %}
+      <p class="text-sm text-(--color-contrast3)">
+        Aucun voyage.
+      </p>
+    {% endif %}
+  </div>
 </div>

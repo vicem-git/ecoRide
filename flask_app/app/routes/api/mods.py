@@ -133,8 +133,8 @@ def get_review_details(conn, review_id):
 def approve_review(conn):
     response = make_response("approved review", 200)
     response.headers["HX-Trigger"] = {
-        "mod-reviews-updated": {
-            "type": "serverMsg",
+        "serverMsg": {
+            "type": "mod-reviews-updated",
             "message": "La revue a été accepté avec succès.",
         }
     }
@@ -149,8 +149,8 @@ def approve_review(conn):
 def reject_review(conn):
     response = make_response("rejected review", 200)
     response.headers["HX-Trigger"] = {
-        "mod-reviews-updated": {
-            "type": "serverMsg",
+        "serverMsg": {
+            "type": "mod-reviews-updated",
             "message": "La revue a été rejetée avec succès.",
         }
     }

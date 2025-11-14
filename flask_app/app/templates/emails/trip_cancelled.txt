@@ -1,0 +1,5 @@
+Bonjour {{ username }},
+Votre trajet prévu a été annulé par le conducteur. Vous avez été remboursé.
+Merci de vérifier votre application EcoRide pour plus d'informations.
+
+L’équipe EcoRide.

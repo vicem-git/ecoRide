@@ -102,7 +102,7 @@ def require_ownership(param="for_user"):
                     if not participant:
                         abort(
                             403,
-                            "la suppression d'un voyage auquel vous n'êtes pas inscrit échoue",
+                            "vous n'êtes pas inscrit a cce voyage",
                         )
 
             except Exception as e:

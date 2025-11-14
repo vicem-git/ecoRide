@@ -7,7 +7,7 @@ class DatabaseManager:
         self.pool = pool.ConnectionPool(
             min_size=db_config["min_conn"],
             max_size=db_config["max_conn"],
-            conninfo=f"postgresql://{db_config['db_user']}:{db_config['db_password']}@{db_config['db_host']}:{db_config['db_port']}/{db_config['db_name']}",
+            conninfo=f"postgresql://{db_config['db_user']}:{db_config['db_password']}@{db_config['db_host']}/{db_config['db_name']}",
         )
 
     def get_conn(self):

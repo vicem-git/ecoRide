@@ -5,3 +5,4 @@ from . import trips_crud
 from . import driver_crud
 from . import tx_crud
 from .db_manager import DatabaseManager
+from .mongo_client import MongoStore

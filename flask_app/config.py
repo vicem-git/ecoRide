@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 
-load_dotenv(".env")
+# load_dotenv(".env")
 
 
 class Config:
@@ -24,9 +24,16 @@ class Config:
 db_config = {
     "min_conn": int(os.getenv("DB_POOL_MIN_CONN", 1)),
     "max_conn": int(os.getenv("DB_POOL_MAX_CONN", 10)),
-    "db_user": os.getenv("DB_USER"),
-    "db_password": os.getenv("DB_PASSWORD"),
-    "db_host": os.getenv("DB_HOST"),
-    "db_port": os.getenv("DB_PORT"),
-    "db_name": os.getenv("DB_NAME"),
+    "db_user": os.getenv("POSTGRES_USER"),
+    "db_password": os.getenv("POSTGRES_PASS"),
+    "db_host": os.getenv("POSTGRES_HOST"),
+    "db_name": os.getenv("POSTGRES_DB"),
 }
+
+mongo_config = {
+    "mdb_user": os.getenv("MONGO_USER"),
+    "mdb_pw": os.getenv("MONGO_PASS"),
+    "mdb_host": os.getenv("MONGO_HOST", "mongo"),
+    "mdb_db": os.getenv("MONGO_DB", "mongo_ecoride"),
+}
+
