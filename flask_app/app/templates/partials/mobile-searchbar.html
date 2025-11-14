@@ -31,7 +31,7 @@
       {% include "trips/trip_filters.html" %}
       <input id="eco_filter" type="hidden" name="eco_filter" :value="$store.tripSearch.tripEco ? 'true' : 'false'">
       <input type="hidden" name="max_price" :value="$store.tripSearch.price">
-      <input type="hidden" name="driver_rating_filter" :value="$store.tripSearch.rating">
+      <input type="hidden" name="driver_rating" :value="$store.tripSearch.rating">
       <input type="date" id="home_start_date" name="start_date"
         class="h-[48px] w-[106px] py-0 px-1 bg-(--color-ground3) font-normal rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" />
       <div class="flex items-center justify-center gap-2">

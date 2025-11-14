@@ -7,6 +7,7 @@ from flask import (
     make_response,
 )
 import logging
+import json
 from app.db_store import user_crud, driver_crud, trips_crud, tx_crud
 from datetime import datetime
 from flask_login import login_required, current_user
@@ -136,8 +137,15 @@ def create_trip(conn, driver_id=None):
             if not summary:
                 raise Exception("Trip summary generation failed")
 
+            logger.debug(f"trip created successfully : id {new_trip}, summary - {summary}")
+
             response = make_response("", 200)
-            response.headers["HX-Trigger"] = {"serverMsg": "Trajet créé avec succès."}
+            response.headers["HX-Trigger"] = json.dumps({
+                "serverMsg": {
+                    "type": "message",
+                    "message": "Trajet créé avec succès."
+                }
+            })
             return response
 
         except ValidationError as ve:
@@ -182,6 +190,7 @@ def cancel_trip(conn, trip_id):
         if not trip_passengers_userdata:
             logger.info("No passengers found for this trip")
 
+
         trip_txs = tx_crud.get_trip_txs(conn, trip_id)
         if not trip_txs:
             logger.info("No transactions found for this trip")
@@ -189,52 +198,41 @@ def cancel_trip(conn, trip_id):
         logger.info(f"Trip passengers: {trip_passengers_userdata}")
         logger.info(f"Trip transactions: {trip_txs}")
 
-        # email all passengers
-        email_subject = "Annulation de votre trajet"
-        email_text = """
-                Bonjour Test User,
-                Votre trajet prévu a été annulé par le conducteur. Vous avez été remboursé.
-                Merci de vérifier votre application EcoRide pour plus d'informations.
-
-                L’équipe EcoRideVotre"""
-
-        # NORMALLY WE WOULD USE REAL USER EMAILS HERE
-        # ALSO BACKGROUND EMAIL SENDING IS NOT SET UP FOR THIS TEST
-        # WE WOULD USE FLASK MAIL WITH CELERY FOR ASYNC EMAIL SENDING
-
-        mail_ok = send_email(
-            username="Test User",
-            address=current_app.config["MAIL_TEST_RECIPIENT"],
-            subject=email_subject,
-            text=email_text,
-        )
-
-        # mail_errors = []
-        # for passenger in trip_passengers_userdata:
-        #    username = passenger.get("username")
-        #    email = passenger.get("email")
-        #    mail_ok = send_email(
-        #        name=username, address=email, subject=email_subject, text=email_text
-        #    )
-        #    if not mail_ok:
-        #        mail_errors.append(
-        #            f"Failed to send email to {username} ({email}), error: {mail_ok}"
-        #        )
-
-        if not mail_ok:
-            raise Exception("Failed to send cancellation emails")
-
         roles = user_crud.get_user_roles(conn, current_user.user_id)
 
         response = make_response(
             render_template("trips/user_trips.html", roles=roles),
             200,
         )
-        response.headers["HX-Trigger"] = {
-            "driver-trips-updated": {
-                "messsage": "Trajet annulé avec succès. Un email de confirmation a été envoyé aux passagers."
+        response.headers["HX-Trigger"] = json.dumps({
+            "serverMsg": {
+                "type": "driver-trips-updated",
+                "message": "Vous avez annulé le trajet avec succès. Un email de confirmation a été envoyé aux passagers."
             }
-        }
+        })
+
+        #@response.call_on_close
+        def trip_cancellation_email():
+            mail_errors = []
+            for passenger in trip_passengers_userdata:
+                try:
+                    username = passenger.get("username")
+                    email = passenger.get("email")
+                    email_subject = "Annulation de votre trajet"
+                    message_body = render_template(
+                        "emails/trip_cancelled.txt",
+                        username=username
+                    )
+                    mail_ok = send_email(
+                        name=username, address=email, subject=email_subject, text=email_text
+                    )
+                    if not mail_ok:
+                        mail_errors.append(
+                            f"Failed to send email to {username} ({email}), error: {mail_ok}"
+                        )
+                        logger.debug(f"ERROR SENDING CANCELATION EMAIL {mail_errors}")
+                except Exception as e:
+                    logger.warning(f"email for {passenger["email"]} failed: {e}")
         return response
 
     except Exception as e:
@@ -262,7 +260,12 @@ def start_trip(conn, trip_id):
             raise Exception("Trip startup failed")
 
         response = make_response("", 200)
-        response.headers["HX-Trigger"] = {"serverMsg": "Trajet demarré."}
+        response.headers["HX-Trigger"] = json.dumps({
+            "serverMsg": {
+                "type": "message",
+                "message": "Trajet démarré avec succès."
+            }
+        })
 
         return response
     except Exception as e:
@@ -290,9 +293,14 @@ def complete_trip(conn, trip_id):
         passengers = trips_crud.get_trip_passengers_userdata(conn, trip_id)
 
         response = make_response("", 200)
-        response.headers["HX-Trigger"] = {"serverMsg": "Trajet finalsé avec succès."}
+        response.headers["HX-Trigger"] = json.dumps({
+            "serverMsg": {
+                "type": "message",
+                "message": "Trajet terminé avec succès."
+            }
+        })
 
-        @response.call_on_close
+        #@response.call_on_close
         def trip_completion_email():
             for passenger in passengers:
                 try:
@@ -317,7 +325,6 @@ def complete_trip(conn, trip_id):
             500,
         )
         return response
-
 
 @trips_bp.route("/query_trips")
 @transactional()
@@ -484,14 +491,17 @@ def leave_trip(conn, trip_id):
             raise Exception("Failed to leave trip")
 
         # RESTORE CREDITS !
-        restore_tx = tx_crud.restore_tx(conn, user_id=current_user.user_id, trip_id=trip_id)
-        if not restore_tx:
+        reverted = tx_crud.revert_tx(conn, user_id=current_user.user_id, trip_id=trip_id)
+        if not reverted:
             raise Exception(f"failed to revert user's transaction: user - {current_user.user_id}, trip - {trip_id}") 
 
         response = make_response("",200,)
-        response.headers["HX-Trigger"] = {
-            "user-trips-updated": {"message": "Vous avez quitté le voyage."}
-        }
+        response.headers["HX-Trigger"] = json.dumps({
+            "serverMsg": {
+                "type": "user-trips-updated",
+                "message": "Vous avez quitté le voyage."
+            }
+        })
         return response
 
     except Exception as e:
@@ -499,7 +509,7 @@ def leave_trip(conn, trip_id):
         messages = ["Une erreur s'est produite, reessayez plus tard."]
         response = make_response(
             render_template(
-                "trips/server_msg.html", messages=messages, msg_case="error"
+                "partials/server_msg.html", messages=messages, msg_case="error"
             ),
             500,
         )
@@ -513,10 +523,17 @@ def leave_trip(conn, trip_id):
 def passenger_trips(conn):
     try:
         user_id = current_user.user_id
-        trips = trips_crud.get_passenger_trips(conn, user_id)
-        trips = [t for t in trips if t["status"] != "cancelled"]
 
-        return render_template("trips/passenger_trip_items.html", trips=trips or [])
+        trips = trips_crud.get_passenger_trips(conn, user_id)
+
+        completed = [t for t in trips if t["status"] == "completed"]
+        upcoming = [t for t in trips if t["status"] == "upcoming"]
+
+        return render_template(
+            "trips/passenger_trip_items.html",
+            completed=completed or [],
+            upcoming=upcoming or []
+        )
 
     except Exception as e:
         logger.error("Error retrieving passenger trips: %s", e)
@@ -545,9 +562,17 @@ def driver_trips(conn):
 
         driver_id = driver_data.get("id")
         trips = trips_crud.get_driver_trips(conn, driver_id)
-        trips = [t for t in trips if t["status"] != "cancelled"]
 
-        return render_template("trips/driver_trip_items.html", trips=trips or [])
+        completed = [t for t in trips if t["status"] == "completed"]
+        upcoming = [t for t in trips if t["status"] == "upcoming"]
+        active = [t for t in trips if t["status"] == "in_progress"]
+
+        return render_template(
+            "trips/driver_trip_items.html",
+            completed=completed or [],
+            upcoming=upcoming or [],
+            active=active or []
+        )
 
     except Exception as e:
         logger.error("Error retrieving driver trips: %s", e)

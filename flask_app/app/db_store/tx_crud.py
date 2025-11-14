@@ -1,4 +1,5 @@
 from flask import current_app
+from psycopg.rows import dict_row
 import logging
 
 # MODULE LOGGER
@@ -56,19 +57,22 @@ def revert_tx(conn, user_id, trip_id):
             "SELECT id, amount FROM transactions WHERE tx_from = %s AND trip_id = %s",
             (user_id, trip_id),
         )
-        tx_id = cur.fetchone()[0]
-        tx_amount = cur.fetchone()[1]
+        try:
+            tx_id, tx_amount = cur.fetchone()
 
-        cur.execute(
-            "DELETE FROM transactions WHERE id = %s",
-            (tx_id,), 
-        )
+            cur.execute(
+                "DELETE FROM transactions WHERE id = %s",
+                (tx_id,), 
+            )
 
-        cur.execute(
-            "UPDATE users SET credits = credits + %s WHERE id = %s",
-            (tx_amount, user_id),
-        )
-        return cur.fetchone > 0
+            cur.execute(
+                "UPDATE users SET credits = credits + %s WHERE id = %s",
+                (int(tx_amount), user_id),
+            )
+            reverted = cur.rowcount
+            return reverted > 0
+        except Exception as e:
+            logger.debug(f"ERROR REVERTING TX: {e}")
 
 
 

@@ -6,8 +6,8 @@
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='graphics/fav-ecoride.svg') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %} - ecoRide</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='dist/assets/app-CRUjErNr.css') }}"/>
-    <script type="module" src="{{ url_for('static', filename='dist/assets/app-B1awWCX1.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/assets/app-HNeHOSMF.css') }}"/>
+    <script type="module" src="{{ url_for('static', filename='dist/assets/app-CfA93lhl.js') }}"></script>
     {% endblock %}
   </head>
   <body x-data :class="{ 'dark': $store.darkMode.on }" class="flex flex-col bg-(--color-ground) items-center transition duration-200 z-0">
@@ -51,8 +51,8 @@
           class="absolute p-2 top-2 right-2 text-(--color-contrast2) hover:text-(--color-contrast)">
           ✕
         </button>
-        <template x-if="$store.modal.errorMessage" class="w-[80%]">
-          <div class="p-4" x-html="$store.modal.errorMessage"></div>
+        <template x-if="$store.modal.content" class="w-[80%]">
+          <div class="p-4" x-html="$store.modal.content"></div>
         </template>
         <div id="global-modal" class="w-full"></div>
       </div>

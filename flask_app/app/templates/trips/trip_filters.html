@@ -21,18 +21,18 @@
       <button
         type="button"
         @click="$store.tripSearch.tripEco = !$store.tripSearch.tripEco"
-        :class="$store.tripSearch.tripEco ? 'bg-eco' : 'bg-ground4'"
+        :class="$store.tripSearch.tripEco ? 'bg-(--color-eco)' : 'bg-(--color-ground4)'"
         class="w-12 h-6 rounded-full"
       >
         <span
           :class="$store.tripSearch.tripEco ? 'translate-x-6' : 'translate-x-1'"
-          class="absolute left-1 top-1 w-4 h-4 bg-contrast2 rounded-full transition-transform duration-200"
+          class="absolute left-1 top-1 w-4 h-4 bg-(--color-contrast2) rounded-full transition-transform duration-200"
         ></span>
       </button> 
     </div>
 
     <div class="flex flex-col">
-      <label for="price_filter" class="flex text-contrast2 text-sm items-center gap-2">
+      <label for="price_filter" class="flex text-(--color-contrast2) text-sm items-center gap-2">
         Prix maximum
         <span x-text="$store.tripSearch.price + ' €'"></span>
       </label>
@@ -46,7 +46,7 @@
         step="1"
         class="range-slider mb-2"
       ></input>
-      <label for="driver_rating_filter" class="text-contrast2 text-sm gap-2">
+      <label for="driver_rating_filter" class="text-(--color-contrast2) text-sm gap-2">
         Note du conducteur
         <span x-text="$store.tripSearch.rating + ' ★' "></span>
       </label>
@@ -54,7 +54,7 @@
         id="driver_rating_filter"
         x-model="$store.tripSearch.rating"
         type="range"
-        name="driver_rating_filter"
+        name="driver_rating"
         min="0"
         max="5"
         step="1"
