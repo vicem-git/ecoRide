@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block main %}
-<main class="p-8 flex w-full">
-  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center w-full">
+<main class="md:p-8 flex w-full">
+  <div class="md:p-8 flex bg-(--color-ground2) flex-col gap-8 items-center w-full">
     
     <section class="w-[80%]">
       <!-- WIDGETS -->
@@ -41,7 +41,7 @@
       </section>
     </section>
     
-    <section class="flex flex-col w-[80%]">
+    <section class="text-sm flex flex-col w-[80%]">
       <section class="mb-8">
         <div
           hx-get="{{ url_for('admin.get_moderators') }}"
@@ -49,14 +49,14 @@
           hx-target="#moderators-view"
           hx-swap="innerHTML"
         ></div>
-        <h2 class="text-base lg:text-lg font-semibold text-contrast3">Moderators</h2>
+        <h2 class="text-base lg:text-lg font-semibold text-(--color-contrast3)">Moderators</h2>
         <hr class="mb-4"/>
         <button
           hx-get="{{ url_for('admin.create_moderator') }}"
           hx-target="#moderators-view"
           hx-swap="innerHTML"
           hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
-          class="px-4 py-2 mb-4 rounded-sm bg-apart hover:bg-apart2 transition-colors duration-200"
+          class="px-4 py-2 mb-4 rounded-xs bg-(--color-apart) hover:bg-(--color-apart2)"
         >
           Ajouter un moderateur
         </button>
@@ -64,7 +64,7 @@
       </section>
 
       <section>
-        <h2 class="text-base lg:text-lg font-semibold text-contrast3">Utilisateurs</h2>
+        <h2 class="text-base lg:text-lg font-semibold text-(--color-contrast3)">Utilisateurs</h2>
         <hr class="mb-4"/>
         <input 
           type="search"
@@ -73,9 +73,9 @@
           hx-post="{{ url_for('admin.query_users') }}"
           hx-target="#users-search-view"
           hx-trigger="input changed delay:500ms, keyup[key=='Enter'], refresh-users from:body"
-          class="p-2 bg-ground3 font-normal rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none">
+          class="p-2 bg-(--color-ground3) font-normal rounded-xs focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none">
         <table class="w-full mt-4">
-          <thead class="bg-ground4 rounded-xs">
+          <thead class="bg-(--color-ground4) rounded-xs">
             <tr> 
               <th class="p-2 text-left">Email</th>
               <th class="p-2 text-left">Username</th>
