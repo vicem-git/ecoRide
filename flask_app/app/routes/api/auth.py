@@ -52,22 +52,25 @@ def register_user(conn):
         existing_account = user_crud.get_user_by_email(conn, reg_data.email)
 
         if existing_account:
-            message = ["un compte existe déjà avec cet email. veuillez vous connecter."]
-            return make_response(
-                render_template(
-                    "partials/server_msg.html", message=message, msg_case="error"
-                ),
-                400,
-            )
-
+            message = "un compte existe déjà avec cet email. veuillez vous connecter."
+            response = make_response("", 200)
+            response.headers["HX-Trigger"] = json.dumps({
+                "serverMsg": {
+                    "type": "message",
+                    "message": message
+                }
+            })
+            return response
         if user_crud.check_username(conn, reg_data.username):
-            message = ["Nom d'utilisateur déjà pris."]
-            return make_response(
-                render_template(
-                    "partials/server_msg.html", message=message, msg_case="error"
-                ),
-                400,
-            )
+            message = "Nom d'utilisateur déjà pris."
+            response = make_response("", 200)
+            response.headers["HX-Trigger"] = json.dumps({
+                "serverMsg": {
+                    "type": "message",
+                    "message": message
+                }
+            })
+            return response
 
         hashed_pw = bcrypt.generate_password_hash(reg_data.password, 14).decode("utf-8")
         account_id = user_crud.create_account(conn, reg_data.email, hashed_pw)
@@ -126,7 +129,6 @@ def register_user(conn):
             ),
             500,
         )
-
 
 @auth_bp.route("/login", methods=["POST"])
 @transactional()

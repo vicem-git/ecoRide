@@ -142,7 +142,7 @@ def create_trip(conn, driver_id=None):
             response = make_response("", 200)
             response.headers["HX-Trigger"] = json.dumps({
                 "serverMsg": {
-                    "type": "message",
+                    "type": "driver-trips-updated",
                     "message": "Trajet créé avec succès."
                 }
             })
@@ -179,60 +179,67 @@ def create_trip(conn, driver_id=None):
 @require_ownership("for_trip")
 def cancel_trip(conn, trip_id):
     try:
-        canceled = trips_crud.cancel_trip(conn, trip_id)
-        if not canceled:
-            raise Exception("Trip cancellation failed")
-
         # find participants and refund the txs created for this trip
         trip_passengers_userdata = trips_crud.get_trip_passengers_userdata(
             conn, trip_id
         )
         if not trip_passengers_userdata:
-            logger.info("No passengers found for this trip")
-
+            logger.info("No passengers found for this trip") 
 
         trip_txs = tx_crud.get_trip_txs(conn, trip_id)
         if not trip_txs:
             logger.info("No transactions found for this trip")
 
-        logger.info(f"Trip passengers: {trip_passengers_userdata}")
-        logger.info(f"Trip transactions: {trip_txs}")
+        logger.info(trip_passengers_userdata)
+        for passenger in trip_passengers_userdata:
+            # revert txs
+            # FOR VEM DROP :
+            # REPLACE "id" WITH "user_id" 
+            #  if volume rebuilt, init_db needs clean re-run
+            passenger_id = passenger.get("id")
+            logger.info(f"passenger id : {passenger_id}")
+            reverted = tx_crud.revert_tx(conn, passenger_id, trip_id)
+            if not reverted:
+                raise Exception("[DRIVER TRIP CANCEL] Error reverting tx for trip cancellation")
 
-        roles = user_crud.get_user_roles(conn, current_user.user_id)
-
-        response = make_response(
-            render_template("trips/user_trips.html", roles=roles),
-            200,
-        )
+        canceled = trips_crud.cancel_trip(conn, trip_id)
+        if not canceled:
+            raise Exception("Trip cancellation failed")
+        
+        response = make_response("", 200)
         response.headers["HX-Trigger"] = json.dumps({
             "serverMsg": {
                 "type": "driver-trips-updated",
                 "message": "Vous avez annulé le trajet avec succès. Un email de confirmation a été envoyé aux passagers."
             }
         })
+        
+        app = current_app._get_current_object()
 
-        #@response.call_on_close
+        @response.call_on_close
         def trip_cancellation_email():
-            mail_errors = []
-            for passenger in trip_passengers_userdata:
-                try:
-                    username = passenger.get("username")
-                    email = passenger.get("email")
-                    email_subject = "Annulation de votre trajet"
-                    message_body = render_template(
-                        "emails/trip_cancelled.txt",
-                        username=username
-                    )
-                    mail_ok = send_email(
-                        name=username, address=email, subject=email_subject, text=email_text
-                    )
-                    if not mail_ok:
-                        mail_errors.append(
-                            f"Failed to send email to {username} ({email}), error: {mail_ok}"
+            with app.app_context():
+                logger.info("sending cancellation emails")
+                mail_errors = []
+                for passenger in trip_passengers_userdata:
+                    try:
+                        username = passenger.get("username")
+                        email = passenger.get("email")
+                        email_subject = "Annulation de votre trajet"
+                        message_body = render_template(
+                            "emails/trip_cancelled.txt",
+                            username=username
                         )
-                        logger.debug(f"ERROR SENDING CANCELATION EMAIL {mail_errors}")
-                except Exception as e:
-                    logger.warning(f"email for {passenger["email"]} failed: {e}")
+                        mail_ok = send_email(
+                            username=username, address=email, subject=email_subject, text=message_body
+                        )
+                        if not mail_ok:
+                            mail_errors.append(
+                                f"Failed to send email to {username} ({email}), error: {mail_ok}"
+                            )
+                            logger.warning(f"ERROR SENDING CANCELATION EMAIL {mail_errors}")
+                    except Exception as e:
+                        logger.warning(f"email for {passenger["email"]} failed: {e}")
         return response
 
     except Exception as e:
@@ -299,21 +306,24 @@ def complete_trip(conn, trip_id):
                 "message": "Trajet terminé avec succès."
             }
         })
+        
+        app = current_app._get_current_object()
 
-        #@response.call_on_close
+        @response.call_on_close
         def trip_completion_email():
-            for passenger in passengers:
-                try:
-                    username = passenger["username"]
-                    address = passenger["email"]
-                    message_body = render_template(
-                        "emails/trip_completed.txt",
-                        username=username,
-                    )
-                    result = send_email(username, address, "Trip completed!", message_body)
-                    logger.debug(f"sending notification to {address}: {result}")
-                except Exception as e:
-                    logger.warning(f"email for {passenger["email"]} failed: {e}")
+            with app.app_context():
+                for passenger in passengers:
+                    try:
+                        username = passenger["username"]
+                        address = passenger["email"]
+                        message_body = render_template(
+                            "emails/trip_completed.txt",
+                            username=username,
+                        )
+                        result = send_email(username, address, "Trip completed!", message_body)
+                        logger.debug(f"sending notification to {address}: {result}")
+                    except Exception as e:
+                        logger.warning(f"email for {passenger["email"]} failed: {e}")
         return response
     except Exception as e:
         logger.error("Error completing trip: %s", e)

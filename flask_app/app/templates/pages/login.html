@@ -19,7 +19,7 @@ Connexion
       hx-swap="innerHTML"
       hx-trigger="submit"
       hx-on::after-request="window.Alpine.store('modal').open()"
-      hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+      hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
       class="flex text-base md:text-xl flex-col items-center"
     >
       <div class="flex flex-col items-center justify-center mb-4 md:mb-12 gap-3">

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 api_url: str = Config.MAIL_API_URL
 api_key: str = Config.MAIL_API_KEY
-sandbox_postmaster: str = Config.MAIL_SANDBOX_POSTMASTER
+postmaster: str = Config.MAIL_POSTMASTER
 
 parsed_url = urlparse(api_url)
 if not (parsed_url.scheme and parsed_url.netloc):
@@ -23,7 +23,7 @@ if not api_key or not isinstance(api_key, str):
 
 def send_email(username, address, subject, text):
     payload = {
-        "from": f"EcoRide <{sandbox_postmaster}>",
+        "from": f"EcoRide <{postmaster}>",
         "to": f"{username} <{address}>",
         "subject": subject,
         "text": text,

@@ -247,7 +247,7 @@ JOIN users u ON d.user_id = u.id;
 CREATE OR REPLACE VIEW trip_passengers_userdata AS
 SELECT
     tp.trip_id,
-    u.id, u.username AS user_id,
+    u.id AS user_id,
     u.username,
     a.email
 FROM

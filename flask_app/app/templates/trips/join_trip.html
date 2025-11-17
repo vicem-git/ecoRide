@@ -10,7 +10,7 @@
     hx-post="{{ url_for('trips.join_trip', trip_id=trip_id) }}"
     hx-target="#join-trip-container"
     hx-swap="innerHTML"
-    hx-ox::after-request="window.Alpine.store('modal').replaceContent(event.detail.xhr.response)"
+    hx-ox::after-request="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
     class="bg-(--color-ground3) hover:bg-(--color-ground2) text-(--color-contrast2) font-semibold py-2 px-4 rounded-sm"
   >
     participer

@@ -155,7 +155,7 @@ def get_trip_passengers_userdata(conn, trip_id):
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             """
-            SELECT user_id, username, email
+            SELECT id, username, email
             FROM trip_passengers_userdata
             WHERE trip_id = %s
             """,

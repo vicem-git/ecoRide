@@ -24,7 +24,7 @@
             hx-swap="none"
             hx-confirm="Vous avez arrivé à destination ?"
             hx-on::after-request="window.Alpine.store('modal').open()"
-            hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+            hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
             class="py-1 px-2 bg-(--color-apart) text-(--color-ground1) hover:bg-(--color-apart3) rounded-xs"
           >
             finaliser
@@ -63,7 +63,7 @@
               hx-swap="none"
               hx-confirm="Commencer ce voyage ?"
               hx-on::after-request="window.Alpine.store('modal').open()"
-              hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+              hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
               class="py-1 px-2 bg-(--color-eco-ground2) text-(--color-contrast) hover:bg-(--color-eco-ground3) rounded-xs"
             >
               démarrer
@@ -74,7 +74,7 @@
               hx-swap="none"
               hx-confirm="Êtes-vous sûr.e de vouloir annuler ce voyage ?"
               hx-on::after-request="window.Alpine.store('modal').open()"
-              hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+              hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
               class="py-1 px-2 bg-(--color-error) text-(--color-ground1) hover:bg-(--color-error2) rounded-xs"
             >
               annuler

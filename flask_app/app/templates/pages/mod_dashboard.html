@@ -14,7 +14,7 @@
       hx-trigger="load, mod-review-updated from:body"
       hx-target="#pending-reviews"
       hx-swap="innerHTML"
-      hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+      hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
     >
       <!-- PENDING REVIEWS -->
       <table class="w-full mt-4">
@@ -41,7 +41,7 @@
       hx-trigger="load"
       hx-target="#pending-negative"
       hx-swap="innerHTML"
-      hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+      hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
     >
       <!-- PENDING NEGATIVE REVIEWS -->
       <div id="pending-negative">pending-negative-reviews</div>

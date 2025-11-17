@@ -41,9 +41,9 @@
   <button 
     type="submit"
     hx-post="{{ url_for('trips.create_trip', driver_id=driver_info.data.id) }}"
-    hx-swap="innerHTML"
+    hx-swap="none"
     hx-on::after-request="window.Alpine.store('modal').open()"
-    hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+    hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
     class="p-2 rounded bg-(--color-eco-ground2) text-(--color-apart3) hover:bg-(--color-eco-ground3) hover:text-(--color-apart2)">
     create trip
   </button>

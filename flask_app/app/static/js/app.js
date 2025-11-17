@@ -48,10 +48,12 @@ Alpine.store('modal', {
     this.content = '';
   },
   setContent(message) {
+    document.querySelector('#global-modal').innerHTML = '';
+    this.content = '';
     this.content = message;
     this.open();
   },
-  replaceContent(html) {
+  htmlContent(html) {
     this.content = '';
     this.open();
     document.querySelector('#global-modal').innerHTML = html;

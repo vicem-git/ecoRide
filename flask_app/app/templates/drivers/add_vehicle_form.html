@@ -3,7 +3,7 @@
   hx-target="#driver-vehicles" 
   hx-swap="innerHTML"
   hx-on::after-request="window.Alpine.store('modal').close()"
-  hx-on::response-error="window.Alpine.store('modal').replaceContent(event.detail.xhr.response)"
+  hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
   class="space-y-2 text-base md:text-lg bg-(--color-ground2) p-8 rounded mt-4"
 >
   <div class="grid grid-cols-2 gap-4">

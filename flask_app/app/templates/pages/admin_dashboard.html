@@ -55,7 +55,7 @@
           hx-get="{{ url_for('admin.create_moderator') }}"
           hx-target="#moderators-view"
           hx-swap="innerHTML"
-          hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+          hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
           class="px-4 py-2 mb-4 rounded-xs bg-(--color-apart) hover:bg-(--color-apart2)"
         >
           Ajouter un moderateur
