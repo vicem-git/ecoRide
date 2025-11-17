@@ -23,7 +23,7 @@
             hx-post="{{ url_for('trips.leave_trip', trip_id=trip.trip_id, for_participant=current_user.user_id) }}"
             hx-swap="none"
             hx-confirm="Êtes-vous sûr.e de vouloir quitter ce voyage ?"
-            hx-on::response-error="window.Alpine.store('modal').setError(event.detail.xhr.response)"
+            hx-on::response-error="window.Alpine.store('modal').setContent(event.detail.xhr.response)"
             class="py-1 px-2 bg-(--color-error) text-(--color-ground1) hover:bg-(--color-error2) rounded-xs"
           >
             quitter

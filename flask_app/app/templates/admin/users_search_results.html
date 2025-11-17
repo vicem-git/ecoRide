@@ -1,5 +1,5 @@
 {% for user in users %}
-<tr class="text-apart">
+<tr class="text-xs md:text-base text-(--color-apart)">
   <td>{{ user.email }}</td>
   <td>{{ user.username }}</td>
   <td>{{ user.status }}</td>
@@ -9,7 +9,7 @@
               hx-confirm="Etes-vous sûr de vouloir suspendre cet utilisateur ?"
               hx-target="#users-search-view"
               hx-swap="innerHTML"
-              class="px-2 py-1 bg-error hover:bg-error2 text-white rounded">
+              class="px-2 py-1 bg-(--color-error) hover:bg-(--color-error2) text-white rounded">
         Suspendre
       </button>
     {% elif user.status|lower == 'suspended' %}
