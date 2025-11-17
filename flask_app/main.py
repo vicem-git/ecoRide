@@ -43,7 +43,9 @@ def create_app():
     bcrypt.init_app(app)
     db_manager = DatabaseManager(db_config)
     app.db_manager = db_manager
-
+    
+    logging.getLogger("pymongo").setLevel(logging.WARNING)
+    logging.getLogger("pymongo.monitoring").setLevel(logging.WARNING)   
     mongo_store = MongoStore(mongo_config)
     app.mongo_store = mongo_store
 
@@ -132,8 +134,4 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    logging.getLogger("pymongo").setLevel(logging.WARNING)
-    logging.getLogger("pymongo.mongo_client").setLevel(logging.WARNING)
-    logging.getLogger("pymongo.pool").setLevel(logging.WARNING)
-    logging.getLogger("bson").setLevel(logging.WARNING)
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
