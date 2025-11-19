@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session
 from rich.logging import RichHandler
 import logging
 from app.db_store import DatabaseManager, MongoStore, crud_utilities, trips_crud
@@ -11,6 +11,7 @@ from app.utils import (
     safe_close,
     create_datetime_filter,
     register_template_helpers,
+    valid_csrf
 )
 from app.models import session_user_loader
 import atexit
@@ -122,6 +123,23 @@ def create_app():
     @app.context_processor
     def inject_static_ids():
         return dict(static_ids=app.static_ids)
+    
+    # CSRF 
+    @app.before_request
+    def ensure_csrf_token():
+        if "csrf_token" not in session:
+            session["csrf_token"] = secrets.token_hex(32)
+    
+    @app.before_request
+    def csrf_protect():
+        view = app.view_functions.get(request.endpoint)
+        if view and getattr(view, "_skip_csrf", False):
+            return  # skip
+
+        if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+            token = request.headers.get("X-CSRFToken")
+            if not valid_csrf(token):
+                abort(400, "Invalid CSRF token")
 
     login_manager.login_view = "pages.login"
 

@@ -79,6 +79,12 @@ window.addEventListener('pageshow', () => {
   Alpine.store('modal').close();
 });
 
+// CSRF TOKEN 
+document.body.addEventListener('htmx:configRequest', (event) => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    event.detail.headers['X-CSRFToken'] = csrfToken;
+});
+
 document.body.addEventListener("htmx:beforeSwap", () => {
   document.querySelectorAll(".dropdown").forEach((dropdown) => {
     dropdown.classList.add("hidden");

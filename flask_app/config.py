@@ -3,8 +3,7 @@ from dotenv import load_dotenv
 from datetime import timedelta
 
 # load_dotenv(".env")
-
-
+ 
 class Config:
     SECRET_KEY = os.getenv("FLASK_SECRET_KEY")
 
@@ -17,8 +16,12 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(hours=1)
     SESSION_COOKIE_NAME = "session"
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = "Lax"
+
+    MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # 2 MB
+    MAX_FORM_MEMORY_SIZE = 300 * 1024     # default is fine
+    MAX_FORM_PARTS = 100
 
 
 db_config = {
