@@ -11,7 +11,8 @@ The application is containerized using docker, and deployed to Linux based VPS.
   
 credentials for admin access to the live app are provided in the 'copie a rendre'.
 <br>
-## environment configuration.
+<br>
+## environment configuration
 
 for deploying the app, the repository needs to be cloned into a linux machine with docker installed.
 Deploy VPS via a provider of your choice. Providers will usually provide a terminal to setup necessary configuration:
@@ -21,36 +22,35 @@ Deploy VPS via a provider of your choice. Providers will usually provide a termi
   * installation of nginx and basic configuration for using it as a reverse proxy for applications hosted on the server.
 
 I had a working Fedora based VPS, so my first step there was using the 'dnf' package manager to install docker:  
-<br>
     ```bash
     $ sudo dnf install ./docker-desktop-x86_64.rpm
     ```
 <br>
+<br>
 ## application services
 on the compose.yaml file three containers are defined for the different services.  
-
-- 
+  
   * postgres : i chose the 'postgis/postgis:17-3.5' because of its GIS capabilities.
   * mongo : 7.0 version was the recommended for compatibility and stability.
   * flask app : python:3.12-slim image. see the Dockerfile at the root of the repository for the complete configuration.
 
-### environment variables : .env
+### environment variables
 Docker and Flask expect an '.env' file  at the root of the project: our database services rely on authentication, and we use API keys for a third-party mailing service. the 'environment.txt' file at the root of the project provides the template with the expected variables.
-
+<br>
+<br>
 ## ready to build and run
 once the previous steps are completed, we are ready to build the containers. at the root of the directory (where the needed docker entry 'compose.yaml' lives):  
-<br>
     ```bash
     $ docker compose build
-    ```
+    ```  
 and then run the containers 'detached', i.e. in the background (-d):  
     ```bash
     $ docker compose up -d
-    ```
+    ```  
 we can check logs on the flask app to verify everything is ok:  
     ```bash
     $ docker logs flask_ecoride
-    ```
+    ```  
 <br>
 
 **you should see something like**:
@@ -76,5 +76,6 @@ now the application is ready and listening on the container's port 5000, which D
         ports:
           - "127.0.0.1:5000:5000"
     ```
+<br>
 nginx handles traffic from there, mapping the requests to the domain to the flask app.  
 the domain is certified by certbot for TLS.  
