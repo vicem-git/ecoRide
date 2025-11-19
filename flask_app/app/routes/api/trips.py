@@ -18,7 +18,7 @@ from app.utils import (
     render_pydantic_errors,
     send_email,
 )
-from app.models import TripSearchData, CreateTripData
+from app.models import TripSearchData, CreateTripData, ReviewData
 from pydantic import ValidationError
 
 trips_bp = Blueprint("trips", __name__, url_prefix="/trips")
@@ -269,7 +269,7 @@ def start_trip(conn, trip_id):
         response = make_response("", 200)
         response.headers["HX-Trigger"] = json.dumps({
             "serverMsg": {
-                "type": "message",
+                "type": "driver-trips-updated",
                 "message": "Trajet démarré avec succès."
             }
         })
@@ -292,21 +292,20 @@ def start_trip(conn, trip_id):
 @require_ownership("for_trip")
 def complete_trip(conn, trip_id):
     try:
+        passengers = trips_crud.get_trip_passengers_userdata(conn, trip_id)
+        
         completed_status = current_app.static_ids["trip_status"]["completed"]
         completed = trips_crud.update_trip_status(conn, trip_id, completed_status)
         if not completed:
             raise Exception("Trip completion failed")
 
-        passengers = trips_crud.get_trip_passengers_userdata(conn, trip_id)
-
         response = make_response("", 200)
         response.headers["HX-Trigger"] = json.dumps({
             "serverMsg": {
-                "type": "message",
+                "type": "driver-trips-updated",
                 "message": "Trajet terminé avec succès."
             }
         })
-        
         app = current_app._get_current_object()
 
         @response.call_on_close
@@ -526,6 +525,83 @@ def leave_trip(conn, trip_id):
         return response
 
 
+@trips_bp.route("/review_trip/<trip_id>", methods=["GET", "POST"])
+@transactional()
+@htmx_login_required
+@require_ownership("for_participant")
+def review_trip(conn, trip_id):
+    if request.method == "GET":
+        driver_id = trips_crud.get_trip_driver_id(conn, trip_id)
+        if not driver_id:
+            raise Exception(f"REVIEW ERROR : trip data missing, driver_id : {driver_id}")
+        
+        response = make_response(
+            render_template(
+                "trips/review_trip.html",
+                trip_id=trip_id,
+                driver_id=driver_id
+            )
+        )
+        return response
+ 
+    if request.method == "POST":
+        try:
+            reviewed_trip = request.form.get("trip_id")
+            reviewed_driver = request.form.get("driver_id")
+            logger.debug(request.form)
+            if not reviewed_trip or not reviewed_driver:
+                    raise Exception("REVIEW ERROR : driver_id/ trip_id missing.")
+            
+            review_data = request.form.to_dict()
+            data = ReviewData(**review_data)
+
+            passenger_id = current_user.user_id
+            trip_evaluation = data.trip_evaluation
+            driver_rating = data.driver_rating
+            review_comment = data.review_comment
+
+            review_id = current_app.mongo_store.add_trip_review(
+                    trip_id=reviewed_trip,
+                    driver_id=reviewed_driver,
+                    passenger_id=passenger_id,
+                    trip_evaluation=trip_evaluation,
+                    driver_rating=driver_rating,
+                    review_comment=review_comment
+            )
+            if not review_id:
+                raise Exception("REVIEW ERROR")
+            response = make_response("", 200)
+            response.headers["HX-Trigger"] = json.dumps({
+                "serverMsg": {
+                    "type": "user-trips-updated",
+                    "message": "Merci de valider votre voyage."
+                }
+            })
+            return response
+
+        except ValueError as ve:
+            logger.error("Validation error during review creation: %s", ve)
+            messages = ["Une erreur s'est produite, veuillez réessayer plus tard."]
+            return make_response(
+                render_template(
+                    "partials/server_msg.html", messages=messages, msg_case="error"
+                ),
+                400,
+            )
+
+        except Exception as e:
+            logger.error("Error during review creation: %s", e)
+            messages = ["Une erreur s'est produite, veuillez réessayer plus tard."]
+            response = make_response(
+                render_template(
+                    "partials/server_msg.html",
+                    messages=messages,
+                    msg_case="error",
+                ),
+                500,
+            )
+            return response
+
 @trips_bp.route("/passenger-trips")
 @transactional()
 @htmx_login_required
@@ -538,10 +614,24 @@ def passenger_trips(conn):
 
         completed = [t for t in trips if t["status"] == "completed"]
         upcoming = [t for t in trips if t["status"] == "upcoming"]
+        
+        to_review = []
+
+        if len(completed) > 0: 
+            for trip in completed:
+                trip_id = trip.get("trip_id")
+                revd = current_app.mongo_store.has_reviewed_trip(
+                    passenger_id=user_id,
+                    trip_id=trip_id
+                )
+                logger.debug(f"reviewed EXISTS : {revd}")
+                if not revd:
+                    to_review.append(trip)
 
         return render_template(
             "trips/passenger_trip_items.html",
             completed=completed or [],
+            to_review=to_review,
             upcoming=upcoming or []
         )
 
@@ -556,7 +646,7 @@ def passenger_trips(conn):
             500,
         )
         return response
-
+    
 
 @trips_bp.route("/driver-trips")
 @transactional()

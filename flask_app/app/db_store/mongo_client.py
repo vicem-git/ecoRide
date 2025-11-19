@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from datetime import date
+from datetime import datetime
 
 class MongoStore:
     def __init__(self, mongo_config):
@@ -9,32 +9,45 @@ class MongoStore:
         db_name = mongo_config["mdb_db"]
     
         self.mongo_uri = f"mongodb://{user}:{passw}@{host}/{db_name}"
-        self.client = MongoClient(self.mongo_uri)
+        self.client = MongoClient(
+            self.mongo_uri,
+            uuidRepresentation="standard"
+        )
         self.db = self.client[db_name]
         self.trip_reviews = self.db["trip_reviews"]
 
     # ---- CRUD ---- #
 
     # insert one
-    def add_trip_review(self, trip_id, driver_id, passenger_id, rating=None, comment=None):
+    def add_trip_review(self, trip_id, driver_id, passenger_id, trip_evaluation, driver_rating=None, review_comment=None):
         """Insert a new trip review document."""
         review = {
             "trip_id": trip_id,
             "driver_id": driver_id,
             "passenger_id": passenger_id,
-            "rating": rating,
-            "comment": comment,
+            "trip_evaluation": trip_evaluation,
+            "driver_rating": driver_rating,
+            "review_comment": review_comment,
             "created_at": datetime.now(),
             "moderated": False,
         }
-        result = self.trip_reviews.insert_one(review)
-        return str(result.inserted_id)
+        try:
+            result = self.trip_reviews.insert_one(review)
+        except Exception as e:
+            logger.warning(f"ERROR: review insertion failed")
+        return str(result.inserted_id) if result else None
 
     # read one
     def get_trip_review(self, review_id):
-        """Retrieve a single trip review by its ObjectId."""
-        return self.trip_reviews.find_one({"_id": ObjectId(review_id)})
-
+            """Retrieve a single trip review by its ObjectId."""
+            return self.trip_reviews.find({"_id": ObjectId(review_id)})
+        
+    def has_reviewed_trip(self, passenger_id, trip_id):
+        return self.trip_reviews.find({
+            "trip_id": trip_id,
+            "passenger_id": passenger_id
+        }) is not None
+        
     # read all, per trip
     def get_trip_reviews_for_trip(self, trip_id):
         """Retrieve all reviews for a given trip."""

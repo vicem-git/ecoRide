@@ -1,0 +1,23 @@
+<form id="create_trip-main" class="p-8 text-base md:text-lg flex flex-col w-full gap-6">
+  <input type="hidden" name="trip_id" value="{{ trip_id }}"/>
+  <input type="hidden" name="driver_id" value="{{ driver_id }}"/>
+  <label for="trip-evaluation">Évaluez le voyage</label>
+  <select id="trip-evaluation" name="trip_evaluation" placeholder="évaluation" class="p-2 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" required >
+    <option value="trip_positive">positif</option>
+    <option value="trip_negative">negatif</option>
+  </select>
+  <label for="review-driver-rating">Note du conducteur.ice</label>
+  <input id="review-driver-rating" type="number" name="driver_rating" min="0" max="5" class="p-2 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" required />
+  <label for="review-comment"></label>
+  <textarea id="review-comment" rows="5" cols="3" name="review_comment" class="p-2 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none"></textarea>
+  <button 
+    type="submit"
+    hx-post="{{ url_for('trips.review_trip', trip_id=trip_id, for_participant=current_user.user_id) }}"
+    hx-swap="none"
+    hx-confirm="confirmer ok."
+    hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
+    class="p-2 rounded bg-(--color-eco-ground2) text-(--color-apart3) hover:bg-(--color-eco-ground3) hover:text-(--color-apart2)"
+  >
+    valider
+  </button>
+</form>

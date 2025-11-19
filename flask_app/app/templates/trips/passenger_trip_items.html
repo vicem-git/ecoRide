@@ -37,9 +37,41 @@
     {% endif %}
   </div>
   <div class="p-2 flex flex-col w-full">
+    {% if to_review %}
+      <span class="text-(--color-error) font-semibold mb-2">
+        A VALIDER
+      </span>
+      {% for trip in to_review %}
+        <div class="p-1 flex items-center bg-(--color-ground2) rounded-xs w-full">
+          <section class="flex flex-col md:flex-row md:gap-6 w-full">
+            <div class="flex items-center gap-2">
+              <p>{{ trip.summary.start_city }}</p>
+              <svg viewbox="0 0 110 30" class="w-12">
+                {% include "graphics/travel_right.html" %}
+              </svg>
+              <p>{{ trip.summary.end_city }}</p>
+            </div>
+            <div class="flex items-center text-base font-normal text-(--color-apart) whitespace-nowrap">
+              <p>{{ trip.summary.start_time|fr_date }}</p>
+            </div>
+          </section>
+          <button
+            type="button"
+            hx-get="{{ url_for('trips.review_trip', trip_id=trip.trip_id, for_participant=current_user.user_id) }}"
+            hx-target="#global-modal"
+            hx-swap="innerHTML"
+            hx-on::after-request="window.Alpine.store('modal').open()"
+            hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
+            class="py-1 px-2 bg-(--color-apart) text-(--color-ground1) hover:bg-(--color-apart3) rounded-xs"
+          >
+            valider
+          </button>
+        </div>
+      {% endfor %}
+    {% endif %}
     <span class="text-(--color-apart3) font-semibold mb-2">
       terminés
-    </span>
+    </span> 
     {% if completed %}
       {% for trip in completed %}
         <div class="p-1 flex items-center bg-(--color-ground2) rounded-xs w-full">

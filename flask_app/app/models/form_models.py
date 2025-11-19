@@ -1,6 +1,6 @@
 from typing_extensions import Self, Optional
 import re
-from typing import List
+from typing import List, Literal
 from pydantic import (
     BaseModel,
     EmailStr,
@@ -173,6 +173,16 @@ class CreateTripData(BaseModel):
             )
         return self
 
+class ReviewData(BaseModel):
+    trip_evaluation: Literal["trip_positive", "trip_negative"]
+    driver_rating: int = Field(..., ge=1, le=6)
+    review_comment: str = Field(..., min_length=5, max_length=1000)
+
+    @field_validator("review_comment")
+    def no_html(cls, v):
+        if re.search(r"<.*?>", v):
+            raise ValueError("HTML is not allowed")
+        return v.strip()
 
 class CreateModeratorData(BaseModel):
     email: EmailStr = Field(
