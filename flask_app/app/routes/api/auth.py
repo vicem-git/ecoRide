@@ -13,7 +13,7 @@ from app.db_store import crud_utilities, user_crud, driver_crud, auth_crud
 from app.models import RegistrationData, LoginData, SessionUser, SessionAdmin
 from pydantic import ValidationError
 from flask_login import login_user, logout_user, login_required
-from app.utils import bcrypt, transactional, static_id_resolver, static_name_resolver
+from app.utils import bcrypt, transactional, skip_csrf, static_id_resolver, static_name_resolver
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -36,6 +36,7 @@ def health_check(conn):
 
 
 @auth_bp.route("/register", methods=["POST"])
+@skip_csrf
 @transactional()
 def register_user(conn):
     data = request.form.to_dict()
@@ -131,6 +132,7 @@ def register_user(conn):
         )
 
 @auth_bp.route("/login", methods=["POST"])
+@skip_csrf
 @transactional()
 def login(conn):
     data = request.form.to_dict()

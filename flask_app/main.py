@@ -1,4 +1,9 @@
-from flask import Flask, session
+from flask import (
+    Flask,
+    session,
+    request,
+    abort
+)
 from rich.logging import RichHandler
 import logging
 import secrets
@@ -128,17 +133,19 @@ def create_app():
     # CSRF 
     @app.before_request
     def ensure_csrf_token():
-        if "csrf_token" not in session:
+        if "csrf_token" not in session: 
             session["csrf_token"] = secrets.token_hex(32)
     
     @app.before_request
     def csrf_protect():
+        logging.debug("Session contents: %s", dict(session))
         view = app.view_functions.get(request.endpoint)
         if view and getattr(view, "_skip_csrf", False):
             return  # skip
 
         if request.method in ("POST", "PUT", "PATCH", "DELETE"):
             token = request.headers.get("X-CSRFToken")
+            logging.debug(f"TOKEN : {token}")
             if not valid_csrf(token):
                 abort(400, "Invalid CSRF token")
 
@@ -153,4 +160,4 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)

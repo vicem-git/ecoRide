@@ -15,6 +15,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def skip_csrf(f):
+    f._skip_csrf = True
+    return f
+
 def transactional(commit=True):
     def transactional_decorator(f):
         @wraps(f)
