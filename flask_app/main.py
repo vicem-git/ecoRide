@@ -71,37 +71,38 @@ def create_app():
 
     # DB SEEDING AND SUMMARY GENERATION
     try:
-        with db_manager.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT COUNT(*) FROM users")
-                user_count = cur.fetchone()[0]
-                conn.commit()
-            if user_count < 10:
-                seed_data(
-                    conn,
-                    num_drivers=500,
-                    num_users=100,
-                    completed_trips=3,
-                    upcoming_trips=5,
-                )
-                logging.info("DB SEED : Database seeded.")
-            else:
-                logging.info("DB SEED : Seeding skipped: users already exist.")
+        with app.app_context():
+            with db_manager.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT COUNT(*) FROM users")
+                    user_count = cur.fetchone()[0]
+                    conn.commit()
+                if user_count < 10:
+                    seed_data(
+                        conn,
+                        num_drivers=500,
+                        num_users=100,
+                        completed_trips=3,
+                        upcoming_trips=5,
+                    )
+                    logging.info("DB SEED : Database seeded.")
+                else:
+                    logging.info("DB SEED : Seeding skipped: users already exist.")
 
-        with db_manager.connection() as conn:
-            try:
-                count = trips_crud.regenerate_all_missing_summaries(conn)
-                conn.commit()
-            except Exception as e:
-                conn.rollback()
-                raise e
+            with db_manager.connection() as conn:
+                try:
+                    count = trips_crud.regenerate_all_missing_summaries(conn)
+                    conn.commit()
+                except Exception as e:
+                    conn.rollback()
+                    raise e
 
-            if count:
-                logging.info(f"BATCH SUMMARIES: {count} summaries generated.")
-            else:
-                logging.info(
-                    "BATCH SUMMARIES: Summary generation skipped: data already present."
-                )
+                if count:
+                    logging.info(f"BATCH SUMMARIES: {count} summaries generated.")
+                else:
+                    logging.info(
+                        "BATCH SUMMARIES: Summary generation skipped: data already present."
+                    )
 
     except Exception as e:
         logging.error(f"DB SEED ERROR: {e}")
@@ -160,4 +161,4 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

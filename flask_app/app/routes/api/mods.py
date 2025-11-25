@@ -31,10 +31,19 @@ logger = logging.getLogger(__name__)
 @htmx_login_required
 def get_pending_reviews(conn):
     try:
-        pending_reviews = mod_crud.get_pending_reviews(conn)
+        filter = (
+                request.form.get("select_reviews")
+                or request.args.get("select_reviews")
+                or None
+        )
+        if filter == "all":
+            filter = None
+
+        pending = mod_crud.get_pending_reviews(batch=50, filter=filter)
+        pending = [p for p in pending] 
 
         response = make_response(
-            render_template("moderators/pending_reviews.html", reviews=pending_reviews),
+            render_template("moderators/pending_reviews.html", pending_r=pending),
             200,
         )
         return response
@@ -48,63 +57,36 @@ def get_pending_reviews(conn):
             ),
             500,
         )
-        return {"error": str(e)}, 500
+        return {"error": str(e)}, 500   
 
 
-@mods_bp.route("/get_pending_negative", methods=["GET"])
-@internal_access
-@transactional()
-@htmx_login_required
-def get_pending_negative(conn):
-    try:
-        pending_reviews = mod_crud.get_pending_negative(conn)
-
-        response = make_response(
-            render_template(
-                "moderators/pending_negative.html", reviews=pending_reviews
-            ),
-            200,
-        )
-
-        return response
-
-    except Exception as e:
-        logger.error(f"Error fetching negative reviews: {str(e)}")
-        messages = ["Une erreur s'est produite. Réessayez plus tard."]
-        response = make_response(
-            render_template(
-                "partials/server_msg.html", message=messages, msg_case="error"
-            ),
-            500,
-        )
-        return {"error": str(e)}, 500
-
-
-@mods_bp.route("/get_review_details/<int:review_id>", methods=["GET"])
+@mods_bp.route("/get_review_details/<review_id>", methods=["GET"])
 @internal_access
 @transactional()
 @htmx_login_required
 def get_review_details(conn, review_id):
     try:
-        review = mod_crud.get_review_by_id(conn, review_id)
+        review = current_app.mongo_store.get_trip_review(review_id)
         if not review:
             raise Exception("Review not found")
 
         trip_id = review["trip_id"]
-        author_id = review["author_id"]
+        passenger_id = review["passenger_id"]
 
         trip_details = mod_crud.get_trip_details(conn, trip_id)
         if not trip_details:
             raise Exception("Trip details not found")
 
         driver_id = trip_details["driver_id"]
+        logger.debug(f"REVIEW TRIP DETAILS: {trip_details}")
+
         driver_user = driver_crud.get_driver_user(conn, driver_id)
 
         driver_email = user_crud.get_user_email(conn, driver_user)
-        author_email = user_crud.get_user_email(conn, author_id)
+        passenger_email = user_crud.get_user_email(conn, passenger_id)
 
-        trip_details["author"][author_email]
-        trip_details["driver"][driver_email]
+        trip_details["passenger"] = passenger_email
+        trip_details["driver"] = driver_email
 
         response = make_response(
             render_template(

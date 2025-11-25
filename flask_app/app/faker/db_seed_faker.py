@@ -1,3 +1,4 @@
+from flask import current_app
 from psycopg import sql
 from faker import Faker
 from uuid import uuid4
@@ -329,26 +330,27 @@ def seed_data(conn, num_drivers, num_users, completed_trips, upcoming_trips):
 
                     # Add PENDING reviews for moderation TEST
                     # RATE TRIP
-                    for pid in chosen_passengers:
-                        review_id = str(uuid4())
-                        rating = random.randint(3, 5)
+                    for pid in chosen_passengers: 
                         comment = fake.sentence()
-                        review_status_id = get_id(cur, "review_status", "pending")
-                        cur.execute(
-                            """
-                            INSERT INTO reviews (
-                                id, trip_id, author_id, rating, comments, review_status_id
-                            ) VALUES (%s, %s, %s, %s, %s, %s)
-                        """,
-                            (
-                                review_id,
-                                trip_id,
-                                pid,
-                                rating,
-                                comment,
-                                review_status_id,
-                            ),
+                        status = "pending"
+                        evaluation = random.choice(["positive", "negative"])
+                        moderated = random.choice([False, True])
+                        if evaluation == "positive":
+                            driver_rating = random.randint(3, 5)
+                        elif evaluation == "negative":
+                            driver_rating = random.randint(1,2)
+                        review_ok = current_app.mongo_store.add_trip_review(
+                                trip_id=trip_id,
+                                driver_id=driver_id,
+                                passenger_id=pid,
+                                trip_evaluation=evaluation,
+                                driver_rating=driver_rating,
+                                review_comment=comment,
+                                moderated=moderated
                         )
+                        if not review_ok:
+                            raise Exception("REVIEW ERROR")
+ 
         conn.commit()
     except Exception as e:
         logger.error(f"DB SEED ERROR : {e}")

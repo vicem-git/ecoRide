@@ -1,0 +1,34 @@
+<section class="flex flex-col p-4">
+  {% if trip %}
+    <section class="flex flex-col gap-4 w-full">
+      <p><strong>ID Voyage</strong> : {{ trip.trip_id}}</p>
+      <div class="flex flex-col">
+        <p><strong>Trajet</strong> :</p>
+        <div class="flex items-center gap-2">  
+          <p>{{ trip.summary.start_city }}</p>
+          <svg viewbox="0 0 110 30" class="w-12">
+            {% include "graphics/travel_right.html" %}
+          </svg>
+          <p>{{ trip.summary.end_city }}</p>
+        </div>
+        <div class="flex items-center text-base font-normal text-(--color-apart) whitespace-nowrap">
+          <p>{{ trip.summary.start_time|fr_date }}</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <p><strong>Participant.e.s</strong></p>
+        <div class="flex-flex-col">
+          <p>Conducteur.ice : <span class="text-(--color-apart)">{{ trip.summary.driver_name }}</span></p>
+          <span class="text-(--color-apart)">{{ trip.driver }}</span>
+        </div>
+        <div class="flex flex-col">
+          <p>Passager.ère : <span class="text-(--color-apart)">{{ trip.passenger }}</span></p>
+        </div>
+      </div>
+    </section>
+  {% else %}
+    <p>Aucun detail</p>
+  {%  endif %}
+</section>
+
+

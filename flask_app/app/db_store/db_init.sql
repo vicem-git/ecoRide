@@ -42,7 +42,6 @@ INSERT INTO account_status (name) VALUES
 ('active'),
 ('suspended');
 
-
 CREATE TABLE accounts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -191,7 +190,6 @@ CREATE TABLE trips (
     start_time TIMESTAMP NOT NULL,
     price INTEGER NOT NULL,
     status UUID NOT NULL REFERENCES trip_status(id) ON DELETE CASCADE,
-    rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
     completed_at TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
@@ -310,40 +308,6 @@ FROM trips t
 JOIN vehicles v ON v.id = t.vehicle_id
 LEFT JOIN trip_passengers tp ON tp.trip_id = t.id
 GROUP BY t.id, v.number_of_seats;
-
-CREATE TABLE review_status (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(50) UNIQUE NOT NULL
-);
-
-INSERT INTO review_status (name) VALUES
-('pending'),
-('approved'),
-('rejected');
-
-CREATE TABLE reviews (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
-    author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    rating INTEGER CHECK (rating >= 0 AND rating <= 5) NOT NULL,
-    comments TEXT,
-    review_status_id UUID NOT NULL REFERENCES review_status(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT now(),
-    updated_at TIMESTAMP DEFAULT now()
-);
-
-CREATE OR REPLACE FUNCTION update_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-   NEW.updated_at = now();
-   RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER set_timestamp
-BEFORE UPDATE ON reviews
-FOR EACH ROW
-EXECUTE FUNCTION update_timestamp();
 
 CREATE TABLE trip_summaries (
     trip_id UUID PRIMARY KEY REFERENCES trips(id) ON DELETE CASCADE,
