@@ -68,7 +68,7 @@ we can check logs on the flask app to verify everything is ok:
   * the faker module properly seeded the db with test data.  
   * debug mode is off for security reasons.  
 
-now the application is ready and listening on the container's port 5000, which Docker attaches to *localhost* on the server, as configured in 'compose.yaml' :
+now the application is ready and listening on the container's port 5000, which Docker attaches to the same port on the server, as configured in 'compose.yaml' :
 
     ```yaml
     services:

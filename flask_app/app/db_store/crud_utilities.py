@@ -36,7 +36,6 @@ STATIC_TABLES = [
     "preferences",
     "vehicle_brand",
     "energy_types",
-    "review_status",
     "trip_status",
 ]
 

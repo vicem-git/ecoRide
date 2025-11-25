@@ -6,9 +6,25 @@
 
 {% block main %}
 <main class="p-8 flex w-full min-h-screen">
-  <div class="p-8 flex bg-ground2 flex-col gap-8 items-center w-full">
+  <div class="p-8 flex bg-(--color-ground2) flex-col gap-8 items-center w-full">
     <h2 class="text-3xl font-bold">Tableau de bord Moderateur</h2>
     <hr/>
+    <form
+      hx-get="{{ url_for('mods.get_pending_reviews') }}"
+      hx-target="#pending-reviews"
+      hx-swap="innerHTML"
+      hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
+      class="flex flex-col p-4 gap-2 bg-(--color-ground4)"
+      >
+      <label for="#select-reviews" class="text-2xl font-semibold">sélectionner l'évaluation</label>
+      <div class="p-2 flex gap-2">
+        <select id="select-reviews" name="select_reviews" class="bg-(--color-ground2) rounded-xs">
+          <option value="all">tous</option>
+          <option value="negative">avis negatif</option>
+        </select>
+        <button type="submit" class="px-2 bg-(--color-apart) rounded-xs hover:bg-(--color-apart2)">rafraîchir</button>
+      </div>
+    </form>
     <section
       hx-get="{{ url_for('mods.get_pending_reviews') }}"
       hx-trigger="load, mod-review-updated from:body"
@@ -17,34 +33,25 @@
       hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
     >
       <!-- PENDING REVIEWS -->
+      <h3 class="font-bold text-(--color-contrast3)">Affichage des 50 premiers résultats</h3>
       <table class="w-full mt-4">
-        <thead class="bg-ground4 rounded-xs">
+        <thead class="bg-(--color-ground4) rounded-xs">
           <tr> 
-            <th class="p-2 text-left">Nom d'utilisateur</th>
-            <th class="p-2 text-left">Note</th>
-            <th class="p-2 text-left">Commentaires</th>
+            <th class="p-2 text-left">Detail Voyage</th>
+            <th class="p-2 text-left">Evaluation</th>
+            <th class="p-2 text-left">Commentaire</th>
             <th class="p-2 text-left">Actions</th>
           </tr>
         </thead>
-        <tbody id="pending-reviews" class="bg-ground1">
+        <tbody id="pending-reviews" class="bg-(--color-ground1)">
           <tr>
-            <td colspan="4" rowspan="4" class="text-center text-apart py-8">
+            <td colspan="4" rowspan="4" class="text-center text-(--color-apart) py-8">
               pending-reviews
             </td>
           </tr>
         </tbody>
       </table> 
     </section>
-
-    <section
-      hx-get="{{ url_for('mods.get_pending_negative') }}"
-      hx-trigger="load"
-      hx-target="#pending-negative"
-      hx-swap="innerHTML"
-      hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
-    >
-      <!-- PENDING NEGATIVE REVIEWS -->
-      <div id="pending-negative">pending-negative-reviews</div>
     </section>
   </div>
 </main>
