@@ -43,7 +43,7 @@ class MongoStore:
         if filter is not None:
             query["trip_evaluation"] = filter
 
-        return self.trip_reviews.find(query).limit(batch)
+        return self.trip_reviews.find(query).limit(batch).sort("created_at", -1)
 
 
     # read one
@@ -54,9 +54,9 @@ class MongoStore:
             return None
         
     def has_reviewed_trip(self, passenger_id, trip_id):
-        return self.trip_reviews.find({
+        return self.trip_reviews.find_one({
             "trip_id": trip_id,
-            "passenger_id": passenger_id
+            "passenger_id": passenger_id,
         }) is not None
         
     # read all, per trip

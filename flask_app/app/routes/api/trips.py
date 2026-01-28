@@ -196,7 +196,7 @@ def cancel_trip(conn, trip_id):
             # FOR VEM DROP :
             # REPLACE "id" WITH "user_id" 
             #  if volume rebuilt, init_db needs clean re-run
-            passenger_id = passenger.get("id")
+            passenger_id = passenger.get("id") 
             logger.info(f"passenger id : {passenger_id}")
             reverted = tx_crud.revert_tx(conn, passenger_id, trip_id)
             if not reverted:
@@ -627,6 +627,7 @@ def passenger_trips(conn):
                 logger.debug(f"reviewed EXISTS : {revd}")
                 if not revd:
                     to_review.append(trip)
+                
 
         return render_template(
             "trips/passenger_trip_items.html",
