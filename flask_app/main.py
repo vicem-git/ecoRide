@@ -139,16 +139,15 @@ def create_app():
     
     @app.before_request
     def csrf_protect():
-        logging.debug("Session contents: %s", dict(session))
         view = app.view_functions.get(request.endpoint)
         if view and getattr(view, "_skip_csrf", False):
             return  # skip
 
         if request.method in ("POST", "PUT", "PATCH", "DELETE"):
             token = request.headers.get("X-CSRFToken")
-            logging.debug(f"TOKEN : {token}")
             if not valid_csrf(token):
                 abort(400, "Invalid CSRF token")
+            logging.info(f"CSRF Token Valid: {token}")
 
     login_manager.login_view = "pages.login"
 

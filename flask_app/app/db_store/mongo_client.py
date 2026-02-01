@@ -2,6 +2,10 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__) 
+
 
 class MongoStore:
     def __init__(self, mongo_config):
@@ -34,10 +38,10 @@ class MongoStore:
         }
         try:
             result = self.trip_reviews.insert_one(review)
+            return str(result.inserted_id) if result else None
         except Exception as e:
-            logger.warning(f"ERROR: review insertion failed")
-        return str(result.inserted_id) if result else None
-
+            logger.warning(f"ERROR: review insertion failed: {e}")
+        
     def get_reviews_by_status(self, moderated, batch, filter=None):
         query = {"moderated": moderated}
         if filter is not None:
