@@ -6,16 +6,16 @@ export default defineConfig({
   root: '.',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'app/static'),
+      '@': path.resolve(__dirname),
     },
   },
   plugins: [
     tailwindcss(),
   ],
   build: {
-    outDir: 'app/static/dist',
+    outDir: 'flask_app/static/dist',
     rollupOptions: {
-      input: path.resolve(__dirname, 'app/static/js/app.js'),
+      input: path.resolve(__dirname, 'js/app.js'),
     },
   },
 });

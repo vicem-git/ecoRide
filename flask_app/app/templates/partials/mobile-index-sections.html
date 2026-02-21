@@ -1,23 +1,21 @@
-<section class="p-4 mt-4 text-base flex flex-col gap-4 items-center text-contrast z-0">
-  <section>
-    <h2>EcoRide connecte les voyageurs <strong>éco-responsables</strong></h2>
-    <p>à des solutions de covoiturage <strong>abordables</strong> et <strong>fiables</strong>.</p>
-  </section>
-  <img src="{{ url_for('static', filename='graphics/acceuil.jpg') }}" alt="image d'acceuil"
-    class="w-[40%] object-cover rounded-lg">
-</section>
-<section class="p-4 flex text-sm text-(--color-contrast2) items-center justify-between  ">
-  <div class="flex flex-col justify-center items-center">
-    <div class="flex flex-col p-2 items-center">
-      <p class="text-(--color-contrast3) text-center mb-2">Rejoignez-nous pour des voyages plus écologiques.</p>
-      <a href="{{ url_for('pages.registration') }}" class="p-2 bg-(--color-ground2) rounded-xs">S'inscrire</a>
+<section role="region" aria-label="Rejoindre EcoRide"
+  class="p-4 mt-2 flex flex-col gap-4 text-(--color-contrast)">
+  <h2 class="text-base font-semibold text-center">EcoRide connecte les voyageurs <strong>éco-responsables</strong>
+    à des solutions de covoiturage <strong>abordables</strong> et <strong>fiables</strong>.</h2>
+  <div class="flex gap-3">
+    <div class="flex-1 flex flex-col gap-3 p-4 rounded-xl bg-(--color-ground2) items-center text-center">
+      <p class="text-sm text-(--color-contrast3)">Rejoignez-nous pour des voyages plus écologiques.</p>
+      <a href="{{ url_for('pages.registration') }}"
+        class="px-4 py-2 rounded-lg bg-(--color-ground4) hover:bg-(--color-ground5) text-(--color-contrast) font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-(--color-eco) transition">
+        S'inscrire
+      </a>
     </div>
-  </div>
-  <div class="flex flex-col justify-center items-center">
-    <div class="flex flex-col p-2 items-center">
-      <p class="text-(--color-contrast3) text-center mb-2">Une façon de voyager respectueuse de l'environnement.
-      </p>
-      <a href="{{ url_for('pages.search_trips') }}" class="p-2 bg-(--color-ground2) rounded-xs">Trouver un voyage</a>
+    <div class="flex-1 flex flex-col gap-3 p-4 rounded-xl bg-(--color-ground2) items-center text-center">
+      <p class="text-sm text-(--color-contrast3)">Une façon de voyager respectueuse de l'environnement.</p>
+      <a href="{{ url_for('pages.search_trips') }}"
+        class="px-4 py-2 rounded-lg bg-(--color-eco-ground2) hover:bg-(--color-eco-ground3) text-(--color-contrast) font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-(--color-eco) transition">
+        Trouver un voyage
+      </a>
     </div>
   </div>
 </section>

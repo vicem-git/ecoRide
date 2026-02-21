@@ -1,8 +1,10 @@
 <div class="relative inline-block" x-data="{ dropdownOpen: false }">
-  <button 
+  <button
     @click="dropdownOpen = !dropdownOpen"
-    class="p-2 flex rounded-sm hover:bg-(--color-ground4)">
-    <svg viewBox="0 0 24 24" class="w-[32px] h-[32px]">
+    :aria-expanded="dropdownOpen"
+    aria-label="Menu utilisateur"
+    class="p-2 flex rounded-xl hover:bg-(--color-ground4) transition-colors">
+    <svg viewBox="0 0 24 24" class="w-8 h-8" aria-hidden="true">
       {% include "graphics/user-icon.html" %}
     </svg>
   </button>
@@ -12,29 +14,33 @@
     x-show="dropdownOpen"
     x-transition
     @click.outside="dropdownOpen = false"
-    class="p-2 absolute flex flex-col bg-(--color-ground2) gap-1 rounded-sm z-50"
-  >
-    <div class="p-2 flex flex-col gap-2 border border-contrast4 rounded-sm">
+    class="absolute right-0 top-full mt-2 min-w-48 rounded-2xl bg-(--color-ground2) shadow-2xl border border-(--color-ground3) overflow-hidden z-50">
+    <div class="flex flex-col p-2">
       {% if not current_user.is_authenticated %}
-        <a href="{{ url_for('pages.login') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
-          <p> Connexion </p>
+        <a href="{{ url_for('pages.login') }}"
+          class="px-4 py-2.5 rounded-xl text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+          Connexion
         </a>
-        <hr class="w-full text-contrast4"/>
-        <a href="{{ url_for('pages.registration') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
-          <p> Inscription </p>
+        <hr class="border-(--color-ground3) mx-2">
+        <a href="{{ url_for('pages.registration') }}"
+          class="px-4 py-2.5 rounded-xl text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+          Inscription
         </a>
       {% elif current_user.is_authenticated and current_user.user_id %}
-        <a href="{{ url_for('pages.profile', identifier=current_user.user_id) }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
-          <p> Tableau de bord </p>
+        <a href="{{ url_for('pages.profile', identifier=current_user.user_id) }}"
+          class="px-4 py-2.5 rounded-xl text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+          Tableau de bord
         </a>
-        <hr class="w-full text-contrast4"/>
-        <a href="{{ url_for('auth.logout') }}" class="p-1 rounded-sm hover:bg-ground4 transition-colors duration-200 whitespace-nowrap">
-          <p> Deconnexion </p>
+        <hr class="border-(--color-ground3) mx-2">
+        <a href="{{ url_for('auth.logout') }}"
+          class="px-4 py-2.5 rounded-xl text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+          Déconnexion
         </a>
       {% endif %}
-      <hr class="w-full text-contrast4"/>
-      <a href="{{ url_for('pages.contact') }}" class="p-1 hover:bg-ground4 rounded-sm transition-colors duration-200 whitespace-nowrap">
-        <p> Contact </p>
+      <hr class="border-(--color-ground3) mx-2">
+      <a href="{{ url_for('pages.contact') }}"
+        class="px-4 py-2.5 rounded-xl text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+        Contact
       </a>
     </div>
   </div>

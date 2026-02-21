@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgis/postgis:17-3.5
-    container_name: postgres_db
+    container_name: ecoride_db
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}

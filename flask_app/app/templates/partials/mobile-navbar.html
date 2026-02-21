@@ -1,16 +1,24 @@
-<div x-data="{show:false}">
-  <button @click="show=!show" class="flex p-2 rounded-sm bg-(--color-ground2)">
-    <svg viewbox="0 0 24 24" class="w-[24px] h-[24px]">
+<div x-data="{show:false}" class="relative">
+  <button
+    @click="show=!show"
+    :aria-expanded="show"
+    aria-label="Menu de navigation"
+    class="flex p-2 rounded-sm backdrop-blur-sm hover:bg-(--color-ground3) transition-colors">
+    <svg viewbox="0 0 24 24" class="w-6 h-6" aria-hidden="true">
       {% include "graphics/drop-menu-icon.html" %}
     </svg>
   </button>
-  <div x-show="show" @click.outside="show = false" x-transition class="absolute flex flex-col bg-(--color-ground2)">
+  <div
+    x-show="show"
+    @click.outside="show = false"
+    x-transition
+    class="absolute top-full left-0 mt-2 min-w-56 rounded-2xl bg-(--color-ground2) shadow-2xl border border-(--color-ground3) overflow-hidden z-50">
     {% if current_user is anonymous or current_user is access("user") %}
-      <nav class="flex flex-col text-base bg-(--color-ground2) items-center justify-center gap-4">
+      <nav aria-label="Navigation principale">
         {% include "partials/mobile-menu.html" %}
       </nav>
     {% elif current_user is access("admin", "moderator") %}
-      <nav class="flex flex-col items-center justify-center gap-4">
+      <nav aria-label="Navigation administration" class="flex flex-col p-2 gap-1">
         {% include "partials/home-button.html" %}
         {% include "partials/internal_access_button.html" %}
       </nav>

@@ -1,32 +1,32 @@
-<section class="p-4 font-normal md:font-semibold text-2lg bg-ground2 shadow-lg opacity">
-  <span class="font-semibold">Utilisateur.ice</span>
-  <hr class="w-full" />
-  <div class="p-2 flex flex-col rounded-sm gap-2 text-(--color-contrast4)">
+<div class="p-3 flex flex-col gap-1 text-base font-normal">
+
+  <p class="px-3 pb-1 text-xs font-semibold text-(--color-contrast3) uppercase tracking-wider">Utilisateur.ice</p>
+  <div class="flex flex-col rounded-xl overflow-hidden border border-(--color-ground3)">
     {% if not current_user.is_authenticated %}
-    <a href="{{ url_for('pages.login') }}"
-      class="whitespace-nowrap">
-      <p> Connexion </p>
-    </a>
-    <hr class="w-full text-contrast4" />
-    <a href="{{ url_for('pages.registration') }}"
-      class="whitespace-nowrap">
-      <p> Inscription </p>
-    </a>
+      <a href="{{ url_for('pages.login') }}"
+        class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+        Connexion
+      </a>
+      <hr class="border-(--color-ground3)">
+      <a href="{{ url_for('pages.registration') }}"
+        class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+        Inscription
+      </a>
     {% elif current_user.is_authenticated and current_user.user_id %}
-    <a href="{{ url_for('pages.profile', identifier=current_user.user_id) }}"
-      class="whitespace-nowrap">
-      <p> Tableau de bord </p>
-    </a>
-    <hr class="w-full text-contrast4" />
-    <a href="{{ url_for('auth.logout') }}"
-      class="whitespace-nowrap">
-      <p> Deconnexion </p>
-    </a>
+      <a href="{{ url_for('pages.profile', identifier=current_user.user_id) }}"
+        class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+        Tableau de bord
+      </a>
+      <hr class="border-(--color-ground3)">
+      <a href="{{ url_for('auth.logout') }}"
+        class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+        Déconnexion
+      </a>
     {% endif %}
   </div>
-  <span class="font-semibold">Voyages</span>
-  <hr class="w-full" />
-  <div class="p-2 flex flex-col rounded-sm gap-2 text-(--color-contrast4)">
+
+  <p class="px-3 pt-3 pb-1 text-xs font-semibold text-(--color-contrast3) uppercase tracking-wider">Voyages</p>
+  <div class="flex flex-col rounded-xl overflow-hidden border border-(--color-ground3)">
     <button
       type="button"
       hx-get="{{ url_for('trips.create_trip') }}"
@@ -34,18 +34,20 @@
       hx-swap="innerHTML"
       hx-on::after-request="window.Alpine.store('modal').open()"
       hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
-      class="flex flex-row rounded-xs gap-2 whitespace-nowrap">
-      <span>Création</span>
+      class="w-full text-left px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+      Créer un voyage
     </button>
-    <hr class="w-full text-contrast4" />
+    <hr class="border-(--color-ground3)">
     <a href="{{ url_for('pages.search_trips') }}"
-      class="whitespace-nowrap">
-      <p> Recherche </p>
+      class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+      Rechercher un voyage
     </a>
   </div>
-  <hr class="w-full text-contrast4 mt-4" />
+
+  <hr class="border-(--color-ground3) mt-2">
   <a href="{{ url_for('pages.contact') }}"
-    class="whitespace-nowrap">
-    <p> Contact </p>
+    class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) rounded-xl active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+    Contact
   </a>
-</section>
+
+</div>

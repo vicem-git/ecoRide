@@ -1,24 +1,34 @@
-<section class="flex flex-col text-base md:text-lg bg-(--color-ground2) rounded-sm gap-4 justify-center">
-  <div class="flex flex-row gap-4 justify-between items-center">
-    <div class="p-4 w-24 h-24 md:w-48 md:h-48">
-      <img src="{{ url_for('static', filename=profile_user.photo_url) }}" alt="profile-pic" class="object-cover rounded-full">
-    </div>
-    <div class="p-4 flex gap-4">
-      <div class="p-4">
-        <h2 class="text-xl font-semibold">{{ profile_user.username }}</h2>
-        <p>{{ profile_user.email }}</p>
-        {% if owner %}
-          <div id="credits-container" hx-get="{{ url_for('users.get_account_credits', for_user=current_user.user_id) }}" hx-trigger="load" hx-swap="innerHTML">
-            Loading credits...
-          </div> 
-        {% endif %}
-      </div>
-      <div id="roles-container" class="flex p-4 gap-6">
-        <p>Rôles :{% for role in roles %}<span class="text-(--color-apart)"><br>{{ role }}</span>{% endfor %}</p>
-        {% if owner %}
-        {% endif %}
-      </div>
-    </div> 
-  </div>
-</section>
+<section class="rounded-xl overflow-hidden shadow-md w-full"
+  aria-label="Profil de {{ profile_user.username }}">
 
+  {# Header band #}
+  <div class="flex flex-row items-center gap-4 p-4 md:p-6 bg-(--color-ground3)">
+    <img src="{{ url_for('static', filename=profile_user.photo_url) }}"
+         alt="Photo de profil de {{ profile_user.username }}"
+         class="w-20 h-20 md:w-32 md:h-32 object-cover rounded-full ring-2 ring-(--color-eco-ground2) shrink-0">
+    <div class="flex flex-col gap-1 min-w-0">
+      <h1 class="text-xl md:text-2xl font-semibold text-(--color-contrast) truncate">{{ profile_user.username }}</h1>
+      {% if owner %}
+        <div id="credits-container"
+             hx-get="{{ url_for('users.get_account_credits', for_user=current_user.user_id) }}"
+             hx-trigger="load"
+             hx-swap="innerHTML"
+             class="text-sm text-(--color-contrast3)">
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Role badges #}
+  <div class="flex flex-row flex-wrap gap-2 p-4 bg-(--color-ground2)"
+       role="list"
+       aria-label="Rôles">
+    {% for role in roles %}
+      <span role="listitem"
+            class="px-3 py-1 text-sm font-semibold rounded-full bg-(--color-eco-ground2) text-(--color-contrast)">
+        {{ role }}
+      </span>
+    {% endfor %}
+  </div>
+
+</section>

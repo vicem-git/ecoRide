@@ -5,8 +5,8 @@ Tableau de bord
 {% endblock %}
 
 {% block main %}
-<section class="p-8 flex w-full min-h-screen">
-  <div class="p-8 flex bg-(--color-ground2) flex-col gap-8 items-center justify-center w-full">
+<section class="p-4 md:p-8 flex w-full min-h-screen">
+  <div class="p-4 md:p-8 flex bg-(--color-ground2) flex-col gap-6 items-center justify-center w-full">
     {% include "users/profile_summary.html" %}
     <hr class="w-full border-(--color-ground5)"/>
     {% if "driver" in roles %}
