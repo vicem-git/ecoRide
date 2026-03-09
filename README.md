@@ -2,27 +2,27 @@
 
 Ce projet est une maquette d'application de covoiturage axée sur la sensibilisation écologique et visant à inciter les utilisateurs à participer à des trajets partagés.
 
-### architecture
+### Architecture
 - **backend** : Flask, Postgres, Mongo
 - **frontend** : Vite, HTMX, Alpinejs, Tailwindcss
 
-The application is containerized using Docker, and deployed to a Linux-based VPS.
-> [visit the live app](https://vem-test.xyz)
+L'application est conteneurisée avec Docker et déployée sur un VPS Linux.
+> [Visiter l'application](https://vem-test.xyz)
 
-Credentials for admin access to the live app are provided in the *copie a rendre*.
+Les identifiants d'accès administrateur sont fournis dans la *copie à rendre*.
 
 ---
 
-## environment configuration
+## Configuration de l'environnement
 
-Clone the repository on a Linux machine with Docker installed.
+Cloner le dépôt sur une machine Linux avec Docker installé.
 
-Deploy a VPS via a provider of your choice. Providers usually give a terminal to do initial setup:
-- create a non-root user with `sudo` access
-- configure SSH for remote access
-- install Nginx as a reverse proxy, and Certbot for TLS
+Déployer un VPS via le fournisseur de votre choix. Les fournisseurs proposent généralement un terminal pour la configuration initiale :
+- création d'un utilisateur non-root avec accès `sudo`
+- configuration SSH pour l'accès distant
+- installation de Nginx comme reverse proxy, et Certbot pour le TLS
 
-Install Docker on the server (example for Fedora/RHEL):
+Installer Docker sur le serveur (exemple pour Fedora/RHEL) :
 ```bash
 sudo dnf install -y dnf-plugins-core
 sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
@@ -32,27 +32,27 @@ sudo systemctl enable --now docker
 
 ---
 
-## environment variables
+## Variables d'environnement
 
-Docker and Flask expect a `.env` file at the root of the project. Database services rely on authentication, and a third-party mailing API key is required. The `environment.txt` file at the root provides the template with all expected variables.
-
----
-
-## application services
-
-Three containers are defined in `compose.yaml`:
-
-- **postgres** : `postgis/postgis:17-3.5` — chosen for its GIS capabilities
-- **mongo** : `7.0` — recommended for compatibility and stability
-- **flask_ecoride** : `python:3.12-slim` — see `Dockerfile` for the full configuration
+Docker et Flask attendent un fichier `.env` à la racine du projet. Les services de base de données requièrent une authentification, et une clé API pour le service d'envoi d'e-mails est nécessaire. Le fichier `environment.txt` à la racine du projet fournit le modèle avec toutes les variables attendues.
 
 ---
 
-## build and run
+## Services de l'application
 
-### 1. build the frontend assets
+Trois conteneurs sont définis dans `compose.yaml` :
 
-The Vite build must be run before building the Docker image, as the compiled assets are copied into the container:
+- **postgres** : `postgis/postgis:17-3.5` — choisi pour ses capacités GIS
+- **mongo** : `7.0` — recommandé pour la compatibilité et la stabilité
+- **flask_ecoride** : `python:3.12-slim` — voir le `Dockerfile` à la racine pour la configuration complète
+
+---
+
+## Build et lancement
+
+### 1. Build des assets frontend
+
+Le build Vite doit être exécuté avant de construire l'image Docker, car les assets compilés sont copiés dans le conteneur :
 ```bash
 cd frontend
 npm install
@@ -60,24 +60,24 @@ npm run build
 cd ..
 ```
 
-This generates the hashed CSS/JS bundles into `flask_app/app/static/dist/`.
+Cela génère les bundles CSS/JS avec hash dans `flask_app/app/static/dist/`.
 
-### 2. build and start the containers
+### 2. Build et démarrage des conteneurs
 
-From the root of the repository (where `compose.yaml` lives):
+Depuis la racine du dépôt (là où se trouve `compose.yaml`) :
 ```bash
 docker compose build
 docker compose up -d
 ```
 
-### 3. verify
+### 3. Vérification
 
-Check the Flask app logs:
+Consulter les logs de l'application :
 ```bash
 docker logs flask_ecoride
 ```
 
-You should see something like:
+Vous devriez voir quelque chose comme :
 ```
 flask_ecoride  | [2026-01-01 17:01:25 +0000] [1] [INFO] Starting gunicorn 23.0.0
 flask_ecoride  | [2026-01-01 17:01:25 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
@@ -85,18 +85,18 @@ flask_ecoride  | [2026-01-01 17:01:25 +0000] [1] [INFO] Using worker: sync
 flask_ecoride  | [2026-01-01 17:01:25 +0000] [7] [INFO] Booting worker with pid: 7
 flask_ecoride  | [2026-01-01 17:01:25 +0000] [8] [INFO] Booting worker with pid: 8
 flask_ecoride  | [2026-01-01 17:01:25 +0000] [9] [INFO] Booting worker with pid: 9
-flask_ecoride  | [17:01:26] INFO     TIME NOW : 01 January 2026 - 17:01hs          main.py:59
-flask_ecoride  |            INFO     static ids loaded ~                            main.py:65
+flask_ecoride  | [17:01:26] INFO     TIME NOW : 01 January 2026
+flask_ecoride  |            INFO     static ids loaded ~
 flask_ecoride  |            INFO     DB SEED : Database seeded.
 flask_ecoride  |            INFO     BATCH SUMMARIES: 42 summaries generated.
 ```
 
-Key indicators:
-- `Listening at: http://0.0.0.0:8000` — Gunicorn is serving the app (3 sync workers)
-- `static ids loaded` — Postgres is running and Flask can reach it
-- `DB SEED` — the database was seeded with test data
+Indicateurs clés :
+- `Listening at: http://0.0.0.0:8000` — Gunicorn sert l'application (3 workers sync)
+- `static ids loaded` — Postgres est opérationnel et Flask peut y accéder
+- `DB SEED` — la base de données a été peuplée avec des données de test
 
-The app listens on port `8000` inside the container, bound to `127.0.0.1` on the host:
+L'application écoute sur le port `8000` à l'intérieur du conteneur, lié à `127.0.0.1` sur l'hôte :
 ```yaml
 services:
   flask_ecoride:
@@ -104,4 +104,4 @@ services:
       - "127.0.0.1:8000:8000"
 ```
 
-Nginx handles traffic from there, routing requests from the domain to the app. The domain is secured by Certbot for TLS.
+Nginx prend en charge le trafic depuis là, en routant les requêtes du domaine vers l'application. Le domaine est sécurisé par Certbot pour le TLS.
