@@ -9,6 +9,7 @@
               hx-confirm="Etes-vous sûr de vouloir suspendre cet utilisateur ?"
               hx-target="#users-search-view"
               hx-swap="innerHTML"
+              aria-label="Suspendre le compte de {{ user.username }}"
               class="px-2 py-1 bg-(--color-error) hover:bg-(--color-error2) text-white rounded">
         Suspendre
       </button>
@@ -17,6 +18,7 @@
               hx-confirm="Etes-vous sûr de vouloir activer cet utilisateur ?"
               hx-target="#users-search-view"
               hx-swap="innerHTML"
+              aria-label="Activer le compte de {{ user.username }}"
               class="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded">
         Activer
       </button>

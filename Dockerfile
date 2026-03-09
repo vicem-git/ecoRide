@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # copy needed stuff
 COPY .  .
 
-# ready :) flask service 'command' in compose.yaml takes over
+CMD ["gunicorn", "--config", "gunicorn.conf.py", "main:app"]

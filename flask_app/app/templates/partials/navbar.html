@@ -1,5 +1,5 @@
 {% if current_user is anonymous or current_user is access("user") %}
-  <nav class="flex flex-row items-center bg-(--color-ground2)/90 justify-center gap-4"> 
+  <nav aria-label="Navigation principale" class="flex flex-row items-center bg-(--color-ground2) justify-center gap-4">
     {% if page_wrap in ["home"] %}
       {% include "partials/trips-button.html" %}
       {% include "partials/user-button.html" %}
@@ -13,7 +13,7 @@
     {% include "partials/theme-button.html" %}
   </nav>
 {% elif current_user is access("admin", "moderator") %}
-  <nav class="flex flex-row items-center justify-center gap-4">
+  <nav aria-label="Navigation administration" class="flex flex-row items-center justify-center gap-4">
     {% include "partials/home-button.html" %}
     {% include "partials/internal_access_button.html" %}
   </nav>

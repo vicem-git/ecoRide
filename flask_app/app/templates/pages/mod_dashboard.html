@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block main %}
-<main class="p-8 flex w-full min-h-screen">
-  <div class="p-8 flex bg-(--color-ground2) flex-col gap-8 items-center w-full">
-    <h2 class="text-3xl font-bold">Tableau de bord Moderateur</h2>
+<main class="p-4 md:p-8 flex w-full min-h-screen">
+  <div class="p-4 md:p-8 flex bg-(--color-ground2) flex-col gap-8 items-center w-full">
+    <h1 class="text-xl md:text-3xl font-bold">Tableau de bord Moderateur</h1>
     <hr/>
     <form
       hx-get="{{ url_for('mods.get_pending_reviews') }}"
@@ -16,7 +16,7 @@
       hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
       class="flex flex-col p-4 gap-2 bg-(--color-ground4)"
       >
-      <label for="#select-reviews" class="text-2xl font-semibold">sélectionner l'évaluation</label>
+      <label for="select-reviews" class="text-lg md:text-2xl font-semibold">sélectionner l'évaluation</label>
       <div class="p-2 flex gap-2">
         <select id="select-reviews" name="select_reviews" class="bg-(--color-ground2) rounded-xs">
           <option value="all">tous</option>
@@ -33,8 +33,9 @@
       hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
     >
       <!-- PENDING REVIEWS -->
-      <h3 class="font-bold text-(--color-contrast3)">Affichage des 50 premiers résultats</h3>
-      <table class="w-full mt-4">
+      <h2 class="font-bold text-(--color-contrast3)">Affichage des 50 premiers résultats</h2>
+      <div class="w-full overflow-x-auto">
+      <table class="w-full mt-4 min-w-[520px]">
         <thead class="bg-(--color-ground4) rounded-xs">
           <tr> 
             <th class="p-2 text-left">Detail Voyage</th>
@@ -50,7 +51,8 @@
             </td>
           </tr>
         </tbody>
-      </table> 
+      </table>
+      </div>
     </section>
     </section>
   </div>

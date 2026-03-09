@@ -23,6 +23,7 @@
     <div class="flex flex-col p-2">
       <button
         type="button"
+        aria-label="Création voyage"
         hx-get="{{ url_for('trips.create_trip') }}"
         hx-target="#global-modal"
         hx-swap="innerHTML"
@@ -33,6 +34,7 @@
       </button>
       <hr class="border-(--color-ground3) mx-2">
       <a
+        aria-label="Rechercher un voyage"
         href="{{ url_for('pages.search_trips') }}"
         class="px-4 py-2.5 rounded-xl text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
         Rechercher un voyage

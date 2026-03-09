@@ -16,7 +16,7 @@ Tableau de bord
         hx-target="#driver-profile-container" 
         hx-swap="innerHTML"
       ></div>
-      <div id="driver-profile-container"></div>
+      <div id="driver-profile-container" aria-live="polite" aria-atomic="false"></div>
     {% endif %}
 
     {% if owner %}

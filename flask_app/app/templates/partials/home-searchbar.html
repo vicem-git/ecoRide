@@ -3,9 +3,10 @@
     action="{{ url_for('pages.search_trips') }}"
     class="px-4 py-2 w-full flex flex-row bg-(--color-ground4) rounded-sm h-[70px] gap-3 items-center z-50">
   <div class="p-2 flex flex-row rounded-sm gap-2 w-[35%] items-center">
-    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
-      {% include "graphics/loc-point.html" %}    
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-[24px] h-[24px]">
+      {% include "graphics/loc-point.html" %}
     </svg>
+    <label for="home_start_city_param" class="sr-only">Ville de départ</label>
     <select id="home_start_city_param" x-model="$store.tripSearch.start_city" name="start_city" placeholder="Départ..." class="p-2 w-full font-normal rounded-sm h-10 bg-(--color-ground2)" required>
       <option value="">Départ...</option>
       {% for city in cities %}
@@ -14,22 +15,25 @@
     </select>
   </div>
   <div class="p-2 flex flex-row rounded-sm gap-2 w-[35%] items-center">
-    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
-      {% include "graphics/loc-point.html" %}    
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-[24px] h-[24px]">
+      {% include "graphics/loc-point.html" %}
     </svg>
+    <label for="home_end_city_param" class="sr-only">Ville d'arrivée</label>
     <select id="home_end_city_param" name="end_city" x-model="$store.tripSearch.end_city" placeholder="Arrivée..." class="p-2 w-full font-normal rounded-sm h-10 bg-(--color-ground2)" required>
       <option value="">Arrivée...</option>
       {% for city in cities %}
         <option value="{{ city }}">{{ city }}</option>
       {% endfor %}
-    </select> 
+    </select>
   </div>
   <div class="flex items-center justify-center">
-    <svg viewBox="0 0 24 24" class="mx-4 w-[24px] h-[24px]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="mx-4 w-[24px] h-[24px]">
       {% include "graphics/users-icon.html" %}
     </svg>
+    <label for="home_passenger_nr" class="sr-only">Nombre de passagers</label>
     <input type="number" id="home_passenger_nr" name="passenger_nr" min="1" max="6" placeholder="1" class="p-4 h-[48px] bg-(--color-ground2) rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none"/>
-  </div> 
+  </div>
+  <label for="home_start_date" class="sr-only">Date de départ</label>
   <input type="date" id="home_start_date" name="start_date" class="h-[48px] w-[106px] p-2 bg-(--color-ground2) font-normal rounded-sm focus:ring-2 focus:ring-contrast2 focus:outline-none" />
   {% include "trips/trip_filters.html" %}
   <input id="eco_filter" type="hidden" name="eco_filter" :value="$store.tripSearch.tripEco ? 'true' : 'false'">
@@ -37,8 +41,9 @@
   <input type="hidden" name="driver_rating" :value="$store.tripSearch.rating">
   <button
     type="submit"
+    aria-label="Rechercher un voyage"
     class="h-[48px] px-4 rounded-sm bg-(--color-ground5) hover:bg-(--color-apart) focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none">
-    <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-[24px] h-[24px]">
       {% include "graphics/search-icon.html" %}
     </svg>
   </button>
