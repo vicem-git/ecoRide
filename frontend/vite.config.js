@@ -13,7 +13,9 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
-    outDir: 'flask_app/static/dist',
+    outDir: path.resolve(__dirname, '../flask_app/app/static/dist'),
+    emptyOutDir: true,
+    manifest: true,
     rollupOptions: {
       input: path.resolve(__dirname, 'js/app.js'),
     },

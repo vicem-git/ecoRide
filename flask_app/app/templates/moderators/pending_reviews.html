@@ -8,8 +8,9 @@
         hx-swap="innerHTML"
         hx-on::after-request="window.Alpine.store('modal').open()"
         hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
+        aria-label="Voir le détail de cet avis"
         class="px-2 py-1 bg-(--color-apart) hover:bg-(--color-apart2) text-white rounded"
-        >voir detail</button>
+        >voir détail</button>
     </td>
     <td class="border border-(--color-ground3) p-2">{{review.trip_evaluation}}</td>
     <td class="border border-(--color-ground3) p-2">{{review.review_comment}}</td>
@@ -17,11 +18,13 @@
       <button
         hx-post="{{ url_for('mods.approve_review', review_id=review.id) }}"
         hx-confirm="Etes-vous sûr de vouloir approuver cet avis ?"
+        aria-label="Approuver cet avis"
         class="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded"
       >accepter</button>
       <button
         hx-post="{{ url_for('mods.reject_review', review_id=review.id) }}"
         hx-confirm="Etes-vous sûr de vouloir rejeter cet avis ?"
+        aria-label="Rejeter cet avis"
         class="px-2 py-1 bg-(--color-error) hover:bg-(--color-error2) text-white rounded"
       >rejeter</button>
     </td>

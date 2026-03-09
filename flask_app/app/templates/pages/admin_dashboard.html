@@ -5,10 +5,10 @@
 {% endblock %}
 
 {% block main %}
-<main class="md:p-8 flex w-full">
-  <div class="md:p-8 flex bg-(--color-ground2) flex-col gap-8 items-center w-full">
-    
-    <section class="w-[80%]">
+<main class="p-4 md:p-8 flex w-full">
+  <div class="p-4 md:p-8 flex bg-(--color-ground2) flex-col gap-8 items-center w-full">
+    <h1 class="sr-only">Tableau de bord Administrateur</h1>
+    <section class="w-full md:w-[80%]">
       <!-- WIDGETS -->
       <section>
         <div
@@ -41,7 +41,7 @@
       </section>
     </section>
     
-    <section class="text-sm flex flex-col w-[80%]">
+    <section class="text-sm flex flex-col w-full md:w-[80%]">
       <section class="mb-8">
         <div
           hx-get="{{ url_for('admin.get_moderators') }}"
@@ -66,15 +66,18 @@
       <section>
         <h2 class="text-base lg:text-lg font-semibold text-(--color-contrast3)">Utilisateurs</h2>
         <hr class="mb-4"/>
-        <input 
+        <label for="search-users" class="sr-only">Rechercher un utilisateur</label>
+        <input
           type="search"
+          id="search-users"
           name="search-term"
           placeholder="Rechercher un utilisateur"
           hx-post="{{ url_for('admin.query_users') }}"
           hx-target="#users-search-view"
           hx-trigger="input changed delay:500ms, keyup[key=='Enter'], refresh-users from:body"
           class="p-2 bg-(--color-ground3) font-normal rounded-xs focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none">
-        <table class="w-full mt-4">
+        <div class="w-full overflow-x-auto">
+        <table class="w-full mt-4 min-w-[480px]">
           <thead class="bg-(--color-ground4) rounded-xs">
             <tr> 
               <th class="p-2 text-left">Email</th>
@@ -83,7 +86,7 @@
               <th class="p-2 text-left">Actions</th>
             </tr>
           </thead>
-          <tbody id="users-search-view">
+          <tbody id="users-search-view" aria-live="polite" aria-atomic="false">
             <tr>
               <td colspan="4" rowspan="4" class="text-center text-apart py-8">
                 Tapez pour rechercher un utilisateur...
@@ -91,6 +94,7 @@
             </tr>
           </tbody>
         </table>
+        </div>
       </section>
 
     </section>

@@ -35,13 +35,12 @@ services:
     container_name: flask_ecoride
     restart: unless-stopped
     ports:
-      - "127.0.0.1:5000:5000"
+      - "${HOST:-127.0.0.1}:8000:8000"
     volumes:
       - ./flask_app:/flask_app
     depends_on:
       - postgres
       - mongo
-    command: "python main.py"
 
 volumes:
   db:

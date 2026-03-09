@@ -13,7 +13,7 @@ Recherche de voyages
     {% include "partials/mobile-searchbar.html" %}
   </div>
   <div id="trip-search-main" class="flex w-full pt-4 gap-4">
-    <div id="trips-container" class="w-full">
+    <div id="trips-container" class="w-full" aria-live="polite" aria-atomic="false">
       <div id="search_error_msg" class="hidden"></div>
       {% include "trips/trip_results.html" %}
       {% if not trips %}

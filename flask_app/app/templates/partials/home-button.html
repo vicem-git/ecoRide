@@ -1,7 +1,8 @@
 <a
   href="{{ url_for('pages.index') }}"
+  aria-label="Retour à l'accueil"
   class="p-2 rounded-sm hover:bg-(--color-ground4)">
-  <svg viewBox="0 0 24 24" class="w-[32px] h-[32px]">
+  <svg viewBox="0 0 24 24" aria-hidden="true" class="w-[32px] h-[32px]">
     {% include "graphics/home-icon.html" %}
   </svg>
 </a>

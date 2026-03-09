@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     {% block head %}
     <meta charset="UTF-8" />
@@ -7,11 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ session.csrf_token }}">
     <title>{% block title %}{% endblock %} - ecoRide</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='dist/assets/app-DIjx0Lom.css') }}"/>
-    <script type="module" src="{{ url_for('static', filename='dist/assets/app-DcQpTg9y.js') }}"></script>
+    {% for css_url in vite_css('js/app.js') %}
+    <link rel="stylesheet" href="{{ css_url }}"/>
+    {% endfor %}
+    <script type="module" src="{{ vite_asset('js/app.js') }}"></script>
     {% endblock %}
   </head>
   <body x-data :class="{ 'dark': $store.darkMode.on }" class="flex flex-col bg-(--color-ground) items-center transition duration-200 z-0">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-100 focus:px-4 focus:py-2 focus:bg-(--color-eco) focus:text-(--color-ground) focus:rounded-sm">
+      Sauter au contenu principal
+    </a>
     <div id="banner">
       {% block banner %}
         {% include "partials/banner.html" %}
@@ -44,11 +49,15 @@
       x-transition
       id="modal-backdrop">
       <div
-        class="flex flex-col bg-(--color-ground) rounded-sm shadow-lg p-6 w-auto relative"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Fenêtre de dialogue"
+        class="flex flex-col bg-(--color-ground) rounded-sm shadow-lg p-4 md:p-6 w-[calc(100vw-2rem)] md:w-auto max-w-lg relative"
         @click.outside="$store.modal.close()"
         x-transition>
-        <button 
+        <button
           @click="$store.modal.close()"
+          aria-label="Fermer"
           class="absolute p-2 top-2 right-2 text-(--color-contrast2) hover:text-(--color-contrast)">
           ✕
         </button>

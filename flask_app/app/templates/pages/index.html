@@ -13,7 +13,7 @@ Acceuil
 
 
 {% block main %}
-<main id="index-main" class="md:pt-2 min-h-screen z-0">
+<main id="index-main" class="md:pt-2 md:min-h-screen z-0">
 
   {# Desktop layout (unchanged) #}
   <div class="hidden md:flex sticky top-22">
@@ -23,17 +23,20 @@ Acceuil
     {% include "partials/index-sections.html" %}
   </div>
 
-  <div class="relative md:hidden">
+  <div class="relative md:hidden h-dvh flex flex-col overflow-hidden">
     <div class="absolute inset-0" aria-hidden="true">
       <img
-        src="{{ url_for('static', filename='graphics/banner-home.jpg') }}"
+        src="{{ url_for('static', filename='graphics/banner-home-mobile.jpg') }}"
         class="absolute inset-0 w-full h-full object-cover object-center"
         alt=""
       >
       <div class="absolute inset-0 bg-black/45"></div>
     </div>
-    <div class="relative z-10 flex top-1/3 flex-col justify-end px-4 pb-6 pt-[calc(72px+14rem)]">
-      {% include "partials/mobile-home-searchbar.html" %}
+    <div class="relative z-10 flex flex-col flex-1 pt-[72px]">
+      <div class="flex-1"></div>
+      <div class="px-4 pb-8">
+        {% include "partials/mobile-home-searchbar.html" %}
+      </div>
     </div>
   </div>
 

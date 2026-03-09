@@ -1,7 +1,7 @@
 <div class="flex text-sm md:text-lg flex-col mt-8 gap-4 items-center">
   {% for trip in trips %}
     <article class="flex rounded p-4 md:p-8 {{ 'bg-(--color-eco-ground)' if trip.summary.vehicle.energy == 'electrique' else 'bg-(--color-ground2)' }} gap-2 w-full justify-between items-center">
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 min-w-0">
         <div class="flex md:text-lg font-semibold text-(--color-contrast) items-center">
           {{ trip.summary.start_city }}
           <svg viewbox="0 0 110 30" class="w-16 h-4 md:w-32 md:h-5" aria-hidden="true">
@@ -23,14 +23,14 @@
           </svg>
         </div>
       {% endif %}
-      <div class="flex gap-3 md:gap-6 items-end justify-center">
+      <div class="flex gap-1 md:gap-6 items-end justify-center shrink-0">
         <div class="flex gap-2 md:gap-4 items-center">
           <div class="flex w-10 h-10 md:w-14 md:h-14 rounded-full overflow-hidden shrink-0">
             <img src="{{ url_for('static', filename=trip.summary.driver_photo) }}"
                  alt="{{ trip.summary.driver_name }}" class="w-full h-full object-cover"/>
           </div>
           <div class="flex flex-col font-normal text-(--color-apart3) items-end justify-between">
-            <p class="md:text-xl font-semibold">{{ trip.summary.driver_name }}</p>
+            <p class="hidden md:block md:text-xl font-semibold">{{ trip.summary.driver_name }}</p>
             <p class="text-xs md:text-lg whitespace-nowrap"
                aria-label="Note : {{ trip.summary.driver_rating }} sur 5">
               {% for r in range(trip.summary.driver_rating) %}★{% endfor %}{% for r in range(5 - trip.summary.driver_rating) %}☆{% endfor %}

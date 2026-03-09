@@ -5,43 +5,41 @@
         {% if trip.summary.vehicle.energy == "electrique" %}
           <div class="flex items-center gap-2">
             <p class="text-sm text-(--color-eco)">eco voyage</p>
-            <svg viewBox="0 0 24 24" class="w-6 h-6">
+            <svg viewBox="0 0 24 24" class="w-6 h-6" aria-hidden="true">
               {% include "graphics/eco-trip.html" %}
             </svg>
           </div>
         {% endif %}
         <div class="flex text-lg font-semibold text-(--color-contrast) items-center">
           {{ trip.summary.start_city }}
-          <svg viewbox="0 0 110 30" class="p-2 w-32 h-5">
+          <svg viewbox="0 0 110 30" class="p-2 w-32 h-5" aria-hidden="true">
             {% include "graphics/travel_right.html" %}
           </svg>
           {{ trip.summary.end_city }}
         </div>
         <div class="flex text-base font-normal text-(--color-apart3) space-x-6 items-end">
           <p>{{ trip.summary.start_time|fr_date }}</p>
-          <p class="text-lg">·····</p>
+          <p class="text-lg" aria-hidden="true">·····</p>
           <p>{{ trip.summary.estimated_duration_min }} min</p>
         </div>
-        <span class="text-(--color-apart2)">
-          places :
-          {{ trip.available_seats }}
+        <span class="text-(--color-apart2)"
+              aria-label="Places disponibles : {{ trip.available_seats }}">
+          places : {{ trip.available_seats }}
         </span>
       </div> 
     </section>
     <section>
       <div class="flex gap-4 items-center">
         <div class="w-16 h-16 rounded-full overflow-hidden">
-          <img src="{{ url_for('static', filename=trip.summary.driver_photo) }}"/>
+          <img src="{{ url_for('static', filename=trip.summary.driver_photo) }}" alt="Photo de profil de {{ trip.summary.driver_name }}"/>
         </div>
         <div class="flex flex-col font-normal text-(--color-apart3) items-end justify-between">
           <a action="GET" href="{{ url_for('pages.profile', identifier=trip.summary.driver_name) }}" class="text-xl font-semibold">{{ trip.summary.driver_name }}</a>
-          <p>
-            {% for r in range(trip.summary.driver_rating) %}
-              ★
-            {% endfor %}
-            {% for r in range(5 - trip.summary.driver_rating) %}
-              ☆
-            {% endfor %}
+          <p aria-label="Note : {{ trip.summary.driver_rating }} sur 5">
+            <span aria-hidden="true">
+              {% for r in range(trip.summary.driver_rating) %}★{% endfor %}{% for r in range(5 - trip.summary.driver_rating) %}☆{% endfor %}
+            </span>
+            <span class="sr-only">{{ trip.summary.driver_rating }}/5</span>
           </p>
         </div>
       </div>
@@ -56,10 +54,11 @@
         hx-swap="innerHTML"
         hx-on::after-request="window.Alpine.store('modal').open()"
         hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
+        aria-label="Rejoindre le voyage {{ trip.summary.start_city }} → {{ trip.summary.end_city }}"
         class="p-2 rounded bg-(--color-eco-ground2) text-(--color-apart3) hover:bg-(--color-eco-ground3) hover:text-(--color-apart2)">
         rejoindre
       </button>
-    </section> 
+    </section>
   </container>
   <container class="flex md:hidden w-full">
     <section class="mb-8">
@@ -67,26 +66,26 @@
         {% if trip.summary.vehicle.energy == "electrique" %}
           <div class="flex items-center mb-4">
             <p class="text-(--color-eco)">eco voyage</p>
-            <svg viewBox="0 0 24 24" class="w-6 h-6">
+            <svg viewBox="0 0 24 24" class="w-6 h-6" aria-hidden="true">
               {% include "graphics/eco-trip.html" %}
             </svg>
           </div>
         {% endif %}
         <div class="flex font-semibold text-(--color-contrast) items-center">
           {{ trip.summary.start_city }}
-          <svg viewbox="0 0 110 30" class="w-32 h-5">
+          <svg viewbox="0 0 110 30" class="w-32 h-5" aria-hidden="true">
             {% include "graphics/travel_right.html" %}
           </svg>
           {{ trip.summary.end_city }}
         </div>
         <div class="flex text-base font-normal text-(--color-apart3) space-x-6 items-end">
           <p>{{ trip.summary.start_time|fr_date }}</p>
-          <p class="text-lg">·····</p>
+          <p class="text-lg" aria-hidden="true">·····</p>
           <p>{{ trip.summary.estimated_duration_min }} min</p>
         </div>
-        <span class="text-(--color-apart2)">
-          places :
-          {{ trip.available_seats }}
+        <span class="text-(--color-apart2)"
+              aria-label="Places disponibles : {{ trip.available_seats }}">
+          places : {{ trip.available_seats }}
         </span>
       </div> 
     </section>
@@ -94,17 +93,15 @@
       <section>
         <div class="flex gap-4 items-center">
           <div class="w-16 h-16 rounded-full overflow-hidden">
-            <img src="{{ url_for('static', filename=trip.summary.driver_photo) }}"/>
+            <img src="{{ url_for('static', filename=trip.summary.driver_photo) }}" alt="Photo de profil de {{ trip.summary.driver_name }}"/>
           </div>
           <div class="flex flex-col font-normal text-(--color-apart3) items-end justify-between">
             <a action="GET" href="{{ url_for('pages.profile', identifier=trip.summary.driver_name) }}" class="text-xl font-semibold">{{ trip.summary.driver_name }}</a>
-            <p>
-              {% for r in range(trip.summary.driver_rating) %}
-                ★
-              {% endfor %}
-              {% for r in range(5 - trip.summary.driver_rating) %}
-                ☆
-              {% endfor %}
+            <p aria-label="Note : {{ trip.summary.driver_rating }} sur 5">
+              <span aria-hidden="true">
+                {% for r in range(trip.summary.driver_rating) %}★{% endfor %}{% for r in range(5 - trip.summary.driver_rating) %}☆{% endfor %}
+              </span>
+              <span class="sr-only">{{ trip.summary.driver_rating }}/5</span>
             </p>
           </div>
         </div>
@@ -119,6 +116,7 @@
           hx-swap="innerHTML"
           hx-on::after-request="window.Alpine.store('modal').open()"
           hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
+          aria-label="Rejoindre le voyage {{ trip.summary.start_city }} → {{ trip.summary.end_city }}"
           class="p-2 rounded bg-(--color-eco-ground2) text-(--color-apart3) hover:bg-(--color-eco-ground3) hover:text-(--color-apart2)">
           rejoindre
         </button>

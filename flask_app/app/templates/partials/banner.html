@@ -2,6 +2,6 @@
   {% if page_wrap == "home" %}
     <img src="{{ url_for('static', filename='graphics/banner-home.jpg') }}" class="object-contain" alt="EcoRide Banner"/>
   {% else %}
-    <img src="{{ url_for('static', filename='graphics/banner_small.jpg') }}" class="object-contain" alt="EcoRide Banner"/>
+    <img src="{{ url_for('static', filename='graphics/banner_small.jpg') }}" class="min-h-[72px] w-full object-cover md:object-contain md:h-auto" alt="EcoRide Banner"/>
   {% endif %}
 </div>

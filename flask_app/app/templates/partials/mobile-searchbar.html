@@ -2,9 +2,10 @@
   class="text-sm flex md:hidden flex-col w-full bg-(--color-ground2)/30 items-center z-20">
   <section class="flex w-full items-center">
     <div class="p-2 w-[50%] flex flex-row rounded-sm items-center">
-        <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]" aria-hidden="true">
         {% include "graphics/loc-point.html" %}
         </svg>
+        <label for="home_start_city_param" class="sr-only">Ville de départ</label>
         <select id="home_start_city_param" x-model="$store.tripSearch.start_city" name="start_city" placeholder="Départ..."
         class="w-full font-normal rounded-sm h-10 bg-(--color-ground3)" required>
         <option value="">Départ...</option>
@@ -14,9 +15,10 @@
         </select>
     </div>
     <div class="p-2 w-[50%] flex flex-row rounded-sm items-center">
-        <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
+        <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]" aria-hidden="true">
         {% include "graphics/loc-point.html" %}
         </svg>
+        <label for="home_end_city_param" class="sr-only">Ville d'arrivée</label>
         <select id="home_end_city_param" name="end_city" x-model="$store.tripSearch.end_city" placeholder="Arrivée..."
         class="w-full font-normal rounded-sm h-10 bg-(--color-ground3)" required>
         <option value="">Arrivée...</option>
@@ -26,26 +28,26 @@
         </select>
     </div>
   </section>
-  <section class="py-2 flex flex-col w-full gap-2 items-center justify-center">
-    <section class="flex gap-6 items-center space-between">
-      {% include "trips/trip_filters.html" %}
-      <input id="eco_filter" type="hidden" name="eco_filter" :value="$store.tripSearch.tripEco ? 'true' : 'false'">
-      <input type="hidden" name="max_price" :value="$store.tripSearch.price">
-      <input type="hidden" name="driver_rating" :value="$store.tripSearch.rating">
-      <input type="date" id="home_start_date" name="start_date"
-        class="h-[48px] w-[106px] py-0 px-1 bg-(--color-ground3) font-normal rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" />
-      <div class="flex items-center justify-center gap-2">
-        <svg viewBox="0 0 24 24" class="w-[24px] h-[24px]">
-          {% include "graphics/users-icon.html" %}
-        </svg>
-        <input type="number" id="home_passenger_nr" name="passenger_nr" min="1" max="6" placeholder="1"
-          class="p-1 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" />
-          <button type="submit" class="flex items-center gap-2 px-4 rounded-sm bg-(--color-ground4) focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none">
-            <svg viewBox="0 0 24 24" class="w-[24px] h-[48px]">
-                {% include "graphics/search-icon.html" %}
-            </svg>
-        </button>
-      </div>
-    </section>
+  <section class="py-2 flex w-full gap-2 items-center px-2">
+    {% include "trips/trip_filters.html" %}
+    <input id="eco_filter" type="hidden" name="eco_filter" :value="$store.tripSearch.tripEco ? 'true' : 'false'">
+    <input type="hidden" name="max_price" :value="$store.tripSearch.price">
+    <input type="hidden" name="driver_rating" :value="$store.tripSearch.rating">
+    <label for="home_start_date" class="sr-only">Date de départ</label>
+    <input type="date" id="home_start_date" name="start_date"
+      class="flex-1 h-10 py-0 px-1 bg-(--color-ground3) font-normal rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" />
+    <div class="flex items-center gap-1">
+      <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0" aria-hidden="true">
+        {% include "graphics/users-icon.html" %}
+      </svg>
+      <label for="home_passenger_nr" class="sr-only">Nombre de passagers</label>
+      <input type="number" id="home_passenger_nr" name="passenger_nr" min="1" max="6" placeholder="1"
+        class="w-8 p-1 bg-(--color-ground3) rounded-sm focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none" />
+    </div>
+    <button type="submit" aria-label="Rechercher un voyage" class="flex items-center px-3 h-10 rounded-sm bg-(--color-ground4) focus:ring-2 focus:ring-(--color-contrast2) focus:outline-none shrink-0">
+      <svg viewBox="0 0 24 24" class="w-5 h-5" aria-hidden="true">
+        {% include "graphics/search-icon.html" %}
+      </svg>
+    </button>
   </section>
 </form>
