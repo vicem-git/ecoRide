@@ -1,4 +1,4 @@
-# ecoRide : plateforme de covoiturage eco-responsable 
+# ecoRide : plateforme de covoiturage eco-responsable
 
 Ce projet est une maquette d'application de covoiturage axée sur la sensibilisation écologique et visant à inciter les utilisateurs à participer à des trajets partagés.
 
@@ -6,76 +6,102 @@ Ce projet est une maquette d'application de covoiturage axée sur la sensibilisa
 - **backend** : Flask, Postgres, Mongo
 - **frontend** : Vite, HTMX, Alpinejs, Tailwindcss
 
-The application is containerized using docker, and deployed to Linux based VPS.  
->  [visit the live app](https://vem-test.xyz)
-  
-credentials for admin access to the live app are provided in the 'copie a rendre'.
-<br>
-<br>
+The application is containerized using Docker, and deployed to a Linux-based VPS.
+> [visit the live app](https://vem-test.xyz)
+
+Credentials for admin access to the live app are provided in the *copie a rendre*.
+
+---
+
 ## environment configuration
 
-for deploying the app, the repository needs to be cloned into a linux machine with docker installed.
-Deploy VPS via a provider of your choice. Providers will usually provide a terminal to setup necessary configuration:
+Clone the repository on a Linux machine with Docker installed.
 
-  * creation of super user, for use instead of root, with high access level via the 'sudo' command.
-  * SSH configuration for connecting to the server via a terminal, and also necessary for accessing git servers among other.
-  * installation of nginx and basic configuration for using it as a reverse proxy for applications hosted on the server.
+Deploy a VPS via a provider of your choice. Providers usually give a terminal to do initial setup:
+- create a non-root user with `sudo` access
+- configure SSH for remote access
+- install Nginx as a reverse proxy, and Certbot for TLS
 
-I had a working Fedora based VPS, so my first step there was using the 'dnf' package manager to install docker:  
-    ```bash
-    $ sudo dnf install ./docker-desktop-x86_64.rpm
-    ```
-<br>
-<br>
+Install Docker on the server (example for Fedora/RHEL):
+```bash
+sudo dnf install -y dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+sudo dnf install docker-ce docker-ce-cli containerd.io
+sudo systemctl enable --now docker
+```
+
+---
+
+## environment variables
+
+Docker and Flask expect a `.env` file at the root of the project. Database services rely on authentication, and a third-party mailing API key is required. The `environment.txt` file at the root provides the template with all expected variables.
+
+---
+
 ## application services
-on the compose.yaml file three containers are defined for the different services.  
-  
-  * postgres : i chose the 'postgis/postgis:17-3.5' because of its GIS capabilities.
-  * mongo : 7.0 version was the recommended for compatibility and stability.
-  * flask app : python:3.12-slim image. see the Dockerfile at the root of the repository for the complete configuration.
 
-### environment variables
-Docker and Flask expect an '.env' file  at the root of the project: our database services rely on authentication, and we use API keys for a third-party mailing service. the 'environment.txt' file at the root of the project provides the template with the expected variables.
-<br>
-<br>
-## ready to build and run
-once the previous steps are completed, we are ready to build the containers. at the root of the directory (where the needed docker entry 'compose.yaml' lives):  
-    ```bash
-    $ docker compose build
-    ```  
-and then run the containers 'detached', i.e. in the background (-d):  
-    ```bash
-    $ docker compose up -d
-    ```  
-we can check logs on the flask app to verify everything is ok:  
-    ```bash
-    $ docker logs flask_ecoride
-    ```  
-<br>
+Three containers are defined in `compose.yaml`:
 
-**you should see something like**:
-> [17:01:57] INFO     TIME NOW : {some date in 2025} - 17:01hs             main.py:52  
-> [17:01:58] INFO     static ids loaded ~                               main.py:58  
-> >INFO     "DB SEED : Database seeded." main.py:82  
->           INFO     BATCH SUMMARIES: {some number} summaries generated. main.py:95                                              
->            * Serving Flask app 'main'  
->            * Debug mode: off _internal.py:97  
+- **postgres** : `postgis/postgis:17-3.5` — chosen for its GIS capabilities
+- **mongo** : `7.0` — recommended for compatibility and stability
+- **flask_ecoride** : `python:3.12-slim` — see `Dockerfile` for the full configuration
 
+---
 
-**some important details are revealed here**:  
-  
-  * 'static ids loaded' this means postgres db is running and flask can talk to it.  
-  * the faker module properly seeded the db with test data.  
-  * debug mode is off for security reasons.  
+## build and run
 
-now the application is ready and listening on the container's port 5000, which Docker attaches to the same port on the server, as configured in 'compose.yaml' :
+### 1. build the frontend assets
 
-    ```yaml
-    services:
-      flask_ecoride:
-        ports:
-          - "127.0.0.1:5000:5000"
-    ```
-<br>
-nginx handles traffic from there, mapping the requests to the domain to the flask app.  
-the domain is certified by certbot for TLS.  
+The Vite build must be run before building the Docker image, as the compiled assets are copied into the container:
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+This generates the hashed CSS/JS bundles into `flask_app/app/static/dist/`.
+
+### 2. build and start the containers
+
+From the root of the repository (where `compose.yaml` lives):
+```bash
+docker compose build
+docker compose up -d
+```
+
+### 3. verify
+
+Check the Flask app logs:
+```bash
+docker logs flask_ecoride
+```
+
+You should see something like:
+```
+flask_ecoride  | [2026-01-01 17:01:25 +0000] [1] [INFO] Starting gunicorn 23.0.0
+flask_ecoride  | [2026-01-01 17:01:25 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
+flask_ecoride  | [2026-01-01 17:01:25 +0000] [1] [INFO] Using worker: sync
+flask_ecoride  | [2026-01-01 17:01:25 +0000] [7] [INFO] Booting worker with pid: 7
+flask_ecoride  | [2026-01-01 17:01:25 +0000] [8] [INFO] Booting worker with pid: 8
+flask_ecoride  | [2026-01-01 17:01:25 +0000] [9] [INFO] Booting worker with pid: 9
+flask_ecoride  | [17:01:26] INFO     TIME NOW : 01 January 2026 - 17:01hs          main.py:59
+flask_ecoride  |            INFO     static ids loaded ~                            main.py:65
+flask_ecoride  |            INFO     DB SEED : Database seeded.
+flask_ecoride  |            INFO     BATCH SUMMARIES: 42 summaries generated.
+```
+
+Key indicators:
+- `Listening at: http://0.0.0.0:8000` — Gunicorn is serving the app (3 sync workers)
+- `static ids loaded` — Postgres is running and Flask can reach it
+- `DB SEED` — the database was seeded with test data
+
+The app listens on port `8000` inside the container, bound to `127.0.0.1` on the host:
+```yaml
+services:
+  flask_ecoride:
+    ports:
+      - "127.0.0.1:8000:8000"
+```
+
+Nginx handles traffic from there, routing requests from the domain to the app. The domain is secured by Certbot for TLS.
