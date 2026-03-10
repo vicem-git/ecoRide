@@ -20,7 +20,18 @@
     {% elif current_user is access("admin", "moderator") %}
       <nav aria-label="Navigation administration" class="flex flex-col p-2 gap-1">
         {% include "partials/home-button.html" %}
-        {% include "partials/internal_access_button.html" %}
+        {% if current_user is access("admin") %}
+          <a href="{{ url_for('pages.admin_dashboard', identifier=current_user.id) }}" class="p-2 rounded-sm hover:bg-(--color-ground3) whitespace-nowrap">
+            Tableau de bord
+          </a>
+        {% elif current_user is access("moderator") %}
+          <a href="{{ url_for('pages.mod_dashboard', identifier=current_user.id) }}" class="p-2 rounded-sm hover:bg-(--color-ground3) whitespace-nowrap">
+            Tableau de bord
+          </a>
+        {% endif %}
+        <a href="{{ url_for('auth.logout') }}" class="p-2 rounded-sm hover:bg-(--color-ground3) whitespace-nowrap">
+          Déconnexion
+        </a>
       </nav>
     {% endif %}
   </div>
