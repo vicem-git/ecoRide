@@ -355,3 +355,136 @@ def seed_data(conn, num_drivers, num_users, completed_trips, upcoming_trips):
     except Exception as e:
         logger.error(f"DB SEED ERROR : {e}")
         raise
+
+
+def seed_trips_only(conn, completed_trips, upcoming_trips):
+    """Generate trips for existing drivers/passengers. Does NOT commit — caller is responsible."""
+    try:
+        with conn.cursor() as cur:
+            # Fetch existing passengers
+            cur.execute(
+                "SELECT u.id FROM users u "
+                "JOIN user_roles ur ON ur.user_id = u.id "
+                "JOIN roles r ON r.id = ur.role_id "
+                "WHERE r.name = 'passenger'"
+            )
+            passenger_ids = [row[0] for row in cur.fetchall()]
+            if not passenger_ids:
+                raise ValueError("No passengers found in DB")
+
+            # Fetch existing drivers with their vehicle and user info
+            cur.execute(
+                "SELECT d.id, d.user_id, v.id, v.number_of_seats "
+                "FROM driver_data d "
+                "JOIN vehicles v ON v.driver_id = d.id"
+            )
+            drivers = cur.fetchall()
+            if not drivers:
+                raise ValueError("No drivers found in DB")
+
+            trip_count = 0
+
+            for driver_id, user_id, vehicle_id, max_seats in drivers:
+
+                for _ in range(upcoming_trips):
+                    start = random_ville()
+                    end = random_ville()
+                    trip_id = str(uuid4())
+                    start_time = fake.date_time_between(start_date="+1d", end_date="+30d")
+                    price = random.randint(5, 15)
+
+                    cur.execute(
+                        """
+                        INSERT INTO trips (
+                            id, driver_id, vehicle_id,
+                            start_location, end_location,
+                            start_time, price, status
+                        ) VALUES (
+                            %s, %s, %s,
+                            ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
+                            ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
+                            %s, %s, (SELECT id FROM trip_status WHERE name = 'upcoming')
+                        )""",
+                        (trip_id, driver_id, vehicle_id,
+                         start["lng"], start["lat"],
+                         end["lng"], end["lat"],
+                         start_time, price),
+                    )
+
+                    num_passengers = random.randint(1, min(3, max_seats))
+                    chosen = random.sample(passenger_ids, min(num_passengers, len(passenger_ids)))
+                    for pid in chosen:
+                        cur.execute(
+                            "INSERT INTO trip_passengers (trip_id, user_id) VALUES (%s, %s)",
+                            (trip_id, pid),
+                        )
+                    trip_count += 1
+
+                for _ in range(completed_trips):
+                    start = random_ville()
+                    end = random_ville()
+                    trip_id = str(uuid4())
+                    start_time = fake.date_time_between(start_date="-30d", end_date="-1d")
+                    price = random.randint(5, 15)
+                    completed_at = start_time
+
+                    cur.execute(
+                        """
+                        INSERT INTO trips (
+                            id, driver_id, vehicle_id,
+                            start_location, end_location,
+                            start_time, price, status, completed_at
+                        ) VALUES (
+                            %s, %s, %s,
+                            ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
+                            ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
+                            %s, %s, (SELECT id FROM trip_status WHERE name = 'completed'), %s
+                        ) RETURNING id""",
+                        (trip_id, driver_id, vehicle_id,
+                         start["lng"], start["lat"],
+                         end["lng"], end["lat"],
+                         start_time, price, completed_at),
+                    )
+                    trip_id = cur.fetchone()[0]
+
+                    num_passengers = random.randint(1, min(3, max_seats))
+                    chosen = random.sample(passenger_ids, min(num_passengers, len(passenger_ids)))
+
+                    for pid in chosen:
+                        cur.execute(
+                            "INSERT INTO trip_passengers (trip_id, user_id) VALUES (%s, %s)",
+                            (trip_id, pid),
+                        )
+                        cur.execute(
+                            """
+                            INSERT INTO transactions (
+                                tx_from, tx_to, amount, trip_id, completed_at, status
+                            ) VALUES (%s, %s, %s, %s, %s, (SELECT id FROM tx_status WHERE name = 'completed'))
+                            """,
+                            (pid, user_id, price, trip_id, completed_at),
+                        )
+                        cur.execute("UPDATE platform_balance SET balance = balance + 2")
+
+                    for pid in chosen:
+                        comment = fake.sentence()
+                        evaluation = random.choice(["positive", "negative"])
+                        moderated = random.choice([False, True])
+                        driver_rating = random.randint(3, 5) if evaluation == "positive" else random.randint(1, 2)
+                        review_ok = current_app.mongo_store.add_trip_review(
+                            trip_id=trip_id,
+                            driver_id=driver_id,
+                            passenger_id=pid,
+                            trip_evaluation=evaluation,
+                            driver_rating=driver_rating,
+                            review_comment=comment,
+                            moderated=moderated,
+                        )
+                        if not review_ok:
+                            raise Exception("REVIEW ERROR")
+
+                    trip_count += 1
+
+        return trip_count
+    except Exception as e:
+        logger.error(f"SEED TRIPS ERROR: {e}")
+        raise

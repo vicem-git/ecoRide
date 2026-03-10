@@ -1,6 +1,7 @@
 from app.utils.static_resolvers import static_id_resolver
 from flask import Blueprint, render_template, request, make_response, url_for
 from app.db_store import admin_crud, user_crud
+from app.faker import seed_trips_only
 import logging
 from app.utils import (
     internal_access,
@@ -303,6 +304,27 @@ def activate_account(conn, account_id):
             500,
         )
         return response
+
+
+@admin_bp.route("/seed_trips", methods=["POST"])
+@internal_access
+@transactional()
+@htmx_login_required
+def seed_trips(conn):
+    try:
+        count = seed_trips_only(conn, completed_trips=1, upcoming_trips=3)
+        messages = [f"{count} nouveaux voyages générés avec succès."]
+        return make_response(
+            render_template("partials/server_msg.html", message=messages, msg_case="success"),
+            200,
+        )
+    except Exception as e:
+        logger.error(f"Error seeding trips: {str(e)}")
+        messages = ["Erreur lors de la génération des voyages."]
+        return make_response(
+            render_template("partials/server_msg.html", message=messages, msg_case="error"),
+            500,
+        )
 
 
 @admin_bp.route("/query_users", methods=["POST"])
