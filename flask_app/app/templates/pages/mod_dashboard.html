@@ -14,7 +14,7 @@
       hx-target="#pending-reviews"
       hx-swap="innerHTML"
       hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
-      class="flex flex-col p-4 gap-2 bg-(--color-ground4)"
+      class="flex flex-col p-4 gap-2 bg-(--color-ground4) w-full"
       >
       <label for="select-reviews" class="text-lg md:text-2xl font-semibold">sélectionner l'évaluation</label>
       <div class="p-2 flex gap-2">
@@ -31,13 +31,14 @@
       hx-target="#pending-reviews"
       hx-swap="innerHTML"
       hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
+      class="w-full"
     >
       <!-- PENDING REVIEWS -->
       <h2 class="font-bold text-(--color-contrast3)">Affichage des 50 premiers résultats</h2>
       <div class="w-full overflow-x-auto">
       <table class="w-full mt-4 min-w-[520px]">
         <thead class="bg-(--color-ground4) rounded-xs">
-          <tr> 
+          <tr>
             <th class="p-2 text-left">Detail Voyage</th>
             <th class="p-2 text-left">Evaluation</th>
             <th class="p-2 text-left">Commentaire</th>
@@ -53,7 +54,6 @@
         </tbody>
       </table>
       </div>
-    </section>
     </section>
   </div>
 </main>
