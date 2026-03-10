@@ -23,7 +23,7 @@ from app.models import session_user_loader
 import atexit
 from datetime import datetime
 from babel import Locale
-from app.faker import seed_data, villes
+from app.faker import seed_data, seed_trips_only, villes
 
 APP_LOCALE = 'fr_FR'
 locale_obj = Locale.parse(APP_LOCALE)
@@ -88,6 +88,21 @@ def create_app():
                     logging.info("DB SEED : Database seeded.")
                 else:
                     logging.info("DB SEED : Seeding skipped: users already exist.")
+
+            with db_manager.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "SELECT COUNT(*) FROM trips "
+                        "WHERE status = (SELECT id FROM trip_status WHERE name = 'upcoming') "
+                        "AND start_time > NOW()"
+                    )
+                    upcoming_count = cur.fetchone()[0]
+                if upcoming_count < 100:
+                    seed_trips_only(conn, completed_trips=1, upcoming_trips=3)
+                    conn.commit()
+                    logging.info(f"DB SEED TRIPS: upcoming trips topped up (was {upcoming_count}).")
+                else:
+                    logging.info(f"DB SEED TRIPS: {upcoming_count} upcoming trips, skipping top-up.")
 
             with db_manager.connection() as conn:
                 try:

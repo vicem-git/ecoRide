@@ -43,6 +43,23 @@
     
     <section class="text-sm flex flex-col w-full md:w-[80%]">
       <section class="mb-8">
+        <h2 class="text-base lg:text-lg font-semibold text-(--color-contrast3)">Données de démonstration</h2>
+        <hr class="mb-4"/>
+        <button
+          hx-post="{{ url_for('admin.seed_trips') }}"
+          hx-target="#seed-result"
+          hx-swap="innerHTML"
+          hx-indicator="#seed-spinner"
+          hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
+          class="px-4 py-2 rounded-xs bg-(--color-apart) hover:bg-(--color-apart2)"
+        >
+          Générer des voyages
+        </button>
+        <span id="seed-spinner" class="htmx-indicator ml-2 text-(--color-contrast3)">...</span>
+        <div id="seed-result" class="mt-2"></div>
+      </section>
+
+      <section class="mb-8">
         <div
           hx-get="{{ url_for('admin.get_moderators') }}"
           hx-trigger="load, refresh-mods from:body"
