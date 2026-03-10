@@ -7,7 +7,7 @@
     @click="dropdownOpen = !dropdownOpen"
     :aria-expanded="dropdownOpen"
     aria-label="Menu voyages"
-    class="p-2 flex rounded-xl bg-(--color-ground2) hover:bg-(--color-ground4) transition-colors"
+    class="p-2 flex rounded-sm bg-(--color-ground2) hover:bg-(--color-ground4) transition-colors"
   >
     <svg viewbox="0 0 24 24" class="w-8 h-8" aria-hidden="true">
       {% include "graphics/trips-icon.html" %}
@@ -19,7 +19,7 @@
     x-show="dropdownOpen"
     @click.outside="dropdownOpen = false"
     x-transition
-    class="absolute right-0 top-full mt-2 min-w-48 rounded-2xl bg-(--color-ground2) shadow-2xl border border-(--color-ground3) overflow-hidden z-50">
+    class="absolute right-0 top-full mt-2 min-w-48 rounded-sm bg-(--color-ground2) shadow-2xl border border-(--color-ground3) overflow-hidden z-50">
     <div class="flex flex-col p-2">
       <button
         type="button"
@@ -29,14 +29,14 @@
         hx-swap="innerHTML"
         hx-on::after-request="window.Alpine.store('modal').open()"
         hx-on::response-error="window.Alpine.store('modal').htmlContent(event.detail.xhr.response)"
-        class="w-full text-left px-4 py-2.5 rounded-xl text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+        class="w-full text-left px-4 py-2.5 rounded-sm text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
         Créer un voyage
       </button>
       <hr class="border-(--color-ground3) mx-2">
       <a
         aria-label="Rechercher un voyage"
         href="{{ url_for('pages.search_trips') }}"
-        class="px-4 py-2.5 rounded-xl text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+        class="px-4 py-2.5 rounded-sm text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
         Rechercher un voyage
       </a>
     </div>

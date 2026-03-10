@@ -1,7 +1,7 @@
 <div class="p-3 flex flex-col gap-1 text-base font-normal">
 
   <p class="px-3 pb-1 text-xs font-semibold text-(--color-contrast3) uppercase tracking-wider">Utilisateur.ice</p>
-  <div class="flex flex-col rounded-xl overflow-hidden border border-(--color-ground3)">
+  <div class="flex flex-col rounded-sm overflow-hidden border border-(--color-ground3)">
     {% if not current_user.is_authenticated %}
       <a href="{{ url_for('pages.login') }}"
         class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) active:bg-(--color-ground4) transition-colors whitespace-nowrap">
@@ -26,7 +26,7 @@
   </div>
 
   <p class="px-3 pt-3 pb-1 text-xs font-semibold text-(--color-contrast3) uppercase tracking-wider">Voyages</p>
-  <div class="flex flex-col rounded-xl overflow-hidden border border-(--color-ground3)">
+  <div class="flex flex-col rounded-sm overflow-hidden border border-(--color-ground3)">
     <button
       type="button"
       hx-get="{{ url_for('trips.create_trip') }}"
@@ -46,7 +46,7 @@
 
   <hr class="border-(--color-ground3) mt-2">
   <a href="{{ url_for('pages.contact') }}"
-    class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) rounded-xl active:bg-(--color-ground4) transition-colors whitespace-nowrap">
+    class="px-4 py-3 text-(--color-contrast) hover:bg-(--color-ground3) rounded-sm active:bg-(--color-ground4) transition-colors whitespace-nowrap">
     Contact
   </a>
 

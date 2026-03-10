@@ -12,7 +12,7 @@
     x-show="show"
     @click.outside="show = false"
     x-transition
-    class="absolute top-full left-0 mt-2 min-w-56 rounded-2xl bg-(--color-ground2) shadow-2xl border border-(--color-ground3) overflow-hidden z-50">
+    class="absolute top-full left-0 mt-2 min-w-56 rounded-sm bg-(--color-ground2) shadow-2xl border border-(--color-ground3) overflow-hidden z-50">
     {% if current_user is anonymous or current_user is access("user") %}
       <nav aria-label="Navigation principale">
         {% include "partials/mobile-menu.html" %}

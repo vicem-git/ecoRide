@@ -7,17 +7,24 @@
     aria-label="Filtres de recherche"
     class="p-2 flex rounded-sm hover:bg-(--color-ground4)"
   >
-    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-[24px] h-[24px]">
+    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-6 h-6">
       {% include "graphics/filters_icon.html" %}
     </svg>
   </button>
+  <!-- mobile backdrop -->
+  <div
+    x-cloak
+    x-show="dropdownOpen"
+    @click="dropdownOpen = false"
+    class="fixed inset-0 bg-black/40 z-40 md:hidden"
+  ></div>
   <div
     id="filters-dropdown"
     x-cloak
     x-show="dropdownOpen"
     @click.outside="dropdownOpen = false"
     x-transition
-    class="p-4 top-12 left-0 md:left-auto md:right-0 absolute flex flex-col bg-(--color-ground2) gap-1 rounded-sm z-50"
+    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 md:absolute md:translate-x-0 md:translate-y-0 md:top-12 md:left-auto md:right-0 p-4 flex flex-col bg-(--color-ground2) gap-1 rounded-sm shadow-xl"
   >
     <div class="flex items-center gap-3">
       <label for="eco-filter">eco voyages</label>
