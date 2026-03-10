@@ -27,7 +27,20 @@ Connexion
         <label for="login-email" class="sr-only">Email</label>
         <input type="email" id="login-email" name="email" placeholder="Email" class="  mb-4 p-2 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none" required/>
         <label for="login-password" class="sr-only">Mot de passe</label>
-        <input type="password" id="login-password" name="password" placeholder="Mot de passe" class="mb-4 p-2 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none" required/>
+        <div class="relative mb-4" x-data="{ show: false }">
+          <input :type="show ? 'text' : 'password'" id="login-password" name="password" placeholder="Mot de passe"
+            class="p-2 pr-10 border border-(--color-ground4) rounded-sm focus:ring-2 focus:ring-(--color-eco-ground3) focus:outline-none w-full" required/>
+          <button type="button" @click="show = !show"
+            :aria-label="show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-(--color-apart3) hover:text-(--color-contrast)">
+            <svg x-show="!show" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg x-show="show" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/>
+            </svg>
+          </button>
+        </div>
       </div> 
       <button type="submit" class="px-4 py-2 rounded-sm bg-(--color-ground2) hover:bg-(--color-ground3) font-semibold" type="submit">Connexion !</button>
     </form>
